@@ -29,7 +29,7 @@
                 <artifactId>exec-maven-plugin</artifactId>
                 <version>3.1.0</version>
                 <configuration>
-                    <mainClass>com.projects.Main</mainClass>
+                    <mainClass>org.FRFood.Main</mainClass>
                 </configuration>
             </plugin>
         </plugins>
