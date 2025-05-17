@@ -25,4 +25,7 @@ public class Picture {
         return  this.dateAdded;
     }
 
+    public int getId() {
+        return id;
+    }
 }
