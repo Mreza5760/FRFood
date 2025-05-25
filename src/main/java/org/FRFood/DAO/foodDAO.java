@@ -18,8 +18,7 @@ public class foodDAO {
         {
             statement.setString(1, food.getName());
             statement.setString(2, food.getDescription());
-            statement.setInt(4, food.getPriceId());
-            statement.setInt(5, food.getPictureId());
+            statement.setString(5, food.getPicture());
 
             statement.executeUpdate();
 

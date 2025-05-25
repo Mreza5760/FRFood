@@ -1,19 +1,31 @@
 package org.FRFood.entity;
 
+import java.util.List;
+
 public class Food {
     private int id;
     private String name;
     private String description;
-    private String category;
+    private List<Category> category;
     private int priceId;
-    private int pictureId;
+    private String picture;
+    private Restaurant restaurant;
 
-    Food(String name , String description, String category , int priceId , int pictureId){
+
+    Food(String name , String description, List<Category> category , int priceId , int pictureId, Restaurant restaurant){
         this.name = name;
         this.description = description;
         this.priceId = priceId;
-        this.pictureId = pictureId;
         this.category = category;
+        this.restaurant = restaurant;
+    }
+
+    public Restaurant getRestaurant() {
+        return restaurant;
+    }
+
+    public void setRestaurant(Restaurant restaurant) {
+        this.restaurant = restaurant;
     }
 
     public String getName() {
@@ -28,11 +40,20 @@ public class Food {
         return id;
     }
 
-    public int getPictureId() {
-        return pictureId;
-    }
-
     public int getPriceId() {
         return priceId;
     }
+
+    public String getPicture() {
+        return picture;
+    }
+
+    public void setPicture(String picture) {
+        this.picture = picture;
+    }
+
+    public List<Category> getCategory() {
+        return category;
+    }
+
 }
