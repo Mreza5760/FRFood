@@ -1,15 +1,15 @@
 package org.FRFood.entity;
 
-public class Person {
+public class User {
     private int id;
     private String name;
     private String phoneNumber;
-    private String email = null;
+    private String email;
     private String password;
     private String address;
     private String picture;
 
-    Person(String picture,String name,String email,String password,String address,String phoneNumber){
+    User(String picture, String name, String email, String password, String address, String phoneNumber){
         this.address = address;
         this.password = password;
         this.email = email;

@@ -2,7 +2,7 @@ package org.FRFood.entity;
 
 public class Restaurant {
     private int id;
-    private Person owner;
+    private User owner;
     private String name;
     private String address;
     private String phone;
@@ -10,7 +10,7 @@ public class Restaurant {
     private int taxFee;
     private int additionalFee;
 
-    Restaurant(Person owner, String name,String address,String phone,String logo,int taxFee,int additionalFee) {
+    Restaurant(User owner, String name, String address, String phone, String logo, int taxFee, int additionalFee) {
         this.owner = owner;
         this.name = name;
         this.address = address;
@@ -36,7 +36,7 @@ public class Restaurant {
         return taxFee;
     }
 
-    public Person getOwner() {
+    public User getOwner() {
         return owner;
     }
 
@@ -72,7 +72,7 @@ public class Restaurant {
         this.logo = logo;
     }
 
-    public void setOwner(Person owner) {
+    public void setOwner(User owner) {
         this.owner = owner;
     }
 
