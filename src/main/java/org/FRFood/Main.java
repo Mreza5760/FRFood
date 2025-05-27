@@ -1,7 +1,10 @@
 package org.FRFood;
 
+import org.FRFood.DAO.BankAccountDAO;
+import org.FRFood.DAO.BankAccountDAOImp;
 import org.FRFood.DAO.CategoryDAO;
 import org.FRFood.DAO.CategoryDAOImp;
+import org.FRFood.entity.BankAccount;
 import org.FRFood.util.DataAlreadyExistsException;
 import org.FRFood.util.DatabaseConnector;
 import org.FRFood.entity.Category;
@@ -14,6 +17,7 @@ import java.sql.SQLException;
 public class Main {
     public static void main(String[] args) {
         CategoryDAO categoryDAO = new CategoryDAOImp();
+        BankAccountDAO bankAccountDAO = new BankAccountDAOImp();
         System.out.println("Hello world!");
         try (Connection connection = DatabaseConnector.gConnection()) {
             System.out.println("connected to db");
@@ -22,20 +26,18 @@ public class Main {
 
                 // test
                 try{
-                categoryDAO.insertCategory("test1");
-                categoryDAO.insertCategory("test2");}
-                catch (DataAlreadyExistsException e) {
-                    System.out.println(e);
+                    BankAccount bankAccount = new BankAccount("account1","123456");
+                    bankAccountDAO.insertBankAccount(bankAccount);
+                    BankAccount bankAccount1 = new BankAccount("account2","123456542");
+                    bankAccountDAO.insertBankAccount(bankAccount1);
+                }catch(DataAlreadyExistsException e) {
+                    System.out.println(e.getMessage());
                 }
-                if(categoryDAO.getCategoryById(2).isPresent()){
-                System.out.println(categoryDAO.getCategoryById(2).get().getName());}else{
-                    System.out.println("not found with id = 2");
+                if(bankAccountDAO.getBankAccountByAccountNumber("123456").isPresent()){
+                    System.out.println(bankAccountDAO.getBankAccountByAccountNumber("123456").get().getName());
                 }
-                if(categoryDAO.getCategoryByName("test1").isPresent()){
-                    System.out.println(categoryDAO.getCategoryByName("test1").get().getId());
-                }else {
-                    System.out.println("not found with name = test1");
-                }
+                System.out.println(bankAccountDAO.getBankAccountById(1).get().getName());
+
                 // end of test
 
 

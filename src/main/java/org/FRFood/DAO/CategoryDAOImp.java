@@ -48,15 +48,15 @@ public class CategoryDAOImp implements CategoryDAO{
     }
 
     @Override
-    public int insertCategory(String name) throws SQLException , DataAlreadyExistsException {
+    public int insertCategory(Category category) throws SQLException , DataAlreadyExistsException {
         int generatedId = -1;
-        if (getCategoryByName(name).isPresent()) {
+        if (getCategoryByName(category.getName()).isPresent()) {
             throw new DataAlreadyExistsException("a Category with that name is already in the db");
         }else{
             String temp = "INSERT INTO Categories (name) VALUES (?)";
             try(Connection connection = DatabaseConnector.gConnection();
                 PreparedStatement statement = connection.prepareStatement(temp , Statement.RETURN_GENERATED_KEYS)){
-                statement.setString(1 , name);
+                statement.setString(1 , category.getName());
                 int affectedRows = statement.executeUpdate();
 
                 if (affectedRows > 0) {
@@ -72,7 +72,7 @@ public class CategoryDAOImp implements CategoryDAO{
                 }
             }catch (SQLException e){
                 if(e.getSQLState().equals("23000")){
-                    throw new DataAlreadyExistsException("FAILED. the category was added into the db by another thread");
+                    throw new DataAlreadyExistsException("FAILED.");
                 }else{
                     throw e;
                 }

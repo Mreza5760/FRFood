@@ -7,7 +7,7 @@ import java.sql.SQLException;
 import java.util.Optional;
 
 public interface CategoryDAO {
-    int insertCategory(String name)throws SQLException , DataAlreadyExistsException;
+    int insertCategory(Category category)throws SQLException , DataAlreadyExistsException;
     Optional<Category> getCategoryById(int id) throws SQLException;
     Optional<Category> getCategoryByName(String Name)throws SQLException;
 }

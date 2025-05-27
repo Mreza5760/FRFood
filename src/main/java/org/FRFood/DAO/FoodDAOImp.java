@@ -27,6 +27,7 @@ public class FoodDAOImp implements FoodDAO{
         }catch (Exception e){
             System.out.println(e);
         }
+        return 0;
     }
 
     @Override
