@@ -8,7 +8,7 @@ import java.sql.PreparedStatement;
 import java.util.Optional;
 
 public class FoodDAOImp implements FoodDAO{
-    @Override
+//    @Override
     public int insert(Food food) {
         String sql = "INSERT INTO FoodItems (vendor_id, name, image, count, price_id, picture_id) VALUES (? , ? , ? , ? )";
 
@@ -30,7 +30,7 @@ public class FoodDAOImp implements FoodDAO{
         return 0;
     }
 
-    @Override
+//    @Override
     public Optional<Food> getById(int id) {
         return Optional.empty();
     }

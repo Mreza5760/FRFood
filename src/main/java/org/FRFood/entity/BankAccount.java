@@ -1,8 +1,12 @@
 package org.FRFood.entity;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 public class BankAccount {
     private int id;
+    @JsonProperty("bank_name")
     private String name;
+    @JsonProperty("account_number")
     private String accountNumber;
 
     public BankAccount(String name, String accountNumber) {

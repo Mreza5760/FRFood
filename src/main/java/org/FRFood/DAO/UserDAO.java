@@ -1,10 +1,14 @@
 package org.FRFood.DAO;
 
 import org.FRFood.entity.User;
+import org.FRFood.util.DataAlreadyExistsException;
 
+import java.sql.SQLException;
 import java.util.Optional;
 
 public interface UserDAO {
-    Optional<User> getUserById(int id);
-    int insertUser(User category);
+    Optional<User> getById(int id) throws SQLException;
+    int insert(User category) throws SQLException, DataAlreadyExistsException;
+    boolean deleteById(int id)throws SQLException;
+    Optional<User> getByPhone(String phoneNumber) throws SQLException;
 }

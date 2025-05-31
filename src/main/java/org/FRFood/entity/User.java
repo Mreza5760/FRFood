@@ -1,33 +1,41 @@
 package org.FRFood.entity;
-
+import com.fasterxml.jackson.annotation.JsonProperty;
 import org.FRFood.util.Role;
 
 public class User {
     private int id;
-    private String name;
+    @JsonProperty("full_name")
+    private String fullName;
+    @JsonProperty("phone")
     private String phoneNumber;
     private String email;
     private String password;
     private String address;
+    @JsonProperty("profileImageBase64")
     private String picture;
     private Role role;
+    @JsonProperty("bank_info")
+    private BankAccount bank;
 
-    User(String picture, String name, String email, String password, String address, String phoneNumber, Role role){
-        this.address = address;
-        this.password = password;
-        this.email = email;
-        this.picture = picture;
-        this.name = name;
-        this.phoneNumber = phoneNumber;
-        this.role = role;
+    public User(){};
+
+    public User(String picture, String name, String email, String password, String address, String phoneNumber, Role role, BankAccount bank) {
+        this.setAddress(address);
+        this.setPassword(password);
+        this.setEmail(email);
+        this.setPicture(picture);
+        this.setFullName(name);
+        this.setPhoneNumber(phoneNumber);
+        this.setRole(role);
+        this.setBank(bank);
     }
 
     public String getAddress() {
         return address;
     }
 
-    public String getName() {
-        return name;
+    public String getFullName() {
+        return fullName;
     }
 
     public int getId() {
@@ -48,5 +56,53 @@ public class User {
 
     public String getPicture() {
         return picture;
+    }
+
+    public BankAccount getBank() {
+        return bank;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
+    }
+
+    public void setAddress(String address) {
+        this.address = address;
+    }
+
+    public void setBankAccount(BankAccount bankAccount) {
+        this.bank = bankAccount;
+    }
+
+    public void setId(int id) {
+        this.id = id;
+    }
+
+    public void setFullName(String fullName) {
+        this.fullName = fullName;
+    }
+
+    public void setPhoneNumber(String phoneNumber) {
+        this.phoneNumber = phoneNumber;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
+    }
+
+    public void setPicture(String picture) {
+        this.picture = picture;
+    }
+
+    public Role getRole() {
+        return role;
+    }
+
+    public void setRole(Role role) {
+        this.role = role;
+    }
+
+    public void setBank(BankAccount bank) {
+        this.bank = bank;
     }
 }

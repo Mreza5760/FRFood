@@ -1,18 +1,142 @@
 package org.FRFood.DAO;
 
+import java.sql.*;
 import java.util.Optional;
+
+import org.FRFood.entity.BankAccount;
 import org.FRFood.entity.User;
+import org.FRFood.util.DataAlreadyExistsException;
+import org.FRFood.util.DatabaseConnector;
+import org.FRFood.util.Role;
 
-public class UserDAOImp implements UserDAO{
+public class UserDAOImp implements UserDAO {
+
     @Override
-    public int insertUser(User category) {
-        String temp = "INSERT TO Users (full_name , phone , email , password_hash , role , address , profile_image " ;
+    public int insert(User user) throws DataAlreadyExistsException, SQLException {
+        BankAccountDAO bankAccountDAO = new BankAccountDAOImp();
+        String sql = "INSERT INTO Users (full_name, phone, email, password_hash, role, address, profile_image, bank_id) " +
+                "VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
+        try (
+                Connection conn = DatabaseConnector.gConnection();
+                PreparedStatement stmt = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)
+        ) {
+            stmt.setString(1, user.getFullName());
+            stmt.setString(2, user.getPhoneNumber());
+            stmt.setString(3, user.getEmail());
+            stmt.setString(4, user.getPassword());
+            stmt.setString(5, user.getRole().toString());
+            stmt.setString(6, user.getAddress());
+            stmt.setString(7, user.getPicture());
 
-        return 0;
+            if (user.getBank() != null) {
+                int bankId = bankAccountDAO.insert(user.getBank());
+                stmt.setInt(8, bankId);
+            } else {
+                stmt.setNull(8, Types.INTEGER);
+            }
+
+            int rows = stmt.executeUpdate();
+            if (rows == 0) {
+                throw new SQLException("Insert failed, no rows affected.");
+            }
+
+            try (ResultSet keys = stmt.getGeneratedKeys()) {
+                if (keys.next()) {
+                    return keys.getInt(1);
+                } else {
+                    throw new SQLException("Insert failed, no ID generated.");
+                }
+            }
+
+        } catch (SQLException e) {
+            if ("23000".equals(e.getSQLState())) {
+                throw new DataAlreadyExistsException("User with given phone or email already exists.");
+            }
+            throw new RuntimeException("Insert failed: " + e.getMessage(), e);
+        }
     }
 
     @Override
-    public Optional<User> getUserById(int id){
+    public Optional<User> getById(int id) throws  SQLException {
+        String sql = "SELECT * FROM Users WHERE id = ?";
+        try (
+                Connection conn = DatabaseConnector.gConnection();
+                PreparedStatement stmt = conn.prepareStatement(sql)
+        ) {
+            stmt.setInt(1, id);
+            try (ResultSet rs = stmt.executeQuery()) {
+                if (rs.next()) {
+                    User user = new User();
+                    user.setId(rs.getInt("id"));
+                    user.setFullName(rs.getString("full_name"));
+                    user.setPhoneNumber(rs.getString("phone"));
+                    user.setEmail(rs.getString("email"));
+                    user.setPassword(rs.getString("password_hash"));
+                    user.setRole(Role.valueOf(rs.getString("role")));
+                    user.setAddress(rs.getString("address"));
+                    user.setPicture(rs.getString("profile_image"));
+
+                    int bankId = rs.getInt("bank_id");
+                    if (!rs.wasNull()) {
+                        BankAccountDAO bankDAO = new BankAccountDAOImp();
+                        user.setBankAccount(bankDAO.getById(bankId).orElse(null));
+                    }
+
+                    return Optional.of(user);
+                }
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException("Query failed: " + e.getMessage(), e);
+        }
+        return Optional.empty();
+    }
+
+    @Override
+    public boolean deleteById(int id) throws SQLException {
+        String sql = "DELETE FROM Users WHERE id = ?";
+        try (
+                Connection conn = DatabaseConnector.gConnection();
+                PreparedStatement stmt = conn.prepareStatement(sql)
+        ) {
+            stmt.setInt(1, id);
+            return stmt.executeUpdate() > 0;
+        } catch (SQLException e) {
+            throw new RuntimeException("Delete failed: " + e.getMessage(), e);
+        }
+    }
+
+    @Override
+    public Optional<User> getByPhone(String phoneNumber) throws SQLException {
+        String sql = "SELECT * FROM Users WHERE phone = ?";
+        BankAccountDAO bankAccountDAO = new BankAccountDAOImp();
+        User user = null;
+        BankAccount bankAccount = null;
+        try(
+                Connection conn = DatabaseConnector.gConnection();
+                PreparedStatement stmt = conn.prepareStatement(sql)
+                ){
+            stmt.setString(1, phoneNumber);
+            try (ResultSet rs = stmt.executeQuery()) {
+                if (rs.next()) {
+                    user = new User();
+                    bankAccount = new BankAccount();
+                    user.setId(rs.getInt("id"));
+                    user.setFullName(rs.getString("full_name"));
+                    user.setPhoneNumber(rs.getString("phone"));
+                    user.setEmail(rs.getString("email"));
+                    user.setPassword(rs.getString("password_hash"));
+                    user.setRole(Role.valueOf(rs.getString("role")));
+                    user.setAddress(rs.getString("address"));
+                    user.setPicture(rs.getString("profile_image"));
+                    bankAccount = bankAccountDAO.getById(rs.getInt("bank_id")).get();
+                    user.setBankAccount(bankAccount);
+                }else{
+                    return Optional.empty();
+                }
+            }
+        }catch(SQLException e){
+            System.out.println(e.getMessage());
+        }
         return Optional.empty();
     }
 }
