@@ -11,4 +11,5 @@ public interface UserDAO {
     int insert(User category) throws SQLException, DataAlreadyExistsException;
     boolean deleteById(int id)throws SQLException;
     Optional<User> getByPhone(String phoneNumber) throws SQLException;
+    public boolean update(User currentUser) throws SQLException;
 }

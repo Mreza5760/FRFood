@@ -50,7 +50,7 @@ public class UserDAOImp implements UserDAO {
 
         } catch (SQLException e) {
             if ("23000".equals(e.getSQLState())) {
-                throw new DataAlreadyExistsException("User with given phone or email already exists.");
+                throw new DataAlreadyExistsException("User with given phone already exists.");
             }
             throw new RuntimeException("Insert failed: " + e.getMessage(), e);
         }
@@ -119,7 +119,6 @@ public class UserDAOImp implements UserDAO {
             try (ResultSet rs = stmt.executeQuery()) {
                 if (rs.next()) {
                     user = new User();
-                    bankAccount = new BankAccount();
                     user.setId(rs.getInt("id"));
                     user.setFullName(rs.getString("full_name"));
                     user.setPhoneNumber(rs.getString("phone"));
@@ -137,6 +136,24 @@ public class UserDAOImp implements UserDAO {
         }catch(SQLException e){
             System.out.println(e.getMessage());
         }
-        return Optional.empty();
+        return Optional.ofNullable(user);
+    }
+
+    @Override
+    public boolean update(User currentUser) throws SQLException{
+        String temp = "UPDATE Users SET full_name = ? , email = ? , password_hash = ? , address = ? , profile_image = ? , bank_id = ? WHERE id = ?";
+        try (
+                Connection conn = DatabaseConnector.gConnection();
+                PreparedStatement stmt = conn.prepareStatement(temp)
+        ){
+            stmt.setString(1, currentUser.getFullName());
+            stmt.setString(2, currentUser.getEmail());
+            stmt.setString(3, currentUser.getPassword());
+            stmt.setString(4, currentUser.getAddress());
+            stmt.setString(5,currentUser.getPicture());
+            stmt.setInt(6,currentUser.getBank().getId());
+            stmt.setInt(7,currentUser.getId());
+            return stmt.executeUpdate() > 0;
+        }
     }
 }
