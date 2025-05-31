@@ -7,8 +7,9 @@ import java.sql.SQLException;
 import java.util.Optional;
 
 public interface FoodDAO{
-    int insertFood(Food food) throws DataAlreadyExistsException , SQLException;
-    Optional<Food> getFoodById(int id);
+    int insert(Food food) throws DataAlreadyExistsException , SQLException;
+    Optional<Food> getById(int id);
+    boolean deleteByID(int id);
 }
 
 

@@ -8,72 +8,65 @@ import java.sql.*;
 import java.util.Optional;
 
 public class BankAccountDAOImp implements BankAccountDAO {
+
     @Override
-    public int insertBankAccount(BankAccount bankAccount) throws SQLException {
-        String temp = "INSERT INTO Bank_account (bank_name , account_number) VALUES (?,?)";
-        int generatedId = -1;
-        try (Connection connection = DatabaseConnector.gConnection();
-                PreparedStatement statement = connection.prepareStatement(temp, Statement.RETURN_GENERATED_KEYS)) {
-            statement.setString(1, bankAccount.getName());
-            statement.setString(2, bankAccount.getAccountNumber());
-            int updatedRows = statement.executeUpdate();
-            if(updatedRows > 0){
-                try (ResultSet generatedKeys = statement.getGeneratedKeys()){
-                    if(generatedKeys.next()){
-                        generatedId = generatedKeys.getInt(1);
-                    }else {
-                        throw new SQLException("Creating category failed, no rows affected.");
-                    }
+    public int insert(BankAccount bankAccount) throws SQLException {
+        String sql = "INSERT INTO bank_account (bank_name, account_number) VALUES (?, ?)";
+        try (
+                Connection conn = DatabaseConnector.gConnection();
+                PreparedStatement stmt = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)
+        ) {
+            stmt.setString(1, bankAccount.getName());
+            stmt.setString(2, bankAccount.getAccountNumber());
+
+            if (stmt.executeUpdate() == 0) {
+                throw new SQLException("Insert failed, no rows affected.");
+            }
+
+            try (ResultSet keys = stmt.getGeneratedKeys()) {
+                if (keys.next()) {
+                    return keys.getInt(1);
+                } else {
+                    throw new SQLException("Insert failed, no ID generated.");
                 }
-            } else{
-                throw new SQLException("Creating category failed, no rows affected.");
             }
-        }catch (SQLException e){
-            if(e.getSQLState().equals("23000")){
-                throw new DataAlreadyExistsException("Bank account already exists");
-            }else{
-                throw new DataAlreadyExistsException(e.getMessage());
+
+        } catch (SQLException e) {
+            if (e.getSQLState().equals("23000")) {
+                throw new DataAlreadyExistsException("Bank account already exists.");
             }
+            throw e;
         }
-        return 0;
     }
 
     @Override
-    public Optional<BankAccount> getBankAccountByAccountNumber(String accountNumber)throws SQLException {
-        BankAccount bankAccount = null;
-        String temp = "SELECT * FROM bank_account WHERE account_number = ?";
-        try (Connection connection = DatabaseConnector.gConnection();
-            PreparedStatement statement = connection.prepareStatement(temp)){
-            statement.setString(1, accountNumber);
-            try (ResultSet resultSet = statement.executeQuery()){
-                if(resultSet.next()){
-                    bankAccount = new BankAccount();
-                    bankAccount.setName(resultSet.getString("bank_name"));
-                    bankAccount.setAccountNumber(resultSet.getString("account_number"));
-                    bankAccount.setId(resultSet.getInt("id"));
+    public Optional<BankAccount> getById(int id) throws SQLException {
+        String sql = "SELECT id, bank_name, account_number FROM bank_account WHERE id = ?";
+        try (
+                Connection conn = DatabaseConnector.gConnection();
+                PreparedStatement stmt = conn.prepareStatement(sql)
+        ) {
+            stmt.setInt(1, id);
+            try (ResultSet rs = stmt.executeQuery()) {
+                if (rs.next()) {
+                    BankAccount account = new BankAccount(rs.getString("bank_name"), rs.getString("account_number"));
+                    account.setId(rs.getInt("id"));
+                    return Optional.of(account);
                 }
             }
-
         }
-        return Optional.ofNullable(bankAccount);
+        return Optional.empty();
     }
 
     @Override
-    public Optional<BankAccount> getBankAccountById(int id) throws SQLException {
-        BankAccount bankAccount = null;
-        String temp = "SELECT * FROM bank_account WHERE id = ?";
-        try(Connection connection = DatabaseConnector.gConnection();
-            PreparedStatement statement = connection.prepareStatement(temp)) {
-            statement.setInt(1, id);
-            try (ResultSet resultSet = statement.executeQuery()){
-                if(resultSet.next()){
-                    bankAccount = new BankAccount();
-                    bankAccount.setName(resultSet.getString("bank_name"));
-                    bankAccount.setAccountNumber(resultSet.getString("account_number"));
-                    bankAccount.setId(resultSet.getInt("id"));
-                }
-            }
+    public boolean deleteById(int id) throws SQLException {
+        String sql = "DELETE FROM bank_account WHERE id = ?";
+        try (
+                Connection conn = DatabaseConnector.gConnection();
+                PreparedStatement stmt = conn.prepareStatement(sql)
+        ) {
+            stmt.setInt(1, id);
+            return stmt.executeUpdate() > 0;
         }
-        return Optional.ofNullable(bankAccount);
     }
 }

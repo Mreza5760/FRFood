@@ -9,7 +9,7 @@ import java.util.Optional;
 
 public class FoodDAOImp implements FoodDAO{
     @Override
-    public int insertFood(Food food) {
+    public int insert(Food food) {
         String sql = "INSERT INTO FoodItems (vendor_id, name, image, count, price_id, picture_id) VALUES (? , ? , ? , ? )";
 
         try(
@@ -31,7 +31,7 @@ public class FoodDAOImp implements FoodDAO{
     }
 
     @Override
-    public Optional<Food> getFoodById(int id) {
+    public Optional<Food> getById(int id) {
         return Optional.empty();
     }
 }

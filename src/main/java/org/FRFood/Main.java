@@ -25,18 +25,18 @@ public class Main {
 
 
                 // test
-                try{
-                    BankAccount bankAccount = new BankAccount("account1","123456");
-                    bankAccountDAO.insertBankAccount(bankAccount);
-                    BankAccount bankAccount1 = new BankAccount("account2","123456542");
-                    bankAccountDAO.insertBankAccount(bankAccount1);
-                }catch(DataAlreadyExistsException e) {
-                    System.out.println(e.getMessage());
-                }
-                if(bankAccountDAO.getBankAccountByAccountNumber("123456").isPresent()){
-                    System.out.println(bankAccountDAO.getBankAccountByAccountNumber("123456").get().getName());
-                }
-                System.out.println(bankAccountDAO.getBankAccountById(1).get().getName());
+//                try{
+//                    BankAccount bankAccount = new BankAccount("account1","123456");
+//                    bankAccountDAO.insertBankAccount(bankAccount);
+//                    BankAccount bankAccount1 = new BankAccount("account2","123456542");
+//                    bankAccountDAO.insertBankAccount(bankAccount1);
+//                }catch(DataAlreadyExistsException e) {
+//                    System.out.println(e.getMessage());
+//                }
+//                if(bankAccountDAO.getBankAccountByAccountNumber("123456").isPresent()){
+//                    System.out.println(bankAccountDAO.getBankAccountByAccountNumber("123456").get().getName());
+//                }
+//                System.out.println(bankAccountDAO.getBankAccountById(1).get().getName());
 
                 // end of test
 
