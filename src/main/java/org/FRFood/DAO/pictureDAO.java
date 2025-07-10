@@ -1,10 +1,8 @@
 package org.FRFood.DAO;
 
-import org.FRFood.util.DatabaseConnector;
+import org.FRFood.util.DBConnector;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.IOException;
-import java.net.URI;
 import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.StandardCopyOption;
@@ -15,7 +13,7 @@ public class pictureDAO {
     public int importImage(String urlToPic) {
         String sql = "INSERT INTO PICTURE (image) VALUES (?)";
 
-        try (Connection connection = DatabaseConnector.gConnection();
+        try (Connection connection = DBConnector.gConnection();
              PreparedStatement statement = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
         ) {
             URL picUrl = new URL(urlToPic);
