@@ -3,14 +3,13 @@ package org.FRFood.DAO;
 import java.sql.*;
 import java.util.Optional;
 
-import org.FRFood.entity.BankAccount;
-import org.FRFood.entity.User;
-import org.FRFood.util.DataAlreadyExistsException;
-import org.FRFood.util.DBConnector;
 import org.FRFood.util.Role;
+import org.FRFood.entity.User;
+import org.FRFood.util.DBConnector;
+import org.FRFood.entity.BankAccount;
+import org.FRFood.util.DataAlreadyExistsException;
 
 public class UserDAOImp implements UserDAO {
-
     @Override
     public int insert(User user) throws DataAlreadyExistsException, SQLException {
         BankAccountDAO bankAccountDAO = new BankAccountDAOImp();
@@ -47,7 +46,6 @@ public class UserDAOImp implements UserDAO {
                     throw new SQLException("Insert failed, no ID generated.");
                 }
             }
-
         } catch (SQLException e) {
             if ("23000".equals(e.getSQLState())) {
                 throw new DataAlreadyExistsException("User with given phone already exists.");

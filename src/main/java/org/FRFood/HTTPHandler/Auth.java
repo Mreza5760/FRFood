@@ -1,25 +1,24 @@
 package org.FRFood.HTTPHandler;
 
+import org.FRFood.DAO.*;
+import io.jsonwebtoken.*;
+import org.FRFood.util.*;
+import org.FRFood.entity.*;
+import com.sun.net.httpserver.HttpHandler;
+import com.sun.net.httpserver.HttpExchange;
+import io.jsonwebtoken.security.SignatureException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
-import com.sun.net.httpserver.HttpExchange;
-import com.sun.net.httpserver.HttpHandler;
-import io.jsonwebtoken.*;
-import io.jsonwebtoken.security.SignatureException;
-import org.FRFood.entity.*;
-import org.FRFood.util.*;
-import org.FRFood.DAO.*;
 
+import java.sql.*;
+import java.util.Map;
+import java.util.HashMap;
+import java.util.Optional;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.nio.charset.StandardCharsets;
-import java.sql.*;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Optional;
 
 public class Auth implements HttpHandler {
-
     private final ObjectMapper objectMapper;
     private final UserDAO userDAO;
     private final BankAccountDAO bankDAO;
@@ -30,6 +29,7 @@ public class Auth implements HttpHandler {
         this.userDAO = new UserDAOImp();
         this.bankDAO = new BankAccountDAOImp();
     }
+
     @Override
     public void handle(HttpExchange exchange) throws IOException {
         String path = exchange.getRequestURI().getPath();
@@ -118,7 +118,6 @@ public class Auth implements HttpHandler {
 
             String jsonResponse = objectMapper.writeValueAsString(responseBody);
             sendJsonResponse(exchange, 200, jsonResponse);
-
         } catch (Exception e) {
             e.printStackTrace();
             sendJsonResponse(exchange, 500, "{\"error\":\"Internal server error\"}");
@@ -144,7 +143,6 @@ public class Auth implements HttpHandler {
 
             String token = JwtUtil.generateToken(user);
             sendJsonResponse(exchange, 200, "{\"token\":\"" + token + "\"}");
-
         } catch (SQLException e) {
             e.printStackTrace();
             sendJsonResponse(exchange, 500, "Database error");
@@ -225,7 +223,6 @@ public class Auth implements HttpHandler {
                 this.userDAO.update(currentUser); // You'll need an update method in UserDAO
             }
             sendJsonResponse(exchange, 200, "{\"message\":\"Profile updated successfully\"}");
-
         }catch (com.fasterxml.jackson.core.JsonProcessingException jsonEx) {
             sendJsonResponse(exchange, 400, "{\"error\":\"Invalid JSON input\"}");
         } catch (Exception e) { // Catch other exceptions like DB errors
@@ -260,9 +257,7 @@ public class Auth implements HttpHandler {
                 return Optional.empty();
             }
 
-
             return userOptional;
-
         }catch (SQLException e){
             e.printStackTrace();
             sendJsonResponse(exchange, 500, "{\"error\":\"Internal server error\"}");
