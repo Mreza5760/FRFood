@@ -8,6 +8,6 @@ import java.sql.SQLException;
 import java.util.Optional;
 
 public interface RestaurantDAO {
-    int insert(Restaurant restaurant) throws SQLException, DataAlreadyExistsException;
+    int insert(Restaurant restaurant,int userId) throws SQLException, DataAlreadyExistsException;
     Optional<Restaurant> getById(int id) throws SQLException;
 }

@@ -29,7 +29,7 @@ public class RestaurantHandle implements HttpHandler {
         String method = exchange.getRequestMethod();
         try{
             if(path.equals("/restaurants")) {
-                handleRestaurants();
+                handleRestaurants(exchange);
             }else if(path.equals("/restaurants/mine")) {}
         }catch(Exception e){
             System.out.println(e.getMessage());

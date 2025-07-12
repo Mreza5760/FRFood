@@ -10,7 +10,7 @@ public class Restaurant {
     private int taxFee;
     private int additionalFee;
 
-    Restaurant(User owner, String name, String address, String phone, String logo, int taxFee, int additionalFee) {
+    public Restaurant(User owner, String name, String address, String phone, String logo, int taxFee, int additionalFee) {
         this.owner = owner;
         this.name = name;
         this.address = address;
@@ -19,6 +19,8 @@ public class Restaurant {
         this.taxFee = taxFee;
         this.additionalFee = additionalFee;
     }
+
+    public Restaurant() {}
 
     public int getId() {
         return id;
