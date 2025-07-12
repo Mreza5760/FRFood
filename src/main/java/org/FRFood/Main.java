@@ -26,29 +26,5 @@ public class Main {
         }catch (Exception e){
             System.err.println(e.getMessage());
         }
-
-
-
-//        CategoryDAO categoryDAO = new CategoryDAOImp();
-//        BankAccountDAO bankAccountDAO = new BankAccountDAOImp();
-//        UserDAO userDAO = new UserDAOImp();
-//        System.out.println("Hello world!");
-//        try (Connection connection = DatabaseConnector.gConnection()) {
-//            System.out.println("connected to db");
-//            try (Statement statement = connection.createStatement()) {
-//
-//
-//                // test
-//
-//
-//                // end of test
-//
-//
-//            }
-//
-//        } catch (SQLException e) {
-//            System.out.println("couldn't connect to db" + "\n" + e);
-//        }
     }
 }
-

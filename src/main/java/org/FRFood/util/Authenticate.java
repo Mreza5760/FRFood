@@ -37,7 +37,7 @@ public class Authenticate {
             }
 
             return userOptional;
-        } catch (SQLException e){
+        } catch (SQLException e) {
 //            e.printStackTrace();
             JsonResponse.sendJsonResponse(exchange, 500, "{\"error\":\"Internal server error\"}");
         } catch (ExpiredJwtException e) {
@@ -57,5 +57,4 @@ public class Authenticate {
         }
         return Optional.empty();
     }
-
 }
