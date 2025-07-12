@@ -7,7 +7,9 @@ import com.sun.net.httpserver.HttpHandler;
 import org.FRFood.DAO.*;
 import org.FRFood.entity.Restaurant;
 import org.FRFood.entity.User;
+import org.FRFood.util.Authenticate;
 import org.FRFood.util.JsonResponse;
+import org.FRFood.util.Validate;
 
 import java.io.IOException;
 
@@ -38,12 +40,18 @@ public class RestaurantHandle implements HttpHandler {
     }
 
     private void handleRestaurants(HttpExchange exchange) throws IOException {
+        User currentUser = Authenticate.authenticate(exchange).get();
         Restaurant restaurant;
         try {
             restaurant = objectMapper.readValue(exchange.getRequestBody(), Restaurant.class);
+            if(!Validate.validatePhone(restaurant.getPhone())) {
+                throw new Exception("{\"error\":\"Invalid Phone\"}");
+            }
+            if(!Validate.validateName(restaurant.getName())){
+
+            }
         } catch (Exception e) {
-            JsonResponse.sendJsonResponse(exchange, 400, "{\"error\":\"Invalid input\"}");
-            return;
+            JsonResponse.sendJsonResponse(exchange, 400, e.getMessage());
         }
     }
 }
