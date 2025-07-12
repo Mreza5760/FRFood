@@ -8,10 +8,7 @@ import com.sun.net.httpserver.HttpHandler;
 import org.FRFood.DAO.*;
 import org.FRFood.entity.Restaurant;
 import org.FRFood.entity.User;
-import org.FRFood.util.Authenticate;
-import org.FRFood.util.DBConnector;
-import org.FRFood.util.JsonResponse;
-import org.FRFood.util.Validate;
+import org.FRFood.util.*;
 
 import java.io.IOException;
 import java.sql.Connection;
@@ -50,6 +47,9 @@ public class RestaurantHandle implements HttpHandler {
     }
 
     private void handleRestaurants(HttpExchange exchange) throws IOException {
+        if(Authenticate.authenticate(exchange).isEmpty()){
+            return;
+        }
         User currentUser = Authenticate.authenticate(exchange).get();
         Restaurant restaurant;
         try {
@@ -75,13 +75,20 @@ public class RestaurantHandle implements HttpHandler {
             JsonResponse.sendJsonResponse(exchange, 201, result.toString());
         } catch (SQLException e1) {
             System.out.println(e1.getMessage());
-        } catch (Exception e) {
+        } catch (DataValidationException e) {
             JsonResponse.sendJsonResponse(exchange, 400, e.getMessage());
         }
     }
 
     private void myRestaurants(HttpExchange exchange) throws IOException {
+        if(Authenticate.authenticate(exchange).isEmpty()){
+            return;
+        }
         User currentUser = Authenticate.authenticate(exchange).get();
+        if (!currentUser.getRole().equals(buyer)) {
+            JsonResponse.sendJsonResponse(exchange, 401, "{\"error\":\"Unauthorized request\"}");
+            return;
+        }
         Restaurant restaurant = new Restaurant();
         String statement = "SELECT * FROM restaurants WHERE owner_id = ?";
         try (
@@ -112,6 +119,8 @@ public class RestaurantHandle implements HttpHandler {
             JsonResponse.sendJsonResponse(exchange, 200, result.toString());
         } catch (SQLException e1) {
             System.out.println(e1.getMessage());
+        } catch (DataValidationException e) {
+            JsonResponse.sendJsonResponse(exchange, 400, e.getMessage());
         }
     }
 
