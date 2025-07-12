@@ -3,6 +3,8 @@ package org.FRFood.util;
 import com.sun.net.httpserver.HttpExchange;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.security.SignatureException;
+import org.FRFood.DAO.UserDAO;
+import org.FRFood.DAO.UserDAOImp;
 import org.FRFood.entity.User;
 
 import java.io.IOException;
@@ -26,7 +28,8 @@ public class Authenticate {
             int userId = Integer.parseInt(claims.getSubject());
             // String userRoleFromToken = claims.get("role", String.class);
 
-            Optional<User> userOptional = this.userDAO.getById(userId);
+            UserDAO userDAO = new UserDAOImp();
+            Optional<User> userOptional = userDAO.getById(userId);
 
             if (userOptional.isEmpty()) {
                 JsonResponse.sendJsonResponse(exchange, 401, "{\"error\":\"Unauthorized: User associated with token not found\"}");
