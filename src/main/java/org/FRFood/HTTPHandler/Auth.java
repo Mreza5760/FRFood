@@ -66,14 +66,6 @@ public class Auth implements HttpHandler {
         }
     }
 
-    private void sendJsonResponse(HttpExchange exchange, int statusCode, String responseJson) throws IOException {
-        exchange.getResponseHeaders().add("Content-Type", "application/json");
-        byte[] bytes = responseJson.getBytes(StandardCharsets.UTF_8);
-        exchange.sendResponseHeaders(statusCode, bytes.length);
-        try (OutputStream os = exchange.getResponseBody()) {
-            os.write(bytes);
-        }
-    }
 
     private Optional<User> authenticate(HttpExchange exchange) throws IOException {
         String authHeader = exchange.getRequestHeaders().getFirst("Authorization");
