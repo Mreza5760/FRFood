@@ -8,7 +8,7 @@ import java.nio.file.Files;
 import java.nio.file.StandardCopyOption;
 import java.sql.*;
 
-public class pictureDAO {
+public class PictureDAO {
 
     public int importImage(String urlToPic) {
         String sql = "INSERT INTO PICTURE (image) VALUES (?)";
