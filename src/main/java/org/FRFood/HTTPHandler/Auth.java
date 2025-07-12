@@ -41,28 +41,28 @@ public class Auth implements HttpHandler {
                         case "/auth/register" -> handleRegister(exchange);
                         case "/auth/login" -> handleLogin(exchange);
                         case "/auth/logout" -> handleLogout(exchange);
-                        default -> sendJsonResponse(exchange, 404, "Not Found");
+                        default -> JsonResponse.sendJsonResponse(exchange, 404, "Not Found");
                     }
                 }
                 case "GET" -> {
                     if (path.equals("/auth/profile")) {
                         handleGetProfile(exchange);
                     } else {
-                        sendJsonResponse(exchange, 404, "{\"error\":\"Not Found\"}");
+                        JsonResponse.sendJsonResponse(exchange, 404, "{\"error\":\"Not Found\"}");
                     }
                 }
                 case "PUT" -> {
                     if (path.equals("/auth/profile")) {
                         handleUpdateProfile(exchange);
                     } else {
-                        sendJsonResponse(exchange, 404, "{\"error\":\"Not Found\"}");
+                        JsonResponse.sendJsonResponse(exchange, 404, "{\"error\":\"Not Found\"}");
                     }
                 }
-                default -> sendJsonResponse(exchange, 404, "Not Found");
+                default -> JsonResponse.sendJsonResponse(exchange, 404, "Not Found");
             }
         } catch (Exception e) {
 //            e.printStackTrace();
-            sendJsonResponse(exchange, 500, "Internal Server Error");
+            JsonResponse.sendJsonResponse(exchange, 500, "Internal Server Error");
         }
     }
 
@@ -70,7 +70,7 @@ public class Auth implements HttpHandler {
     private Optional<User> authenticate(HttpExchange exchange) throws IOException {
         String authHeader = exchange.getRequestHeaders().getFirst("Authorization");
         if (authHeader == null || !authHeader.startsWith("Bearer ")) {
-            sendJsonResponse(exchange, 401, "{\"error\":\"Unauthorized: Missing or malformed Bearer token\"}");
+            JsonResponse.sendJsonResponse(exchange, 401, "{\"error\":\"Unauthorized: Missing or malformed Bearer token\"}");
             return Optional.empty();
         }
 
@@ -89,29 +89,29 @@ public class Auth implements HttpHandler {
             Optional<User> userOptional = this.userDAO.getById(userId); // You'll need a getById(int id) in UserDAO
 
             if (userOptional.isEmpty()) {
-                sendJsonResponse(exchange, 401, "{\"error\":\"Unauthorized: User associated with token not found\"}");
+                JsonResponse.sendJsonResponse(exchange, 401, "{\"error\":\"Unauthorized: User associated with token not found\"}");
                 return Optional.empty();
             }
 
             return userOptional;
         } catch (SQLException e){
 //            e.printStackTrace();
-            sendJsonResponse(exchange, 500, "{\"error\":\"Internal server error\"}");
+            JsonResponse.sendJsonResponse(exchange, 500, "{\"error\":\"Internal server error\"}");
         } catch (ExpiredJwtException e) {
-            sendJsonResponse(exchange, 401, "{\"error\":\"Unauthorized: Token has expired\"}");
+            JsonResponse.sendJsonResponse(exchange, 401, "{\"error\":\"Unauthorized: Token has expired\"}");
         } catch (SignatureException e) {
-            sendJsonResponse(exchange, 401, "{\"error\":\"Unauthorized: Invalid token signature\"}");
+            JsonResponse.sendJsonResponse(exchange, 401, "{\"error\":\"Unauthorized: Invalid token signature\"}");
         } catch (MalformedJwtException e) {
-            sendJsonResponse(exchange, 401, "{\"error\":\"Unauthorized: Malformed token\"}");
+            JsonResponse.sendJsonResponse(exchange, 401, "{\"error\":\"Unauthorized: Malformed token\"}");
         } catch (UnsupportedJwtException e) { // May not be thrown directly by default parser setup
-            sendJsonResponse(exchange, 401, "{\"error\":\"Unauthorized: Unsupported token type\"}");
+            JsonResponse.sendJsonResponse(exchange, 401, "{\"error\":\"Unauthorized: Unsupported token type\"}");
         } catch (IllegalArgumentException e) { // e.g., if token string is empty or issues with key during parsing
-            sendJsonResponse(exchange, 401, "{\"error\":\"Unauthorized: Invalid token argument (" + e.getMessage() + ")\"}");
+            JsonResponse.sendJsonResponse(exchange, 401, "{\"error\":\"Unauthorized: Invalid token argument (" + e.getMessage() + ")\"}");
         } catch (JwtException e) { // A general catch-all for other JWT-related issues
             // Log the actual exception for server-side debugging
             System.err.println("JWT Validation Error: " + e.getMessage());
             // e.printStackTrace(); // For more detailed logs
-            sendJsonResponse(exchange, 401, "{\"error\":\"Unauthorized: Invalid token\"}");
+            JsonResponse.sendJsonResponse(exchange, 401, "{\"error\":\"Unauthorized: Invalid token\"}");
         }
         return Optional.empty(); // Return empty if any exception occurred
     }
@@ -121,20 +121,20 @@ public class Auth implements HttpHandler {
         try {
             user = objectMapper.readValue(exchange.getRequestBody(), User.class);
         } catch (Exception e) {
-            sendJsonResponse(exchange, 400, "{\"error\":\"Invalid input\"}");
+            JsonResponse.sendJsonResponse(exchange, 400, "{\"error\":\"Invalid input\"}");
             return;
         }
 
         if (user.getFullName() == null || user.getPassword() == null ||
                 user.getRole() == null || user.getBank() == null ||
                 user.getBank().getName() == null || user.getBank().getAccountNumber() == null) {
-            sendJsonResponse(exchange, 400, "{\"error\":\"Missing required fields\"}");
+            JsonResponse.sendJsonResponse(exchange, 400, "{\"error\":\"Missing required fields\"}");
             return;
         }
 
         try {
             if (userDAO.getByPhone(user.getPhoneNumber()).isPresent()) {
-                sendJsonResponse(exchange, 409, "{\"error\":\"Phone number already exists\"}");
+                JsonResponse.sendJsonResponse(exchange, 409, "{\"error\":\"Phone number already exists\"}");
                 return;
             }
 
@@ -149,10 +149,10 @@ public class Auth implements HttpHandler {
             responseBody.put("user_id", userId);
             responseBody.put("token", token);
             String jsonResponse = objectMapper.writeValueAsString(responseBody);
-            sendJsonResponse(exchange, 200, jsonResponse);
+            JsonResponse.sendJsonResponse(exchange, 200, jsonResponse);
         } catch (Exception e) {
 //            e.printStackTrace();
-            sendJsonResponse(exchange, 500, "{\"error\":\"Internal server error\"}");
+            JsonResponse.sendJsonResponse(exchange, 500, "{\"error\":\"Internal server error\"}");
         }
     }
 
@@ -165,19 +165,19 @@ public class Auth implements HttpHandler {
             if (OpUser.isPresent()){
                 user = OpUser.get();
                 if (!user.getPassword().equals(loginRequest.getPassword())){
-                    sendJsonResponse(exchange, 401, "{\"error\":\"Invalid password\"}");
+                    JsonResponse.sendJsonResponse(exchange, 401, "{\"error\":\"Invalid password\"}");
                     return;
                 }
             } else {
-                sendJsonResponse(exchange, 401, "{\"error\":\"phone number not found\"}");
+                JsonResponse.sendJsonResponse(exchange, 401, "{\"error\":\"phone number not found\"}");
                 return;
             }
 
             String token = JwtUtil.generateToken(user);
-            sendJsonResponse(exchange, 200, "{\"token\":\"" + token + "\"}");
+            JsonResponse.sendJsonResponse(exchange, 200, "{\"token\":\"" + token + "\"}");
         } catch (SQLException e) {
 //            e.printStackTrace();
-            sendJsonResponse(exchange, 500, "Database error");
+            JsonResponse.sendJsonResponse(exchange, 500, "Database error");
         }
     }
 
@@ -188,7 +188,7 @@ public class Auth implements HttpHandler {
         }
         User authenticatedUser = authenticatedUserOptional.get();
         String jsonResponse = this.objectMapper.writeValueAsString(authenticatedUser);
-        sendJsonResponse(exchange, 200, jsonResponse);
+        JsonResponse.sendJsonResponse(exchange, 200, jsonResponse);
     }
 
     private void handleLogout(HttpExchange exchange) throws IOException {
@@ -196,7 +196,7 @@ public class Auth implements HttpHandler {
         if (authenticatedUserOptional.isEmpty()) {
             return;
         }
-        sendJsonResponse(exchange, 200, "{\"message\":\"User logged out successfully\"}");
+        JsonResponse.sendJsonResponse(exchange, 200, "{\"message\":\"User logged out successfully\"}");
     }
 
     private void handleUpdateProfile(HttpExchange exchange) throws IOException {
@@ -254,12 +254,12 @@ public class Auth implements HttpHandler {
             if (changed) {
                 this.userDAO.update(currentUser); // You'll need an update method in UserDAO
             }
-            sendJsonResponse(exchange, 200, "{\"message\":\"Profile updated successfully\"}");
+            JsonResponse.sendJsonResponse(exchange, 200, "{\"message\":\"Profile updated successfully\"}");
         } catch (com.fasterxml.jackson.core.JsonProcessingException jsonEx) {
-            sendJsonResponse(exchange, 400, "{\"error\":\"Invalid JSON input\"}");
+            JsonResponse.sendJsonResponse(exchange, 400, "{\"error\":\"Invalid JSON input\"}");
         } catch (Exception e) { // Catch other exceptions like DB errors
 //            e.printStackTrace();
-            sendJsonResponse(exchange, 500, "{\"error\":\"Internal server error while updating profile\"}");
+            JsonResponse.sendJsonResponse(exchange, 500, "{\"error\":\"Internal server error while updating profile\"}");
         }
     }
 }
