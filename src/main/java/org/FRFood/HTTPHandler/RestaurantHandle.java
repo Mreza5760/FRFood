@@ -1,6 +1,7 @@
 package org.FRFood.HTTPHandler;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
@@ -12,6 +13,9 @@ import org.FRFood.util.JsonResponse;
 import org.FRFood.util.Validate;
 
 import java.io.IOException;
+import java.sql.SQLException;
+
+import static org.FRFood.util.Role.*;
 
 public class RestaurantHandle implements HttpHandler {
     private final RestaurantDAO restaurantDAO;
@@ -48,9 +52,29 @@ public class RestaurantHandle implements HttpHandler {
                 throw new Exception("{\"error\":\"Invalid Phone\"}");
             }
             if(!Validate.validateName(restaurant.getName())){
-
+                throw new Exception("{\"error\":\"Invalid Name\"}");
             }
-        } catch (Exception e) {
+            // needs more validation checks
+            if(!currentUser.getRole().equals(buyer)) {
+                JsonResponse.sendJsonResponse(exchange, 401, "{\"error\":\"Unauthorized request\"}");
+                return;
+            }
+            int restaurantId = restaurantDAO.insert(restaurant, currentUser.getId());
+            restaurant.setId(restaurantId);
+
+            ObjectNode result = objectMapper.createObjectNode();
+            result.put("id", restaurantId);
+            result.put("name", restaurant.getName());
+            result.put("address", restaurant.getAddress());
+            result.put("phone", restaurant.getPhone());
+            result.put("logoBase64", restaurant.getLogo());
+            result.put("tax_fee",restaurant.getTaxFee());
+            result.put("additional_fee", restaurant.getAdditionalFee());
+            JsonResponse.sendJsonResponse(exchange, 201,result.toString());
+        } catch(SQLException e1){
+            System.out.println(e1.getMessage());
+        }
+        catch (Exception e) {
             JsonResponse.sendJsonResponse(exchange, 400, e.getMessage());
         }
     }
