@@ -6,17 +6,17 @@ public class Food {
     private int id;
     private String name;
     private String description;
-    private List<Category> category;
+    private List<Keyword> keywords;
     private int priceId;
     private String picture;
     private Restaurant restaurant;
 
 
-    Food(String name , String description, List<Category> category , int priceId , int pictureId, Restaurant restaurant){
+    Food(String name , String description, List<Keyword> keywords, int priceId , int pictureId, Restaurant restaurant){
         this.name = name;
         this.description = description;
         this.priceId = priceId;
-        this.category = category;
+        this.keywords = keywords;
         this.restaurant = restaurant;
     }
 
@@ -52,8 +52,7 @@ public class Food {
         this.picture = picture;
     }
 
-    public List<Category> getCategory() {
-        return category;
+    public List<Keyword> getKeywords() {
+        return keywords;
     }
-
 }

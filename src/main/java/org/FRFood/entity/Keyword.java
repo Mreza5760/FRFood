@@ -1,12 +1,12 @@
 package org.FRFood.entity;
 
-public class Category {
+public class Keyword {
     private int id;
     private String name;
 
-    public Category(){};
+    public Keyword(){};
 
-    public Category(String name) {
+    public Keyword(String name) {
         this.name = name;
     }
 

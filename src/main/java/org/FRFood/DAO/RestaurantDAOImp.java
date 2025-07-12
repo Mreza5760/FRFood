@@ -38,8 +38,7 @@ public class RestaurantDAOImp implements RestaurantDAO {
                     throw new SQLException("Insert failed, no ID generated.");
                 }
             }
-        }
-        catch (SQLException e) {
+        } catch (SQLException e) {
             System.out.println(e.getMessage());
         }
         return -1;
@@ -67,7 +66,7 @@ public class RestaurantDAOImp implements RestaurantDAO {
                     return Optional.of(restaurant);
                 }
             }
-        }catch (SQLException e) {
+        } catch (SQLException e) {
             System.out.println(e.getMessage());
             return Optional.empty();
         }

@@ -11,5 +11,3 @@ public interface FoodDAO{
 //    Optional<Food> getById(int id);
 //    boolean deleteByID(int id);
 }
-
-
