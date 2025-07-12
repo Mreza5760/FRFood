@@ -69,7 +69,7 @@ public class BankAccountDAOImp implements BankAccountDAO {
     }
 
     @Override
-    public boolean update(BankAccount bankAccount) throws SQLException {
+    public void update(BankAccount bankAccount) throws SQLException {
         String temp = "UPDATE Bank_account Set bank_name = ?, account_number = ? WHERE id = ?";
         try(
                 Connection conn = DBConnector.gConnection();
@@ -78,7 +78,7 @@ public class BankAccountDAOImp implements BankAccountDAO {
             stmt.setString(1, bankAccount.getName());
             stmt.setString(2, bankAccount.getAccountNumber());
             stmt.setInt(3, bankAccount.getId());
-            return stmt.executeUpdate() > 0;
+            stmt.executeUpdate();
         }
     }
 }

@@ -74,19 +74,16 @@ public class Auth implements HttpHandler {
             return Optional.empty();
         }
 
-        String token = authHeader.substring(7); // Remove "Bearer " prefix
+        String token = authHeader.substring(7);
 
         try {
-            // 1. Validate the token and get the claims object
-            Jws<Claims> claimsJws = JwtUtil.validateToken(token); // Your method that throws exceptions
+            Jws<Claims> claimsJws = JwtUtil.validateToken(token);
             Claims claims = claimsJws.getBody();
 
-            // 2. Extract User ID from claims
             int userId = Integer.parseInt(claims.getSubject());
-            // String userRoleFromToken = claims.get("role", String.class); // You can also get other claims
+            // String userRoleFromToken = claims.get("role", String.class);
 
-            // 3. Fetch the user from the database
-            Optional<User> userOptional = this.userDAO.getById(userId); // You'll need a getById(int id) in UserDAO
+            Optional<User> userOptional = this.userDAO.getById(userId);
 
             if (userOptional.isEmpty()) {
                 JsonResponse.sendJsonResponse(exchange, 401, "{\"error\":\"Unauthorized: User associated with token not found\"}");
@@ -103,17 +100,16 @@ public class Auth implements HttpHandler {
             JsonResponse.sendJsonResponse(exchange, 401, "{\"error\":\"Unauthorized: Invalid token signature\"}");
         } catch (MalformedJwtException e) {
             JsonResponse.sendJsonResponse(exchange, 401, "{\"error\":\"Unauthorized: Malformed token\"}");
-        } catch (UnsupportedJwtException e) { // May not be thrown directly by default parser setup
+        } catch (UnsupportedJwtException e) {
             JsonResponse.sendJsonResponse(exchange, 401, "{\"error\":\"Unauthorized: Unsupported token type\"}");
-        } catch (IllegalArgumentException e) { // e.g., if token string is empty or issues with key during parsing
+        } catch (IllegalArgumentException e) {
             JsonResponse.sendJsonResponse(exchange, 401, "{\"error\":\"Unauthorized: Invalid token argument (" + e.getMessage() + ")\"}");
-        } catch (JwtException e) { // A general catch-all for other JWT-related issues
-            // Log the actual exception for server-side debugging
+        } catch (JwtException e) {
             System.err.println("JWT Validation Error: " + e.getMessage());
-            // e.printStackTrace(); // For more detailed logs
+            // e.printStackTrace();
             JsonResponse.sendJsonResponse(exchange, 401, "{\"error\":\"Unauthorized: Invalid token\"}");
         }
-        return Optional.empty(); // Return empty if any exception occurred
+        return Optional.empty();
     }
 
     private void handleRegister(HttpExchange exchange) throws IOException {
@@ -206,7 +202,7 @@ public class Auth implements HttpHandler {
         }
         User currentUser = authenticatedUserOptional.get();
 
-        try{
+        try {
             @SuppressWarnings("unchecked")
             Map<String, Object> updates = this.objectMapper.readValue(exchange.getRequestBody(), Map.class);
             boolean changed = false;
@@ -243,21 +239,19 @@ public class Auth implements HttpHandler {
                     changed = true;
                 }
                 if (changed && bankDAO.getById(currentBank.getId()).isPresent()) {
-                    //already has a bank account
                     this.bankDAO.update(currentBank);
                 } else if (changed && bankDAO.getById(currentBank.getId()).isEmpty()) {
-                    //needs a new bank account
                     int bankId = this.bankDAO.insert(currentBank);
                     currentBank.setId(bankId);
                 }
             }
             if (changed) {
-                this.userDAO.update(currentUser); // You'll need an update method in UserDAO
+                this.userDAO.update(currentUser);
             }
             JsonResponse.sendJsonResponse(exchange, 200, "{\"message\":\"Profile updated successfully\"}");
         } catch (com.fasterxml.jackson.core.JsonProcessingException jsonEx) {
             JsonResponse.sendJsonResponse(exchange, 400, "{\"error\":\"Invalid JSON input\"}");
-        } catch (Exception e) { // Catch other exceptions like DB errors
+        } catch (Exception e) {
 //            e.printStackTrace();
             JsonResponse.sendJsonResponse(exchange, 500, "{\"error\":\"Internal server error while updating profile\"}");
         }

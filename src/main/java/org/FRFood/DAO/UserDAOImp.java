@@ -55,7 +55,7 @@ public class UserDAOImp implements UserDAO {
     }
 
     @Override
-    public Optional<User> getById(int id) throws  SQLException {
+    public Optional<User> getById(int id) {
         String sql = "SELECT * FROM Users WHERE id = ?";
         try (
                 Connection conn = DBConnector.gConnection();
@@ -90,7 +90,7 @@ public class UserDAOImp implements UserDAO {
     }
 
     @Override
-    public boolean deleteById(int id) throws SQLException {
+    public boolean deleteById(int id) {
         String sql = "DELETE FROM Users WHERE id = ?";
         try (
                 Connection conn = DBConnector.gConnection();
@@ -104,11 +104,11 @@ public class UserDAOImp implements UserDAO {
     }
 
     @Override
-    public Optional<User> getByPhone(String phoneNumber) throws SQLException {
+    public Optional<User> getByPhone(String phoneNumber) {
         String sql = "SELECT * FROM Users WHERE phone = ?";
         BankAccountDAO bankAccountDAO = new BankAccountDAOImp();
         User user = null;
-        BankAccount bankAccount = null;
+        BankAccount bankAccount;
         try(
                 Connection conn = DBConnector.gConnection();
                 PreparedStatement stmt = conn.prepareStatement(sql)
@@ -138,7 +138,7 @@ public class UserDAOImp implements UserDAO {
     }
 
     @Override
-    public boolean update(User currentUser) throws SQLException{
+    public void update(User currentUser) throws SQLException{
         String temp = "UPDATE Users SET full_name = ? , email = ? , password_hash = ? , address = ? , profile_image = ? , bank_id = ? WHERE id = ?";
         try (
                 Connection conn = DBConnector.gConnection();
@@ -151,7 +151,7 @@ public class UserDAOImp implements UserDAO {
             stmt.setString(5,currentUser.getPicture());
             stmt.setInt(6,currentUser.getBank().getId());
             stmt.setInt(7,currentUser.getId());
-            return stmt.executeUpdate() > 0;
+            stmt.executeUpdate();
         }
     }
 }
