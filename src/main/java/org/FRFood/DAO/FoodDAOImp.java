@@ -1,7 +1,7 @@
 package org.FRFood.DAO;
 
 import org.FRFood.entity.Food;
-import org.FRFood.util.DatabaseConnector;
+import org.FRFood.util.DBConnector;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -13,7 +13,7 @@ public class FoodDAOImp implements FoodDAO{
         String sql = "INSERT INTO FoodItems (vendor_id, name, image, count, price_id, picture_id) VALUES (? , ? , ? , ? )";
 
         try(
-                Connection connection = DatabaseConnector.gConnection();
+                Connection connection = DBConnector.gConnection();
                 PreparedStatement statement = connection.prepareStatement(sql);
         )
 

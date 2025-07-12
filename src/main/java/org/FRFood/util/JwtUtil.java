@@ -9,8 +9,8 @@ import java.security.Key;
 import java.util.Date;
 
 public class JwtUtil {
-    private static final Key SECRET_KEY = Keys.hmacShaKeyFor("ay baba farsi benvisam momkene error bede".getBytes(StandardCharsets.UTF_8));
     private static final long EXPIRATION_TIME = 1000 * 60 * 60 * 24; // 24 hours
+    private static final Key SECRET_KEY = Keys.hmacShaKeyFor("ay baba farsi benvisam momkene error bede".getBytes(StandardCharsets.UTF_8));
 
     public static String generateToken(User user) {
         return Jwts.builder()
@@ -38,6 +38,4 @@ public class JwtUtil {
         Claims claims = validateToken(token).getBody();
         return claims.get("role", String.class);
     }
-
-
 }

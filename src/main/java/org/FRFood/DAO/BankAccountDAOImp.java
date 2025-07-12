@@ -1,19 +1,18 @@
 package org.FRFood.DAO;
 
+import org.FRFood.util.DBConnector;
 import org.FRFood.entity.BankAccount;
 import org.FRFood.util.DataAlreadyExistsException;
-import org.FRFood.util.DatabaseConnector;
 
 import java.sql.*;
 import java.util.Optional;
 
 public class BankAccountDAOImp implements BankAccountDAO {
-
     @Override
     public int insert(BankAccount bankAccount) throws SQLException {
         String sql = "INSERT INTO bank_account (bank_name, account_number) VALUES (?, ?)";
         try (
-                Connection conn = DatabaseConnector.gConnection();
+                Connection conn = DBConnector.gConnection();
                 PreparedStatement stmt = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)
         ) {
             stmt.setString(1, bankAccount.getName());
@@ -30,7 +29,6 @@ public class BankAccountDAOImp implements BankAccountDAO {
                     throw new SQLException("Insert failed, no ID generated.");
                 }
             }
-
         } catch (SQLException e) {
             if (e.getSQLState().equals("23000")) {
                 throw new DataAlreadyExistsException("Bank account already exists.");
@@ -43,7 +41,7 @@ public class BankAccountDAOImp implements BankAccountDAO {
     public Optional<BankAccount> getById(int id) throws SQLException {
         String sql = "SELECT id, bank_name, account_number FROM bank_account WHERE id = ?";
         try (
-                Connection conn = DatabaseConnector.gConnection();
+                Connection conn = DBConnector.gConnection();
                 PreparedStatement stmt = conn.prepareStatement(sql)
         ) {
             stmt.setInt(1, id);
@@ -62,7 +60,7 @@ public class BankAccountDAOImp implements BankAccountDAO {
     public boolean deleteById(int id) throws SQLException {
         String sql = "DELETE FROM bank_account WHERE id = ?";
         try (
-                Connection conn = DatabaseConnector.gConnection();
+                Connection conn = DBConnector.gConnection();
                 PreparedStatement stmt = conn.prepareStatement(sql)
         ) {
             stmt.setInt(1, id);
@@ -74,7 +72,7 @@ public class BankAccountDAOImp implements BankAccountDAO {
     public void update(BankAccount bankAccount) throws SQLException {
         String temp = "UPDATE Bank_account Set bank_name = ?, account_number = ? WHERE id = ?";
         try(
-                Connection conn = DatabaseConnector.gConnection();
+                Connection conn = DBConnector.gConnection();
                 PreparedStatement stmt = conn.prepareStatement(temp)
                 ){
             stmt.setString(1, bankAccount.getName());

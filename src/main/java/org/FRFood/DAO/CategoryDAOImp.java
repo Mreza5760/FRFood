@@ -2,7 +2,7 @@ package org.FRFood.DAO;
 
 import org.FRFood.entity.Category;
 import org.FRFood.util.DataAlreadyExistsException;
-import org.FRFood.util.DatabaseConnector;
+import org.FRFood.util.DBConnector;
 
 import java.sql.*;
 import java.util.Optional;
@@ -14,7 +14,7 @@ public class CategoryDAOImp implements CategoryDAO{
         String temp = "SELECT id, name FROM Categories WHERE id = ?";
         Category category = null;
 
-        try(Connection connection = DatabaseConnector.gConnection();
+        try(Connection connection = DBConnector.gConnection();
             PreparedStatement statement = connection.prepareStatement(temp)){
             statement.setString(1 , Integer.toString(id));
             try(ResultSet result = statement.executeQuery()){
@@ -32,8 +32,8 @@ public class CategoryDAOImp implements CategoryDAO{
     public Optional<Category> getCategoryByName(String name) throws SQLException{
         String temp = "SELECT id, name FROM Categories WHERE name = ?";
         Category category = null;
-        try (Connection connection = DatabaseConnector.gConnection();
-            PreparedStatement statement = connection.prepareStatement(temp)){
+        try (Connection connection = DBConnector.gConnection();
+             PreparedStatement statement = connection.prepareStatement(temp)){
             statement.setString(1, name);
             try(ResultSet result = statement.executeQuery()){
                 if(result.next()){
@@ -54,7 +54,7 @@ public class CategoryDAOImp implements CategoryDAO{
             throw new DataAlreadyExistsException("a Category with that name is already in the db");
         }else{
             String temp = "INSERT INTO Categories (name) VALUES (?)";
-            try(Connection connection = DatabaseConnector.gConnection();
+            try(Connection connection = DBConnector.gConnection();
                 PreparedStatement statement = connection.prepareStatement(temp , Statement.RETURN_GENERATED_KEYS)){
                 statement.setString(1 , category.getName());
                 int affectedRows = statement.executeUpdate();

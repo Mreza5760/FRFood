@@ -3,21 +3,20 @@ package org.FRFood.DAO;
 import java.sql.*;
 import java.util.Optional;
 
-import org.FRFood.entity.BankAccount;
-import org.FRFood.entity.User;
-import org.FRFood.util.DataAlreadyExistsException;
-import org.FRFood.util.DatabaseConnector;
 import org.FRFood.util.Role;
+import org.FRFood.entity.User;
+import org.FRFood.util.DBConnector;
+import org.FRFood.entity.BankAccount;
+import org.FRFood.util.DataAlreadyExistsException;
 
 public class UserDAOImp implements UserDAO {
-
     @Override
     public int insert(User user) throws DataAlreadyExistsException, SQLException {
         BankAccountDAO bankAccountDAO = new BankAccountDAOImp();
         String sql = "INSERT INTO Users (full_name, phone, email, password_hash, role, address, profile_image, bank_id) " +
                 "VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
         try (
-                Connection conn = DatabaseConnector.gConnection();
+                Connection conn = DBConnector.gConnection();
                 PreparedStatement stmt = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)
         ) {
             stmt.setString(1, user.getFullName());
@@ -47,7 +46,6 @@ public class UserDAOImp implements UserDAO {
                     throw new SQLException("Insert failed, no ID generated.");
                 }
             }
-
         } catch (SQLException e) {
             if ("23000".equals(e.getSQLState())) {
                 throw new DataAlreadyExistsException("User with given phone already exists.");
@@ -60,7 +58,7 @@ public class UserDAOImp implements UserDAO {
     public Optional<User> getById(int id) {
         String sql = "SELECT * FROM Users WHERE id = ?";
         try (
-                Connection conn = DatabaseConnector.gConnection();
+                Connection conn = DBConnector.gConnection();
                 PreparedStatement stmt = conn.prepareStatement(sql)
         ) {
             stmt.setInt(1, id);
@@ -95,7 +93,7 @@ public class UserDAOImp implements UserDAO {
     public boolean deleteById(int id) {
         String sql = "DELETE FROM Users WHERE id = ?";
         try (
-                Connection conn = DatabaseConnector.gConnection();
+                Connection conn = DBConnector.gConnection();
                 PreparedStatement stmt = conn.prepareStatement(sql)
         ) {
             stmt.setInt(1, id);
@@ -112,7 +110,7 @@ public class UserDAOImp implements UserDAO {
         User user = null;
         BankAccount bankAccount;
         try(
-                Connection conn = DatabaseConnector.gConnection();
+                Connection conn = DBConnector.gConnection();
                 PreparedStatement stmt = conn.prepareStatement(sql)
                 ){
             stmt.setString(1, phoneNumber);
@@ -143,7 +141,7 @@ public class UserDAOImp implements UserDAO {
     public void update(User currentUser) throws SQLException{
         String temp = "UPDATE Users SET full_name = ? , email = ? , password_hash = ? , address = ? , profile_image = ? , bank_id = ? WHERE id = ?";
         try (
-                Connection conn = DatabaseConnector.gConnection();
+                Connection conn = DBConnector.gConnection();
                 PreparedStatement stmt = conn.prepareStatement(temp)
         ){
             stmt.setString(1, currentUser.getFullName());
