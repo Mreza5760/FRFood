@@ -16,4 +16,16 @@ public class Price {
     public int getDiscount() {
         return discount;
     }
+
+    public void setId(int id) {
+        this.id = id;
+    }
+
+    public void setCurrentPrice(int currentPrice) {
+        this.currentPrice = currentPrice;
+    }
+
+    public void setDiscount(int discount) {
+        this.discount = discount;
+    }
 }
