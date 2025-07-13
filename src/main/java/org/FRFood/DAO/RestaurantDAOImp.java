@@ -102,7 +102,7 @@ public class RestaurantDAOImp implements RestaurantDAO {
     }
 
     @Override
-    public void UpdateById(Restaurant restaurant) throws SQLException {
+    public void Update(Restaurant restaurant) throws SQLException {
         String sql = "INSERT INTO restaurants (id,owner_id , name , address , phone , logo , tax_fee , additional_fee) VALUES (?,?,?,?,?,?,?,?)";
         try(
                 Connection connection = DBConnector.gConnection();

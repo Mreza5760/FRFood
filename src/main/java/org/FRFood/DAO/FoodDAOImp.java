@@ -25,4 +25,14 @@ public class FoodDAOImp implements FoodDAO{
     public int insert(Food food) throws SQLException{
         return 0;
     }
+
+    @Override
+    public void update(Food food) throws SQLException {
+        return;
+    }
+
+    @Override
+    public void delete(Food food) throws SQLException {
+        return;
+    }
 }

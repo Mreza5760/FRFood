@@ -1,7 +1,6 @@
 package org.FRFood.HTTPHandler;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
@@ -40,9 +39,15 @@ public class RestaurantHandler implements HttpHandler {
             if (parts.length == 3) {
                 handleUpdateRestaurants(exchange, Integer.parseInt(parts[2]));
             }
-            if (parts.length == 4) {
-                if (parts[3].equals("POST")) {
+            else if (parts.length == 4) {
+                if (parts[3].equals("item") && method.equals("POST")) {
                     addItem(exchange, Integer.parseInt(parts[2]));
+                }
+            }else if(parts.length == 5){
+                if(method.equals("PUT")){
+                    editItem(exchange,Integer.parseInt(parts[2]),Integer.parseInt(parts[4]));
+                }else if(method.equals("DELETE")){
+                    deleteItem(exchange,Integer.parseInt(parts[2]),Integer.parseInt(parts[4]));
                 }
             }
             if (path.equals("/restaurants")) {
@@ -147,7 +152,7 @@ public class RestaurantHandler implements HttpHandler {
             Validate.validatePhone(newRestaurant.getPhone());
             Validate.validateName(newRestaurant.getName());
             //needs more validations
-            restaurantDAO.UpdateById(newRestaurant);
+            restaurantDAO.Update(newRestaurant);
 
             String json = objectMapper.writeValueAsString(restaurant);
             JsonResponse.sendJsonResponse(exchange, 201, json);
@@ -164,7 +169,6 @@ public class RestaurantHandler implements HttpHandler {
             return;
         }
         User currentUser = Authenticate.authenticate(exchange).get();
-        RestaurantDAO restaurantDAO = new RestaurantDAOImp();
         Food food = objectMapper.readValue(exchange.getRequestBody(), Food.class);
         food.setVendorId(restaurantId);
         FoodDAO foodDAO = new FoodDAOImp();
@@ -178,5 +182,30 @@ public class RestaurantHandler implements HttpHandler {
         JsonResponse.sendJsonResponse(exchange, 200, json);
     }
 
+    private void editItem(HttpExchange exchange, int restaurantId , int foodId) throws IOException {
+        Food food = objectMapper.readValue(exchange.getRequestBody(), Food.class);
+        food.setVendorId(restaurantId);
+        food.setId(foodId);
+        FoodDAO  foodDAO = new FoodDAOImp();
+        try {
+            foodDAO.update(food);
+        }catch (SQLException e){
+            JsonResponse.sendJsonResponse(exchange, 500, "{\"error\":\"Internal Server Error\"}");
+            System.out.println(e.getMessage());
+        }
+        String json = objectMapper.writeValueAsString(food);
+        JsonResponse.sendJsonResponse(exchange, 200, json);
+
+    }
+
+    private void deleteItem(HttpExchange exchange, int restaurantId , int foodId) throws IOException {
+        FoodDAO foodDAO = new FoodDAOImp();
+        try{
+        foodDAO.delete(foodId);}
+        catch(SQLException e){
+            JsonResponse.sendJsonResponse(exchange, 500, "{\"error\":\"Internal Server Error\"}");
+            System.out.println(e.getMessage());
+        }
+    }
 
 }
