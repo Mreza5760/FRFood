@@ -18,14 +18,16 @@ import java.util.Optional;
 import java.io.IOException;
 
 public class BuyerHandler implements HttpHandler {
+    private final FoodDAO foodDAO;
+    private final PriceDAO priceDAO;
     private final ObjectMapper objectMapper;
     private final RestaurantDAO restaurantDAO;
-    private final FoodDAO foodDAO;
 
     public BuyerHandler() {
+        foodDAO = new FoodDAOImp();
+        priceDAO = new PriceDAOImp();
         objectMapper = new ObjectMapper();
         restaurantDAO = new RestaurantDAOImp();
-        foodDAO = new FoodDAOImp();
     }
 
     @Override
@@ -136,7 +138,14 @@ public class BuyerHandler implements HttpHandler {
             for (Restaurant restaurant : restaurants) {
                 List<Food> foods = restaurantDAO.getFoods(restaurant.getId());
                 for (Food food : foods) {
-                    if (foodDAO.doesHaveKeywords(req.keywords) && food.getPriceId() < req.price) {
+                    Optional<Price> optionalPrice = priceDAO.getById(food.getPriceId());
+                    if (optionalPrice.isEmpty()) {
+                        // باید ارور داد
+                        return;
+                    }
+                    Price price = optionalPrice.get();
+                    // تخفیف میشه هم لحاظ بشه هم نه
+                    if (foodDAO.doesHaveKeywords(req.keywords) && price.getCurrentPrice() <= req.price) {
                         foodsFiltered.add(food);
                     }
                 }

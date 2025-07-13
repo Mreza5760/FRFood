@@ -8,4 +8,12 @@ public class Price {
     public int getId() {
         return id;
     }
+
+    public int getCurrentPrice() {
+        return currentPrice;
+    }
+
+    public int getDiscount() {
+        return discount;
+    }
 }
