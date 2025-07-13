@@ -39,6 +39,11 @@ public class RestaurantHandler implements HttpHandler {
             if(parts.length == 3){
                 handleUpdateRestaurants(exchange,Integer.parseInt(parts[2]));
             }
+            if(parts.length == 4){
+                if (parts[3].equals("POST")) {
+                    addItem(exchange,Integer.parseInt(parts[2]));
+                }
+            }
             if (path.equals("/restaurants")) {
                 handleRestaurants(exchange);
             } else if (path.equals("/restaurants/mine")) {
@@ -173,6 +178,14 @@ public class RestaurantHandler implements HttpHandler {
             System.out.println(e2.getMessage());
             JsonResponse.sendJsonResponse(exchange, 500, "{\"error\":\"Internal Server Error\"}");
         }
+    }
+
+    private void addItem(HttpExchange exchange,int restaurantId) throws IOException {
+        if(Authenticate.authenticate(exchange).isEmpty()){
+            return;
+        }
+        User currentUser = Authenticate.authenticate(exchange).get();
+        RestaurantDAO restaurantDAO = new RestaurantDAOImp();
     }
 
 }
