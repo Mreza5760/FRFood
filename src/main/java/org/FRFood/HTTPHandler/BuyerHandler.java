@@ -85,13 +85,6 @@ public class BuyerHandler implements HttpHandler {
             }
             String json = objectMapper.writeValueAsString(restaurantsFiltered);
             JsonResponse.sendJsonResponse(exchange, 200, json);
-
-            /*
-            مبین اینجا باید اون لیست لستوران فیلر شده رو خروجی بدی من بلد نیستم
-            فقط قبلش فکر کنم باید توی انتیتی رستوران با جکسون عین یوزر تگ بزاری
-            بعد نوشته بود یمل که تو خروجی لوگو اجباری نیست اونم چک کن که اگه رستوران لوگو نداشت
-            یا نال بدی یا ندی لوگو رو
-             */
         } catch (SQLException e) {
 //            e.printStackTrace();
             JsonResponse.sendJsonResponse(exchange, 500, "Database error");
@@ -115,7 +108,8 @@ public class BuyerHandler implements HttpHandler {
                 return;
             }
             Restaurant restaurant = optionalRestaurant.get();
-
+            List<Menu> Menus = restaurantDAO.getMenus(restaurant.getId());
+            List<Food> foods = restaurantDAO.getFoods(restaurant.getId());
             /*
             اول اطلاعات رستوران
             بعد لیست اسم منو
