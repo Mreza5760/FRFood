@@ -15,12 +15,12 @@ import java.util.HashMap;
 import java.util.Optional;
 import java.io.IOException;
 
-public class Auth implements HttpHandler {
+public class AuthHandler implements HttpHandler {
     private final UserDAO userDAO;
     private final BankAccountDAO bankDAO;
     private final ObjectMapper objectMapper;
 
-    public Auth() {
+    public AuthHandler() {
         userDAO = new UserDAOImp();
         bankDAO = new BankAccountDAOImp();
         objectMapper = new ObjectMapper();

@@ -79,4 +79,43 @@ public class RestaurantDAOImp implements RestaurantDAO {
         return List.of();
     }
 
+    @Override
+    public void DeleteById(int id) throws SQLException{
+        String sql = "DELETE FROM restaurants WHERE id = ?";
+        try(
+                Connection connection = DBConnector.gConnection();
+                PreparedStatement preparedStatement = connection.prepareStatement(sql);
+        ){
+            preparedStatement.setInt(1,id);
+            int rows = preparedStatement.executeUpdate();
+            if (rows == 0) {
+                throw new SQLException("Delete failed, no rows affected.");
+            }
+        }
+    }
+
+    @Override
+    public void UpdateById(Restaurant restaurant) throws SQLException {
+        String sql = "INSERT INTO restaurants (id,owner_id , name , address , phone , logo , tax_fee , additional_fee) VALUES (?,?,?,?,?,?,?,?)";
+        try(
+                Connection connection = DBConnector.gConnection();
+                PreparedStatement preparedStatement = connection.prepareStatement(sql);
+        )
+        {
+            preparedStatement.setInt(1,restaurant.getId());
+            preparedStatement.setInt(2,restaurant.getOwner().getId() );
+            preparedStatement.setString(3, restaurant.getName());
+            preparedStatement.setString(4, restaurant.getAddress());
+            preparedStatement.setString(5, restaurant.getPhone());
+            preparedStatement.setString(6, restaurant.getLogo());
+            preparedStatement.setInt(7, restaurant.getTaxFee());
+            preparedStatement.setInt(8, restaurant.getAdditionalFee());
+
+            DeleteById(restaurant.getId());
+            int rows = preparedStatement.executeUpdate();
+            if (rows == 0) {
+                throw new SQLException("Insert failed, no rows affected.");
+            }
+        }
+    }
 }
