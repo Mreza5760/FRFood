@@ -15,7 +15,7 @@ public class Menu {
         this.title = title;
     }
 
-    Menu() {}
+    public Menu() {}
 
     public int getId() {
         return id;

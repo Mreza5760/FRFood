@@ -39,18 +39,19 @@ public class RestaurantHandler implements HttpHandler {
             String[] parts = path.split("/");
             if (parts.length == 3) {
                 handleUpdateRestaurants(exchange, Integer.parseInt(parts[2]));
-            }
-            else if (parts.length == 4) {
+            } else if (parts.length == 4) {
                 if (parts[3].equals("item") && method.equals("POST")) {
                     addItem(exchange, Integer.parseInt(parts[2]));
-                }else if (parts[3].equals("menu") && method.equals("POST")) {
+                } else if (parts[3].equals("menu") && method.equals("POST")) {
                     addMenu(exchange, Integer.parseInt(parts[2]));
                 }
-            }else if(parts.length == 5){
-                if(method.equals("PUT")){
-                    editItem(exchange,Integer.parseInt(parts[2]),Integer.parseInt(parts[4]));
-                }else if(method.equals("DELETE")){
-                    deleteItem(exchange,Integer.parseInt(parts[2]),Integer.parseInt(parts[4]));
+            } else if (parts.length == 5) {
+                if (parts[3].equals("item") && method.equals("PUT")) {
+                    editItem(exchange, Integer.parseInt(parts[2]), Integer.parseInt(parts[4]));
+                } else if (parts[3].equals("item") && method.equals("DELETE")) {
+                    deleteItem(exchange, Integer.parseInt(parts[2]), Integer.parseInt(parts[4]));
+                } else if (parts[3].equals("menu") && method.equals("DELETE")) {
+                    deleteMenu(exchange, Integer.parseInt(parts[2]), parts[4]);
                 }
             }
             if (path.equals("/restaurants")) {
@@ -185,14 +186,14 @@ public class RestaurantHandler implements HttpHandler {
         JsonResponse.sendJsonResponse(exchange, 200, json);
     }
 
-    private void editItem(HttpExchange exchange, int restaurantId , int foodId) throws IOException {
+    private void editItem(HttpExchange exchange, int restaurantId, int foodId) throws IOException {
         Food food = objectMapper.readValue(exchange.getRequestBody(), Food.class);
         food.setVendorId(restaurantId);
         food.setId(foodId);
-        FoodDAO  foodDAO = new FoodDAOImp();
+        FoodDAO foodDAO = new FoodDAOImp();
         try {
             foodDAO.update(food);
-        }catch (SQLException e){
+        } catch (SQLException e) {
             JsonResponse.sendJsonResponse(exchange, 500, "{\"error\":\"Internal Server Error\"}");
             System.out.println(e.getMessage());
         }
@@ -201,35 +202,41 @@ public class RestaurantHandler implements HttpHandler {
 
     }
 
-    private void deleteItem(HttpExchange exchange, int restaurantId , int foodId) throws IOException {
+    private void deleteItem(HttpExchange exchange, int restaurantId, int foodId) throws IOException {
         FoodDAO foodDAO = new FoodDAOImp();
-        try{
-        foodDAO.delete(foodId);
+        try {
+            foodDAO.delete(foodId);
             JsonResponse.sendJsonResponse(exchange, 500, "{\"message\":\"Food item removed successfully\"}");
-        }
-        catch(SQLException e){
+        } catch (SQLException e) {
             JsonResponse.sendJsonResponse(exchange, 500, "{\"error\":\"Internal Server Error\"}");
             System.out.println(e.getMessage());
         }
     }
 
-    private void addMenu(HttpExchange exchange, int restaurantId ) throws IOException {
+    private void addMenu(HttpExchange exchange, int restaurantId) throws IOException {
         Menu menu = objectMapper.readValue(exchange.getRequestBody(), Menu.class);
-        Restaurant restaurant ;
-        try{
-            if(restaurantDAO.getById(restaurantId).isPresent()){
+        Restaurant restaurant = null;
+        try {
+            if (restaurantDAO.getById(restaurantId).isPresent()) {
                 restaurant = restaurantDAO.getById(restaurantId).get();
             }
-            menu.setId(restaurantId);
+            menu.setRestaurant(restaurant);
             menu.setId(restaurantDAO.insertMenu(menu));
             String json = objectMapper.writeValueAsString(menu);
             JsonResponse.sendJsonResponse(exchange, 200, json);
-        }catch (SQLException e){
+        } catch (SQLException e) {
             //handle
             return;
         }
     }
 
-
+    private void deleteMenu(HttpExchange exchange, int restaurantId, String menuTitle) throws IOException {
+        try {
+            restaurantDAO.deleteMenuByTitle(menuTitle, restaurantId);
+        } catch (SQLException e) {
+            JsonResponse.sendJsonResponse(exchange, 500, "{\"error\":\"Internal Server Error\"}");
+            System.out.println(e.getMessage());
+        }
+    }
 
 }
