@@ -50,7 +50,7 @@ public class BuyerHandler implements HttpHandler {
                     switch (path) {
                         case "/vendors" -> handleVendorsMenu(exchange);
                         case "/items" -> handleGetItem(exchange);
-//                        case  "/orders/history" -> handleSubmitOrder(exchange);
+                        case  "/orders/history" -> handleOrdersHistory(exchange);
                         default -> {
                             if (path.equals("^/orders/[^/]+$")) {
                                 handleGetOrder(exchange);
@@ -215,12 +215,11 @@ public class BuyerHandler implements HttpHandler {
         }
     }
 
-    void handleGetOrderOrders(HttpExchange exchange) throws IOException {
+    void handleGetOrder(HttpExchange exchange) throws IOException {
         Optional<User> authenticatedUserOptional = authenticate(exchange);
         if (authenticatedUserOptional.isEmpty()) {
             return;
         }
-        // اگر صاحب سفارش نبود ارور بده
 
         String path = exchange.getRequestURI().getPath();
         String[] parts = path.split("/");
@@ -233,6 +232,11 @@ public class BuyerHandler implements HttpHandler {
             }
             Order order = optionalOrder.get();
 
+            // ارور بده صاحب اش نبود
+            if (order.getCustomerId() !=  authenticatedUserOptional.get().getId()) {
+                return;
+            }
+
             /*
                 خروجی بده اوردر رو
              */
@@ -240,5 +244,17 @@ public class BuyerHandler implements HttpHandler {
 //            e.printStackTrace();
             JsonResponse.sendJsonResponse(exchange, 500, "{\"error\":\"Internal server error\"}");
         }
+    }
+
+    void handleOrdersHistory(HttpExchange exchange) throws IOException {
+        Optional<User> authenticatedUserOptional = authenticate(exchange);
+        if (authenticatedUserOptional.isEmpty()) {
+            return;
+        }
+        int customerId = authenticatedUserOptional.get().getId();
+        List<Order> orders = orderDAO.getUserOrders();
+        /*
+        لیست اوردر ها رو خروجی بده
+         */
     }
 }
