@@ -8,5 +8,5 @@ import java.util.List;
 import java.util.Optional;
 
 public interface FoodDAO{
-    boolean doesHaveKeyWord(List<String> input) throws SQLException;
+    boolean doesHaveKeyword(List<String> input) throws SQLException;
 }

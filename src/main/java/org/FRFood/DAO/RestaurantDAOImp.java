@@ -7,6 +7,7 @@ import org.FRFood.util.DataAlreadyExistsException;
 import org.FRFood.util.Role;
 
 import java.sql.*;
+import java.util.List;
 import java.util.Optional;
 
 public class RestaurantDAOImp implements RestaurantDAO {
@@ -71,6 +72,11 @@ public class RestaurantDAOImp implements RestaurantDAO {
             return Optional.empty();
         }
         return Optional.empty();
+    }
+
+    @Override
+    public List<Restaurant> searchByString(String search) throws SQLException {
+        return List.of();
     }
 
 }
