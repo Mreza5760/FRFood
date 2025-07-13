@@ -83,6 +83,9 @@ public class BuyerHandler implements HttpHandler {
                     restaurantsFiltered.add(restaurant);
                 }
             }
+            String json = objectMapper.writeValueAsString(restaurantsFiltered);
+            JsonResponse.sendJsonResponse(exchange, 200, json);
+
             /*
             مبین اینجا باید اون لیست لستوران فیلر شده رو خروجی بدی من بلد نیستم
             فقط قبلش فکر کنم باید توی انتیتی رستوران با جکسون عین یوزر تگ بزاری
