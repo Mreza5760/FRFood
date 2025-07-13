@@ -10,5 +10,7 @@ import java.util.Optional;
 public interface RestaurantDAO {
     int insert(Restaurant restaurant,int userId) throws SQLException, DataAlreadyExistsException;
     Optional<Restaurant> getById(int id) throws SQLException;
+    void DeleteById(int id) throws SQLException;
+    void UpdateById(Restaurant restaurant) throws SQLException;
     List<Restaurant> searchByString(String search) throws SQLException;
 }
