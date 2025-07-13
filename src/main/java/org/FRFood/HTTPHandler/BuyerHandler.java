@@ -21,11 +21,13 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 
 public class BuyerHandler implements HttpHandler {
     private final FoodDAO foodDAO;
+    private final OrderDAO orderDAO;
     private final ObjectMapper objectMapper;
     private final RestaurantDAO restaurantDAO;
 
     public BuyerHandler() {
         foodDAO = new FoodDAOImp();
+        orderDAO = new OrderDAOImp();
         objectMapper = new ObjectMapper();
         restaurantDAO = new RestaurantDAOImp();
     }
@@ -188,7 +190,22 @@ public class BuyerHandler implements HttpHandler {
         if (authenticatedUserOptional.isEmpty()) {
             return;
         }
-        Order order = objectMapper.readValue(jsonInputStream, Order.class);
+        Order order = objectMapper.readValue(exchange.getRequestBody(), Order.class);
+        // ایدی صفر نمیشه داشت
+        if (order.getDeliveryAddress() == null || order.getVendorId() == 0 || order.getItems() == null) {
+            JsonResponse.sendJsonResponse(exchange, 400, "{\"error\":\"Missing required fields\"}");
+            return;
+        }
+        order.setCustomerId(authenticatedUserOptional.get().getId());
+        try {
+            order.setId(orderDAO.insert(order));
 
+            /*
+                اورد رو باید خروجی داد
+             */
+        } catch (Exception e) {
+//            e.printStackTrace();
+            JsonResponse.sendJsonResponse(exchange, 500, "{\"error\":\"Internal server error\"}");
+        }
     }
 }

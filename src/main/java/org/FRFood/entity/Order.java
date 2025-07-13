@@ -1,10 +1,10 @@
 package org.FRFood.entity;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
+import org.FRFood.util.Status;
 import org.FRFood.DTO.OrderItemDTO;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 import java.util.List;
-import java.util.Map;
 
 public class Order {
     private int id;
@@ -28,7 +28,7 @@ public class Order {
     private int payPrice;
     @JsonProperty("courier_id")
     private int courierId;
-    private String status;
+    private Status status;
     @JsonProperty("created_at")
     private String createdAt;
     @JsonProperty("updated_at")
@@ -50,4 +50,83 @@ public class Order {
     public List<OrderItemDTO> getItems() { return items; }
     public void setItems(List<OrderItemDTO> items) { this.items = items; }
 
+    public int getCustomerId() {
+        return customerId;
+    }
+
+    public void setCustomerId(int customerId) {
+        this.customerId = customerId;
+    }
+
+    public int getRawPrice() {
+        return rawPrice;
+    }
+
+    public void setRawPrice(int rawPrice) {
+        this.rawPrice = rawPrice;
+    }
+
+    public int getTaxFee() {
+        return taxFee;
+    }
+
+    public void setTaxFee(int taxFee) {
+        this.taxFee = taxFee;
+    }
+
+    public int getAdditionalFee() {
+        return additionalFee;
+    }
+
+    public void setAdditionalFee(int additionalFee) {
+        this.additionalFee = additionalFee;
+    }
+
+    public int getCourierFee() {
+        return courierFee;
+    }
+
+    public void setCourierFee(int courierFee) {
+        this.courierFee = courierFee;
+    }
+
+    public int getPayPrice() {
+        return payPrice;
+    }
+
+    public void setPayPrice(int payPrice) {
+        this.payPrice = payPrice;
+    }
+
+    public int getCourierId() {
+        return courierId;
+    }
+
+    public void setCourierId(int courierId) {
+        this.courierId = courierId;
+    }
+
+    public Status getStatus() {
+        return status;
+    }
+
+    public void setStatus(Status status) {
+        this.status = status;
+    }
+
+    public String getCreatedAt() {
+        return createdAt;
+    }
+
+    public void setCreatedAt(String createdAt) {
+        this.createdAt = createdAt;
+    }
+
+    public String getUpdatedAt() {
+        return updatedAt;
+    }
+
+    public void setUpdatedAt(String updatedAt) {
+        this.updatedAt = updatedAt;
+    }
 }
