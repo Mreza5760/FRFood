@@ -35,10 +35,13 @@ public class BuyerHandler implements HttpHandler {
             switch (method) {
                 case "POST" -> {
                     switch (path) {
-                        case "/vendors" -> handleVendors(exchange);
+                        case "/vendors" -> handleVendorsList(exchange);
                     }
                 }
                 case "GET" -> {
+                    switch (path) {
+                        case "/vendors" -> handleVendorsMenu(exchange);
+                    }
                 }
                 case "PUT" -> {
                 }
@@ -50,7 +53,7 @@ public class BuyerHandler implements HttpHandler {
         }
     }
 
-    private void handleVendors(HttpExchange exchange) throws IOException {
+    private void handleVendorsList(HttpExchange exchange) throws IOException {
         Optional<User> authenticatedUserOptional = authenticate(exchange);
         if (authenticatedUserOptional.isEmpty()) {
             return;
@@ -86,5 +89,32 @@ public class BuyerHandler implements HttpHandler {
         }
     }
 
+    void handleVendorsMenu(HttpExchange exchange) throws IOException {
+        Optional<User> authenticatedUserOptional = authenticate(exchange);
+        if (authenticatedUserOptional.isEmpty()) {
+            return;
+        }
 
+        String path = exchange.getRequestURI().getPath();
+        String[] parts = path.split("/");
+        int id = Integer.parseInt(parts[2]);
+
+        try {
+            Optional<Restaurant> optionalRestaurant = restaurantDAO.getById(id);
+            if (optionalRestaurant.isEmpty()) {
+                // باید ارور وجود نداشتن رستوران داد
+                return;
+            }
+            Restaurant restaurant = optionalRestaurant.get();
+
+            /*
+            اول اطلاعات رستوران
+            بعد لیست اسم منو
+            بعد لیست تمام غدا های داخل منو
+             */
+        } catch (SQLException e) {
+//            e.printStackTrace();
+            JsonResponse.sendJsonResponse(exchange, 500, "Database error");
+        }
+    }
 }
