@@ -1,9 +1,11 @@
 package org.FRFood.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 public class Restaurant {
     private int id;
+    @JsonIgnore
     private User owner;
     private String name;
     private String address;
