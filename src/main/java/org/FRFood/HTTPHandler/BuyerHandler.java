@@ -126,11 +126,6 @@ public class BuyerHandler implements HttpHandler {
             root.set("menu_title", foodArrayNode);
             String jsonOutput = objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(root);
             JsonResponse.sendJsonResponse(exchange, 200, jsonOutput);
-            /*
-            اول اطلاعات رستوران
-            بعد لیست اسم منو
-            بعد لیست تمام غدا های داخل منو
-             */
         } catch (SQLException e) {
 //            e.printStackTrace();
             JsonResponse.sendJsonResponse(exchange, 500, "Database error");
@@ -163,9 +158,8 @@ public class BuyerHandler implements HttpHandler {
                     }
                 }
             }
-            /*
-            اینجا باید لیست غذا های فیلتر شده رو خروجی بدیم
-             */
+            String json = objectMapper.writeValueAsString(foodsFiltered);
+            JsonResponse.sendJsonResponse(exchange, 200, json);
         } catch (SQLException e) {
 //            e.printStackTrace();
             JsonResponse.sendJsonResponse(exchange, 500, "Database error");
@@ -189,10 +183,8 @@ public class BuyerHandler implements HttpHandler {
                 return;
             }
             Food food = optionalFood.get();
-
-            /*
-            اطلاعات این غذا رو باید پرینت کرد
-             */
+            String json = objectMapper.writeValueAsString(food);
+            JsonResponse.sendJsonResponse(exchange, 200, json);
         } catch (SQLException e) {
 //            e.printStackTrace();
             JsonResponse.sendJsonResponse(exchange, 500, "Database error");

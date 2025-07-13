@@ -1,31 +1,28 @@
 package org.FRFood.entity;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 import java.util.List;
 
 public class Food {
     private int id;
     private String name;
-    private String description;
-    private List<Keyword> keywords;
-    private int priceId;
+    @JsonProperty("imageBase64")
     private String picture;
-    private Restaurant restaurant;
+    private String description;
+    @JsonProperty("vendor_id")
+    private int vendorId;
+    private int price;
+    private int supply;
+    private List<Keyword> keywords;
 
 
-    Food(String name , String description, List<Keyword> keywords, int priceId , int pictureId, Restaurant restaurant){
+    Food(String name,int vendorId , String description, List<Keyword> keywords, int priceId , int pictureId, Restaurant restaurant){
+        this.vendorId = vendorId;
         this.name = name;
         this.description = description;
-        this.priceId = priceId;
+        this.price = priceId;
         this.keywords = keywords;
-        this.restaurant = restaurant;
-    }
-
-    public Restaurant getRestaurant() {
-        return restaurant;
-    }
-
-    public void setRestaurant(Restaurant restaurant) {
-        this.restaurant = restaurant;
     }
 
     public String getName() {
@@ -41,7 +38,7 @@ public class Food {
     }
 
     public int getPriceId() {
-        return priceId;
+        return price;
     }
 
     public String getPicture() {
