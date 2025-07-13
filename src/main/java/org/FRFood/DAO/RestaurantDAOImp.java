@@ -1,6 +1,7 @@
 package org.FRFood.DAO;
 
 import org.FRFood.entity.Food;
+import org.FRFood.entity.Menu;
 import org.FRFood.entity.Restaurant;
 import org.FRFood.entity.User;
 import org.FRFood.util.DBConnector;
@@ -11,7 +12,7 @@ import java.sql.*;
 import java.util.List;
 import java.util.Optional;
 
-public abstract class RestaurantDAOImp implements RestaurantDAO {
+public class RestaurantDAOImp implements RestaurantDAO {
     @Override
     public int insert (Restaurant restaurant,int userId)throws SQLException, DataAlreadyExistsException {
         String sql = "INSERT INTO restaurants (owner_id , name , address , phone , logo , tax_fee , additional_fee) VALUES (?,?,?,?,?,?,?)";
@@ -123,5 +124,10 @@ public abstract class RestaurantDAOImp implements RestaurantDAO {
                 throw new SQLException("Insert failed, no rows affected.");
             }
         }
+    }
+
+    @Override
+    public List<Menu> getMenus(int id) throws SQLException {
+        return List.of();
     }
 }
