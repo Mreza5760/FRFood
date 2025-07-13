@@ -73,15 +73,8 @@ public class RestaurantHandler implements HttpHandler {
             int restaurantId = restaurantDAO.insert(restaurant, currentUser.getId());
             restaurant.setId(restaurantId);
 
-            ObjectNode result = objectMapper.createObjectNode();
-            result.put("id", restaurantId);
-            result.put("name", restaurant.getName());
-            result.put("address", restaurant.getAddress());
-            result.put("phone", restaurant.getPhone());
-            result.put("logoBase64", restaurant.getLogo());
-            result.put("tax_fee", restaurant.getTaxFee());
-            result.put("additional_fee", restaurant.getAdditionalFee());
-            JsonResponse.sendJsonResponse(exchange, 201, result.toString());
+            String json = objectMapper.writeValueAsString(restaurant);
+            JsonResponse.sendJsonResponse(exchange, 201, json);
         } catch (SQLException e1) {
             System.out.println(e1.getMessage());
         } catch (DataValidationException e) {
@@ -117,15 +110,8 @@ public class RestaurantHandler implements HttpHandler {
                 }
             }
 
-            ObjectNode result = objectMapper.createObjectNode();
-            result.put("id", restaurant.getId());
-            result.put("name", restaurant.getName());
-            result.put("address", restaurant.getAddress());
-            result.put("phone", restaurant.getPhone());
-            result.put("logo", restaurant.getLogo());
-            result.put("tax_fee", restaurant.getTaxFee());
-            result.put("additional_fee", restaurant.getAdditionalFee());
-            JsonResponse.sendJsonResponse(exchange, 200, result.toString());
+            String json = objectMapper.writeValueAsString(restaurant);
+            JsonResponse.sendJsonResponse(exchange, 200, json);
         } catch (SQLException e1) {
             System.out.println(e1.getMessage());
         } catch (DataValidationException e) {
@@ -162,16 +148,8 @@ public class RestaurantHandler implements HttpHandler {
             //needs more validations
             restaurantDAO.UpdateById(newRestaurant);
 
-            ObjectNode result = objectMapper.createObjectNode();
-            result.put("id", restaurantId);
-            result.put("name", restaurant.getName());
-            result.put("address", restaurant.getAddress());
-            result.put("phone", restaurant.getPhone());
-            result.put("logoBase64", restaurant.getLogo());
-            result.put("tax_fee", restaurant.getTaxFee());
-            result.put("additional_fee", restaurant.getAdditionalFee());
-            JsonResponse.sendJsonResponse(exchange, 201, result.toString());
-
+            String json = objectMapper.writeValueAsString(restaurant);
+            JsonResponse.sendJsonResponse(exchange, 201, json);
         }catch (DataValidationException e1){
             JsonResponse.sendJsonResponse(exchange, 400, e1.getMessage());
         }catch (Exception e2){

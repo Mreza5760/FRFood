@@ -1,13 +1,20 @@
 package org.FRFood.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 public class Restaurant {
     private int id;
+    @JsonIgnore
     private User owner;
     private String name;
     private String address;
     private String phone;
+    @JsonProperty("logoBase64")
     private String logo;
+    @JsonProperty("tax_fee")
     private int taxFee;
+    @JsonProperty("additional_fee")
     private int additionalFee;
 
     public Restaurant(User owner, String name, String address, String phone, String logo, int taxFee, int additionalFee) {
