@@ -38,7 +38,7 @@ public class FoodDAOImp implements FoodDAO{
     }
 
     @Override
-    public boolean doesHaveKeyword(List<String> input) throws SQLException {
+    public boolean doesHaveKeywords(List<String> input) throws SQLException {
         return false;
     }
 }

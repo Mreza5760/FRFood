@@ -1,5 +1,6 @@
 package org.FRFood.DAO;
 
+import org.FRFood.entity.Food;
 import org.FRFood.entity.Restaurant;
 import org.FRFood.entity.User;
 import org.FRFood.util.DBConnector;
@@ -92,6 +93,11 @@ public class RestaurantDAOImp implements RestaurantDAO {
                 throw new SQLException("Delete failed, no rows affected.");
             }
         }
+    }
+
+    @Override
+    public List<Food> getFoods(int id) throws SQLException {
+        return List.of();
     }
 
     @Override

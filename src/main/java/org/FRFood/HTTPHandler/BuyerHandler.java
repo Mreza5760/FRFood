@@ -11,6 +11,7 @@ import static org.FRFood.util.Authenticate.authenticate;
 import org.FRFood.util.BuyerReq.VendorsReq;
 
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.io.IOException;
@@ -18,10 +19,12 @@ import java.io.IOException;
 public class BuyerHandler implements HttpHandler {
     private final ObjectMapper objectMapper;
     private final RestaurantDAO restaurantDAO;
+    private final FoodDAO foodDAO;
 
     public BuyerHandler() {
         objectMapper = new ObjectMapper();
         restaurantDAO = new RestaurantDAOImp();
+        foodDAO = new FoodDAOImp();
     }
 
     @Override
@@ -56,13 +59,32 @@ public class BuyerHandler implements HttpHandler {
         VendorsReq req = objectMapper.readValue(exchange.getRequestBody(), VendorsReq.class);
 
         try {
+            List<Restaurant> restaurantsFiltered = new ArrayList<>();
             List<Restaurant> restaurants = restaurantDAO.searchByString(req.search);
             for (Restaurant restaurant : restaurants) {
-
+                boolean haveFood = false;
+                List<Food> foods = restaurantDAO.getFoods(restaurant.getId());
+                for (Food food : foods) {
+                   if (foodDAO.doesHaveKeywords(req.keywords)) {
+                       haveFood = true;
+                       break;
+                   }
+                }
+                if (haveFood) {
+                    restaurantsFiltered.add(restaurant);
+                }
             }
+            /*
+            مبین اینجا باید اون لیست لستوران فیلر شده رو خروجی بدی من بلد نیستم
+            فقط قبلش فکر کنم باید توی انتیتی رستوران با جکسون عین یوزر تگ بزاری
+            بعد نوشته بود یمل که تو خروجی لوگو اجباری نیست اونم چک کن که اگه رستوران لوگو نداشت
+            یا نال بدی یا ندی لوگو رو
+             */
         } catch (SQLException e) {
 //            e.printStackTrace();
             JsonResponse.sendJsonResponse(exchange, 500, "Database error");
         }
     }
+
+
 }
