@@ -26,7 +26,7 @@ public class RestaurantHandle implements HttpHandler {
     public RestaurantHandle() {
         restaurantDAO = new RestaurantDAOImp();
         objectMapper = new ObjectMapper();
-        objectMapper.setPropertyNamingStrategy(PropertyNamingStrategies.KEBAB_CASE);
+        objectMapper.setPropertyNamingStrategy(PropertyNamingStrategies.SNAKE_CASE);
         userDAO = new UserDAOImp();
     }
 
