@@ -1,5 +1,8 @@
 package org.FRFood.HTTPHandler;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.FRFood.DAO.*;
 import org.FRFood.util.*;
 import org.FRFood.entity.*;
@@ -108,13 +111,21 @@ public class BuyerHandler implements HttpHandler {
                 return;
             }
             Restaurant restaurant = optionalRestaurant.get();
-            List<Menu> Menus = restaurantDAO.getMenus(restaurant.getId());
+            List<Menu> menus = restaurantDAO.getMenus(restaurant.getId());
             List<Food> foods = restaurantDAO.getFoods(restaurant.getId());
-            /*
-            اول اطلاعات رستوران
-            بعد لیست اسم منو
-            بعد لیست تمام غدا های داخل منو
-             */
+
+            ObjectNode root = objectMapper.createObjectNode();
+            JsonNode vendorNode = objectMapper.valueToTree(restaurant);
+            root.set("vendor", vendorNode);
+            ArrayNode menuTitlesArray = objectMapper.createArrayNode();
+            for (Menu menu : menus) {
+                menuTitlesArray.add(menu.getTitle());
+            }
+            root.set("menu_titles", menuTitlesArray);
+            JsonNode foodArrayNode = objectMapper.valueToTree(foods);
+            root.set("menu_title", foodArrayNode);
+            String jsonOutput = objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(root);
+            JsonResponse.sendJsonResponse(exchange, 200, jsonOutput);
         } catch (SQLException e) {
 //            e.printStackTrace();
             JsonResponse.sendJsonResponse(exchange, 500, "Database error");
@@ -147,9 +158,8 @@ public class BuyerHandler implements HttpHandler {
                     }
                 }
             }
-            /*
-            اینجا باید لیست غذا های فیلتر شده رو خروجی بدیم
-             */
+            String json = objectMapper.writeValueAsString(foodsFiltered);
+            JsonResponse.sendJsonResponse(exchange, 200, json);
         } catch (SQLException e) {
 //            e.printStackTrace();
             JsonResponse.sendJsonResponse(exchange, 500, "Database error");
@@ -173,10 +183,8 @@ public class BuyerHandler implements HttpHandler {
                 return;
             }
             Food food = optionalFood.get();
-
-            /*
-            اطلاعات این غذا رو باید پرینت کرد
-             */
+            String json = objectMapper.writeValueAsString(food);
+            JsonResponse.sendJsonResponse(exchange, 200, json);
         } catch (SQLException e) {
 //            e.printStackTrace();
             JsonResponse.sendJsonResponse(exchange, 500, "Database error");
