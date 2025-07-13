@@ -1,7 +1,11 @@
 package org.FRFood.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 public class Menu {
+    @JsonIgnore
     private int id;
+    @JsonIgnore
     private Restaurant restaurant;
     private String title;
 

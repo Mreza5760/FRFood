@@ -6,6 +6,7 @@ import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
 import org.FRFood.DAO.*;
 import org.FRFood.entity.Food;
+import org.FRFood.entity.Menu;
 import org.FRFood.entity.Restaurant;
 import org.FRFood.entity.User;
 import org.FRFood.util.*;
@@ -42,6 +43,8 @@ public class RestaurantHandler implements HttpHandler {
             else if (parts.length == 4) {
                 if (parts[3].equals("item") && method.equals("POST")) {
                     addItem(exchange, Integer.parseInt(parts[2]));
+                }else if (parts[3].equals("menu") && method.equals("POST")) {
+                    addMenu(exchange, Integer.parseInt(parts[2]));
                 }
             }else if(parts.length == 5){
                 if(method.equals("PUT")){
@@ -201,11 +204,32 @@ public class RestaurantHandler implements HttpHandler {
     private void deleteItem(HttpExchange exchange, int restaurantId , int foodId) throws IOException {
         FoodDAO foodDAO = new FoodDAOImp();
         try{
-        foodDAO.delete(foodId);}
+        foodDAO.delete(foodId);
+            JsonResponse.sendJsonResponse(exchange, 500, "{\"message\":\"Food item removed successfully\"}");
+        }
         catch(SQLException e){
             JsonResponse.sendJsonResponse(exchange, 500, "{\"error\":\"Internal Server Error\"}");
             System.out.println(e.getMessage());
         }
     }
+
+    private void addMenu(HttpExchange exchange, int restaurantId ) throws IOException {
+        Menu menu = objectMapper.readValue(exchange.getRequestBody(), Menu.class);
+        Restaurant restaurant ;
+        try{
+            if(restaurantDAO.getById(restaurantId).isPresent()){
+                restaurant = restaurantDAO.getById(restaurantId).get();
+            }
+            menu.setId(restaurantId);
+            menu.setId(restaurantDAO.insertMenu(menu));
+            String json = objectMapper.writeValueAsString(menu);
+            JsonResponse.sendJsonResponse(exchange, 200, json);
+        }catch (SQLException e){
+            //handle
+            return;
+        }
+    }
+
+
 
 }
