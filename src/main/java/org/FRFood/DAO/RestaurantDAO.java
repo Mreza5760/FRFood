@@ -1,6 +1,7 @@
 package org.FRFood.DAO;
 
 import org.FRFood.entity.Food;
+import org.FRFood.entity.Menu;
 import org.FRFood.entity.Restaurant;
 import org.FRFood.util.DataAlreadyExistsException;
 
@@ -11,6 +12,7 @@ import java.sql.SQLException;
 public interface RestaurantDAO {
     void DeleteById(int id) throws SQLException;
     List<Food> getFoods(int id) throws SQLException;
+    List<Menu> getMenus(int id) throws SQLException;
     Optional<Restaurant> getById(int id) throws SQLException;
     void UpdateById(Restaurant restaurant) throws SQLException;
     List<Restaurant> searchByString(String search) throws SQLException;
