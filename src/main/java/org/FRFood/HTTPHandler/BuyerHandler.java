@@ -41,6 +41,7 @@ public class BuyerHandler implements HttpHandler {
                     switch (path) {
                         case "/vendors" -> handleVendorsList(exchange);
                         case "/items" -> handleItemsList(exchange);
+                        case "/orders" -> handleSubmitOrder(exchange);
                     }
                 }
                 case "GET" -> {
@@ -181,5 +182,13 @@ public class BuyerHandler implements HttpHandler {
             JsonResponse.sendJsonResponse(exchange, 500, "Database error");
         }
     }
+
+    void handleSubmitOrder(HttpExchange exchange) throws IOException {
+        Optional<User> authenticatedUserOptional = authenticate(exchange);
+        if (authenticatedUserOptional.isEmpty()) {
+            return;
+        }
+        Order order = objectMapper.readValue(jsonInputStream, Order.class);
+
+    }
 }
-//Order order = objectMapper.readValue(jsonInputStream, Order.class);

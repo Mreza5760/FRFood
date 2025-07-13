@@ -8,12 +8,31 @@ import java.util.Map;
 
 public class Order {
     private int id;
+    @JsonProperty("customer_id")
+    private int customerId;
     @JsonProperty("vendor_id")
     private int vendorId;
     @JsonProperty("coupon_id")
     private int couponId;
     @JsonProperty("delivery_address")
     private String deliveryAddress;
+    @JsonProperty("raw_price")
+    private int rawPrice;
+    @JsonProperty("tax_fee")
+    private int taxFee;
+    @JsonProperty("additional_fee")
+    private int additionalFee;
+    @JsonProperty("courier_fee")
+    private int courierFee;
+    @JsonProperty("pay_price")
+    private int payPrice;
+    @JsonProperty("courier_id")
+    private int courierId;
+    private String status;
+    @JsonProperty("created_at")
+    private String createdAt;
+    @JsonProperty("updated_at")
+    private String updatedAt;
     private List<OrderItemDTO> items;
 
     public int getId() { return id; }
