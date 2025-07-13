@@ -94,7 +94,7 @@ public class RestaurantHandler implements HttpHandler {
             return;
         }
         Restaurant restaurant = new Restaurant();
-        String statement = "SELECT * FROM restaurants WHERE owner_id = ?";
+        String statement = "SELECT * FROM Restaurants WHERE owner_id = ?";
         try (
                 Connection connection = DBConnector.gConnection();
                 PreparedStatement preparedStatement = connection.prepareStatement(statement)) {
