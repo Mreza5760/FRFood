@@ -48,8 +48,8 @@ public class BuyerHandler implements HttpHandler {
                 }
                 case "GET" -> {
                     switch (path) {
-                        case "/vendors" -> handleVendorsMenu(exchange);
-                        case "/items" -> handleGetItem(exchange);
+                        case "^/vendors/[^/]+$" -> handleVendorsMenu(exchange);
+                        case "^/items/[^/]+$" -> handleGetItem(exchange);
                         case  "/orders/history" -> handleOrdersHistory(exchange);
                         default -> {
                             if (path.equals("^/orders/[^/]+$")) {
