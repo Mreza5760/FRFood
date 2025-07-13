@@ -16,15 +16,15 @@ import java.util.Optional;
 import java.io.IOException;
 
 public class Auth implements HttpHandler {
-    private final ObjectMapper objectMapper;
     private final UserDAO userDAO;
     private final BankAccountDAO bankDAO;
+    private final ObjectMapper objectMapper;
 
     public Auth() {
-        this.objectMapper = new ObjectMapper();
-        this.objectMapper.setPropertyNamingStrategy(PropertyNamingStrategies.SNAKE_CASE);
-        this.userDAO = new UserDAOImp();
-        this.bankDAO = new BankAccountDAOImp();
+        userDAO = new UserDAOImp();
+        bankDAO = new BankAccountDAOImp();
+        objectMapper = new ObjectMapper();
+        objectMapper.setPropertyNamingStrategy(PropertyNamingStrategies.SNAKE_CASE);
     }
 
     @Override
