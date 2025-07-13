@@ -1,10 +1,10 @@
-package org.FRFood.entity;
+package org.FRFood.DTO;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import org.FRFood.entity.User;
 
-public class Restaurant {
+public class RestaurantDTO {
     private int id;
-    private User owner;
     private String name;
     private String address;
     private String phone;
@@ -15,8 +15,7 @@ public class Restaurant {
     @JsonProperty("additional_fee")
     private int additionalFee;
 
-    public Restaurant(User owner, String name, String address, String phone, String logo, int taxFee, int additionalFee) {
-        this.owner = owner;
+    public RestaurantDTO( String name, String address, String phone, String logo, int taxFee, int additionalFee) {
         this.name = name;
         this.address = address;
         this.phone = phone;
@@ -25,7 +24,7 @@ public class Restaurant {
         this.additionalFee = additionalFee;
     }
 
-    public Restaurant() {}
+    public RestaurantDTO() {}
 
     public int getId() {
         return id;
@@ -41,10 +40,6 @@ public class Restaurant {
 
     public int getTaxFee() {
         return taxFee;
-    }
-
-    public User getOwner() {
-        return owner;
     }
 
     public String getAddress() {
@@ -77,10 +72,6 @@ public class Restaurant {
 
     public void setLogo(String logo) {
         this.logo = logo;
-    }
-
-    public void setOwner(User owner) {
-        this.owner = owner;
     }
 
     public void setPhone(String phone) {
