@@ -17,12 +17,12 @@ public class Food {
     private List<Keyword> keywords;
 
 
-    Food(String name,int vendorId , String description, List<Keyword> keywords, int priceId , int pictureId, Restaurant restaurant){
-        this.vendorId = vendorId;
-        this.name = name;
-        this.description = description;
-        this.price = priceId;
-        this.keywords = keywords;
+    Food(String name,int vendorId , String description, List<Keyword> keywords, int price, int pictureId, Restaurant restaurant){
+        this.setVendorId(vendorId);
+        this.setName(name);
+        this.setDescription(description);
+        this.setPrice(price);
+        this.setKeywords(keywords);
     }
 
     public String getName() {
@@ -38,7 +38,7 @@ public class Food {
     }
 
     public int getPriceId() {
-        return price;
+        return getPrice();
     }
 
     public String getPicture() {
@@ -51,5 +51,45 @@ public class Food {
 
     public List<Keyword> getKeywords() {
         return keywords;
+    }
+
+    public void setId(int id) {
+        this.id = id;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
+    public int getVendorId() {
+        return vendorId;
+    }
+
+    public void setVendorId(int vendorId) {
+        this.vendorId = vendorId;
+    }
+
+    public int getPrice() {
+        return price;
+    }
+
+    public void setPrice(int price) {
+        this.price = price;
+    }
+
+    public int getSupply() {
+        return supply;
+    }
+
+    public void setSupply(int supply) {
+        this.supply = supply;
+    }
+
+    public void setKeywords(List<Keyword> keywords) {
+        this.keywords = keywords;
     }
 }

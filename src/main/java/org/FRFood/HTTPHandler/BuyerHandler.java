@@ -1,34 +1,31 @@
 package org.FRFood.HTTPHandler;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.node.ArrayNode;
-import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.FRFood.DAO.*;
 import org.FRFood.util.*;
 import org.FRFood.entity.*;
+import org.FRFood.util.BuyerReq.ItemsReq;
 import com.sun.net.httpserver.HttpHandler;
+import org.FRFood.util.BuyerReq.VendorsReq;
 import com.sun.net.httpserver.HttpExchange;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import static org.FRFood.util.Authenticate.authenticate;
 
-import org.FRFood.util.BuyerReq.ItemsReq;
-import org.FRFood.util.BuyerReq.VendorsReq;
-
-import java.sql.SQLException;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.sql.SQLException;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 
 public class BuyerHandler implements HttpHandler {
     private final FoodDAO foodDAO;
-    private final PriceDAO priceDAO;
     private final ObjectMapper objectMapper;
     private final RestaurantDAO restaurantDAO;
 
     public BuyerHandler() {
         foodDAO = new FoodDAOImp();
-        priceDAO = new PriceDAOImp();
         objectMapper = new ObjectMapper();
         restaurantDAO = new RestaurantDAOImp();
     }
@@ -146,14 +143,8 @@ public class BuyerHandler implements HttpHandler {
             for (Restaurant restaurant : restaurants) {
                 List<Food> foods = restaurantDAO.getFoods(restaurant.getId());
                 for (Food food : foods) {
-                    Optional<Price> optionalPrice = priceDAO.getById(food.getPriceId());
-                    if (optionalPrice.isEmpty()) {
-                        // باید ارور داد
-                        return;
-                    }
-                    Price price = optionalPrice.get();
                     // تخفیف میشه هم لحاظ بشه هم نه
-                    if (foodDAO.doesHaveKeywords(req.keywords) && price.getCurrentPrice() <= req.price) {
+                    if (foodDAO.doesHaveKeywords(req.keywords) && food.getPrice() <= req.price) {
                         foodsFiltered.add(food);
                     }
                 }
