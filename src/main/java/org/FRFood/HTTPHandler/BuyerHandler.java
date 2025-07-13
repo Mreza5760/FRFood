@@ -50,6 +50,12 @@ public class BuyerHandler implements HttpHandler {
                     switch (path) {
                         case "/vendors" -> handleVendorsMenu(exchange);
                         case "/items" -> handleGetItem(exchange);
+//                        case  "/orders/history" -> handleSubmitOrder(exchange);
+                        default -> {
+                            if (path.equals("^/orders/[^/]+$")) {
+                                handleGetOrder(exchange);
+                            }
+                        }
                     }
                 }
                 case "PUT" -> {
@@ -202,6 +208,33 @@ public class BuyerHandler implements HttpHandler {
 
             /*
                 اورد رو باید خروجی داد
+             */
+        } catch (Exception e) {
+//            e.printStackTrace();
+            JsonResponse.sendJsonResponse(exchange, 500, "{\"error\":\"Internal server error\"}");
+        }
+    }
+
+    void handleGetOrderOrders(HttpExchange exchange) throws IOException {
+        Optional<User> authenticatedUserOptional = authenticate(exchange);
+        if (authenticatedUserOptional.isEmpty()) {
+            return;
+        }
+        // اگر صاحب سفارش نبود ارور بده
+
+        String path = exchange.getRequestURI().getPath();
+        String[] parts = path.split("/");
+        int id = Integer.parseInt(parts[2]);
+
+        try {
+            Optional<Order> optionalOrder = orderDAO.getById(id);
+            if (optionalOrder.isEmpty()) {
+                return;
+            }
+            Order order = optionalOrder.get();
+
+            /*
+                خروجی بده اوردر رو
              */
         } catch (Exception e) {
 //            e.printStackTrace();
