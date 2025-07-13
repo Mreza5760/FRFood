@@ -11,7 +11,7 @@ import java.sql.*;
 import java.util.List;
 import java.util.Optional;
 
-public class RestaurantDAOImp implements RestaurantDAO {
+public abstract class RestaurantDAOImp implements RestaurantDAO {
     @Override
     public int insert (Restaurant restaurant,int userId)throws SQLException, DataAlreadyExistsException {
         String sql = "INSERT INTO restaurants (owner_id , name , address , phone , logo , tax_fee , additional_fee) VALUES (?,?,?,?,?,?,?)";
