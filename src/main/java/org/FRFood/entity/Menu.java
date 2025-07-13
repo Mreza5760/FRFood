@@ -1,4 +1,39 @@
 package org.FRFood.entity;
 
 public class Menu {
+    private int id;
+    private Restaurant restaurant;
+    private String title;
+
+    Menu(int id, User owner,Restaurant restaurant, String title) {
+        this.id = id;
+        this.restaurant = restaurant;
+        this.title = title;
+    }
+
+    Menu() {}
+
+    public int getId() {
+        return id;
+    }
+
+    public Restaurant getRestaurant() {
+        return restaurant;
+    }
+
+    public String getTitle() {
+        return title;
+    }
+
+    public void setId(int id) {
+        this.id = id;
+    }
+
+    public void setRestaurant(Restaurant restaurant) {
+        this.restaurant = restaurant;
+    }
+
+    public void setTitle(String title) {
+        this.title = title;
+    }
 }
