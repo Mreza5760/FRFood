@@ -251,10 +251,16 @@ public class BuyerHandler implements HttpHandler {
         if (authenticatedUserOptional.isEmpty()) {
             return;
         }
-        int customerId = authenticatedUserOptional.get().getId();
-        List<Order> orders = orderDAO.getUserOrders();
-        /*
-        لیست اوردر ها رو خروجی بده
-         */
+
+        try {
+            int customerId = authenticatedUserOptional.get().getId();
+            List<Order> orders = orderDAO.getUserOrders(customerId);
+            /*
+            لیست اوردر ها رو خروجی بده
+             */
+        } catch (Exception e) {
+//            e.printStackTrace();
+            JsonResponse.sendJsonResponse(exchange, 500, "{\"error\":\"Internal server error\"}");
+        }
     }
 }
