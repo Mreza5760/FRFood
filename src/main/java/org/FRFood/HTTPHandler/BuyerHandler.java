@@ -1,29 +1,27 @@
 package org.FRFood.HTTPHandler;
 
 import org.FRFood.DAO.*;
-import io.jsonwebtoken.*;
 import org.FRFood.util.*;
 import org.FRFood.entity.*;
 import com.sun.net.httpserver.HttpHandler;
 import com.sun.net.httpserver.HttpExchange;
-import io.jsonwebtoken.security.SignatureException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import static org.FRFood.util.Authenticate.authenticate;
-import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 
-import java.sql.*;
-import java.util.Map;
-import java.util.HashMap;
+import org.FRFood.util.BuyerReq.VendorsReq;
+
+import java.sql.SQLException;
+import java.util.List;
 import java.util.Optional;
 import java.io.IOException;
-import java.io.OutputStream;
-import java.nio.charset.StandardCharsets;
 
 public class BuyerHandler implements HttpHandler {
     private final ObjectMapper objectMapper;
+    private final RestaurantDAO restaurantDAO;
 
     public BuyerHandler() {
         objectMapper = new ObjectMapper();
+        restaurantDAO = new RestaurantDAOImp();
     }
 
     @Override
@@ -33,32 +31,38 @@ public class BuyerHandler implements HttpHandler {
         try {
             switch (method) {
                 case "POST" -> {
-//                    switch (path) {
-//                        case "/auth/register" -> handleRegister(exchange);
-//                        case "/auth/login" -> handleLogin(exchange);
-//                        case "/auth/logout" -> handleLogout(exchange);
-//                        default -> JsonResponse.sendJsonResponse(exchange, 404, "Not Found");
-//                    }
+                    switch (path) {
+                        case "/vendors" -> handleVendors(exchange);
+                    }
                 }
                 case "GET" -> {
-//                    if (path.equals("/auth/profile")) {
-//                        handleGetProfile(exchange);
-//                    } else {
-//                        JsonResponse.sendJsonResponse(exchange, 404, "{\"error\":\"Not Found\"}");
-//                    }
                 }
                 case "PUT" -> {
-//                    if (path.equals("/auth/profile")) {
-//                        handleUpdateProfile(exchange);
-//                    } else {
-//                        JsonResponse.sendJsonResponse(exchange, 404, "{\"error\":\"Not Found\"}");
-//                    }
                 }
                 default -> JsonResponse.sendJsonResponse(exchange, 404, "Not Found");
             }
         } catch (Exception e) {
 //            e.printStackTrace();
             JsonResponse.sendJsonResponse(exchange, 500, "Internal Server Error");
+        }
+    }
+
+    private void handleVendors(HttpExchange exchange) throws IOException {
+        Optional<User> authenticatedUserOptional = authenticate(exchange);
+        if (authenticatedUserOptional.isEmpty()) {
+            return;
+        }
+
+        VendorsReq req = objectMapper.readValue(exchange.getRequestBody(), VendorsReq.class);
+
+        try {
+            List<Restaurant> restaurants = restaurantDAO.searchByString(req.search);
+            for (Restaurant restaurant : restaurants) {
+
+            }
+        } catch (SQLException e) {
+//            e.printStackTrace();
+            JsonResponse.sendJsonResponse(exchange, 500, "Database error");
         }
     }
 }
