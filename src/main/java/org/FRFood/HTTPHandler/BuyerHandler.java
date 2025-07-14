@@ -21,11 +21,13 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 
 public class BuyerHandler implements HttpHandler {
     private final FoodDAO foodDAO;
+    private final OrderDAO orderDAO;
     private final ObjectMapper objectMapper;
     private final RestaurantDAO restaurantDAO;
 
     public BuyerHandler() {
         foodDAO = new FoodDAOImp();
+        orderDAO = new OrderDAOImp();
         objectMapper = new ObjectMapper();
         restaurantDAO = new RestaurantDAOImp();
     }
@@ -41,12 +43,19 @@ public class BuyerHandler implements HttpHandler {
                     switch (path) {
                         case "/vendors" -> handleVendorsList(exchange);
                         case "/items" -> handleItemsList(exchange);
+                        case "/orders" -> handleSubmitOrder(exchange);
                     }
                 }
                 case "GET" -> {
                     switch (path) {
-                        case "/vendors" -> handleVendorsMenu(exchange);
-                        case "/items" -> handleGetItem(exchange);
+                        case "^/vendors/[^/]+$" -> handleVendorsMenu(exchange);
+                        case "^/items/[^/]+$" -> handleGetItem(exchange);
+                        case  "/orders/history" -> handleOrdersHistory(exchange);
+                        default -> {
+                            if (path.equals("^/orders/[^/]+$")) {
+                                handleGetOrder(exchange);
+                            }
+                        }
                     }
                 }
                 case "PUT" -> {
@@ -181,5 +190,77 @@ public class BuyerHandler implements HttpHandler {
             JsonResponse.sendJsonResponse(exchange, 500, "Database error");
         }
     }
+
+    void handleSubmitOrder(HttpExchange exchange) throws IOException {
+        Optional<User> authenticatedUserOptional = authenticate(exchange);
+        if (authenticatedUserOptional.isEmpty()) {
+            return;
+        }
+        Order order = objectMapper.readValue(exchange.getRequestBody(), Order.class);
+        // ایدی صفر نمیشه داشت
+        if (order.getDeliveryAddress() == null || order.getVendorId() == 0 || order.getItems() == null) {
+            JsonResponse.sendJsonResponse(exchange, 400, "{\"error\":\"Missing required fields\"}");
+            return;
+        }
+        order.setCustomerId(authenticatedUserOptional.get().getId());
+        try {
+            order.setId(orderDAO.insert(order));
+
+            /*
+                اورد رو باید خروجی داد
+             */
+        } catch (Exception e) {
+//            e.printStackTrace();
+            JsonResponse.sendJsonResponse(exchange, 500, "{\"error\":\"Internal server error\"}");
+        }
+    }
+
+    void handleGetOrder(HttpExchange exchange) throws IOException {
+        Optional<User> authenticatedUserOptional = authenticate(exchange);
+        if (authenticatedUserOptional.isEmpty()) {
+            return;
+        }
+
+        String path = exchange.getRequestURI().getPath();
+        String[] parts = path.split("/");
+        int id = Integer.parseInt(parts[2]);
+
+        try {
+            Optional<Order> optionalOrder = orderDAO.getById(id);
+            if (optionalOrder.isEmpty()) {
+                return;
+            }
+            Order order = optionalOrder.get();
+
+            // ارور بده صاحب اش نبود
+            if (order.getCustomerId() !=  authenticatedUserOptional.get().getId()) {
+                return;
+            }
+
+            /*
+                خروجی بده اوردر رو
+             */
+        } catch (Exception e) {
+//            e.printStackTrace();
+            JsonResponse.sendJsonResponse(exchange, 500, "{\"error\":\"Internal server error\"}");
+        }
+    }
+
+    void handleOrdersHistory(HttpExchange exchange) throws IOException {
+        Optional<User> authenticatedUserOptional = authenticate(exchange);
+        if (authenticatedUserOptional.isEmpty()) {
+            return;
+        }
+
+        try {
+            int customerId = authenticatedUserOptional.get().getId();
+            List<Order> orders = orderDAO.getUserOrders(customerId);
+            /*
+            لیست اوردر ها رو خروجی بده
+             */
+        } catch (Exception e) {
+//            e.printStackTrace();
+            JsonResponse.sendJsonResponse(exchange, 500, "{\"error\":\"Internal server error\"}");
+        }
+    }
 }
-//Order order = objectMapper.readValue(jsonInputStream, Order.class);

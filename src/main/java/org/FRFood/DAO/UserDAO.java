@@ -8,7 +8,7 @@ import java.util.Optional;
 
 public interface UserDAO {
     Optional<User> getById(int id) throws SQLException;
-    int insert(User category) throws SQLException, DataAlreadyExistsException;
+    int insert(User user) throws SQLException, DataAlreadyExistsException;
     boolean deleteById(int id)throws SQLException;
     Optional<User> getByPhone(String phoneNumber) throws SQLException;
     void update(User currentUser) throws SQLException;
