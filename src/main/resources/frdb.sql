@@ -115,12 +115,7 @@ CREATE TABLE IF NOT EXISTS Orders
     'waiting vendor',
     'cancelled',
     'finding courier',
-    'accepted',
-    'rejected',
-    'served',
-    'received',
     'on the way',
-    'delivered',
     'completed'
 ) NOT NULL,
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,

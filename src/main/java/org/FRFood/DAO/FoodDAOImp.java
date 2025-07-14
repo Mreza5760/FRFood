@@ -52,6 +52,7 @@ public class FoodDAOImp implements FoodDAO {
 
     @Override
     public int insert(Food food) throws SQLException {
+
         return 0;
     }
 
