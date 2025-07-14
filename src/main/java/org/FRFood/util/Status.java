@@ -6,11 +6,6 @@ public enum Status {
         waitingVendor,
         cancelled,
         findingCourier,
-        accepted,
-        rejected,
-        served,
-        received,
         onTheWay,
-        delivered,
         completed
 }
