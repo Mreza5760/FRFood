@@ -5,6 +5,8 @@ import org.FRFood.util.DBConnector;
 import org.FRFood.util.DataAlreadyExistsException;
 
 import java.sql.*;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 public class KeywordDAOImp implements KeywordDAO {
@@ -78,5 +80,30 @@ public class KeywordDAOImp implements KeywordDAO {
             }
         }
         return generatedId;
+    }
+
+    @Override
+    public List<Keyword> getKeywordsByFoodId(int foodId) throws SQLException {
+        String temp = "SELECT * FROM FoodItem_Keywords WHERE food_item_id = ?";
+        List<Keyword> keywords = new ArrayList<>();
+        try(
+                Connection connection = DBConnector.gConnection();
+                PreparedStatement statement = connection.prepareStatement(temp)
+                ){
+            statement.setInt(1, foodId);
+            try (ResultSet result = statement.executeQuery()) {
+                while (result.next()) {
+                    Keyword keyword = new Keyword();
+                    if(getKeywordById(result.getInt("id")).isEmpty()){
+                        //error
+                        return null;
+                    }else{
+                        keyword = getKeywordById(result.getInt("id")).get();
+                    }
+                    keywords.add(keyword);
+                }
+            }
+        }
+        return keywords;
     }
 }
