@@ -107,7 +107,6 @@ CREATE TABLE IF NOT EXISTS Orders
     tax_fee          INTEGER NOT NULL,
     additional_fee   INTEGER NOT NULL,
     courier_fee      INTEGER NOT NULL,
-    discount_amount  INTEGER DEFAULT 0,
     pay_price        INTEGER NOT NULL,
     status           ENUM(
         'submitted',

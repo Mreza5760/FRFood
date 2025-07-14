@@ -209,7 +209,7 @@ public class BuyerHandler implements HttpHandler {
         }
         Order order = objectMapper.readValue(exchange.getRequestBody(), Order.class);
         // ایدی صفر نمیشه داشت
-        if (order.getDeliveryAddress() == null || order.getVendorId() == 0 || order.getItems() == null) {
+        if (order.getDeliveryAddress() == null || order.getRestaurantId() == 0 || order.getItems() == null) {
             JsonResponse.sendJsonResponse(exchange, 400, "{\"error\":\"Missing required fields\"}");
             return;
         }
