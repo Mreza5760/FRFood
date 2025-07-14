@@ -5,10 +5,7 @@ import org.FRFood.entity.Keyword;
 import org.FRFood.entity.Restaurant;
 import org.FRFood.util.DBConnector;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import java.sql.*;
 import java.util.List;
 import java.util.Optional;
 
@@ -52,13 +49,83 @@ public class FoodDAOImp implements FoodDAO {
 
     @Override
     public int insert(Food food) throws SQLException {
+        int generatedKey = -1;
+        String sql = "INSERT INTO FoodItems ( restaurant_id , name , image , description , price , supply) VALUES (?,?,?,?,?,?)";
+        try (
+                Connection connection = DBConnector.gConnection();
+                PreparedStatement preparedStatement = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
+        ) {
+            preparedStatement.setInt(1, food.getRestaurantId());
+            preparedStatement.setString(2, food.getName());
+            preparedStatement.setString(3, food.getPicture());
+            preparedStatement.setString(4, food.getDescription());
+            preparedStatement.setInt(5, food.getPrice());
+            preparedStatement.setInt(6, food.getSupply());
 
-        return 0;
+            int rows = preparedStatement.executeUpdate();
+            if (rows == 0) {
+                throw new SQLException("Insert failed, no rows affected.");
+            }
+
+            try (ResultSet keys = preparedStatement.getGeneratedKeys()) {
+                if (keys.next()) {
+                    generatedKey =  keys.getInt(1);
+                } else {
+                    throw new SQLException("Insert failed, no ID generated.");
+                }
+            }
+
+            food.setId(generatedKey);
+            List<Keyword> keywords = food.getKeywords();
+            String sql2 = "INSERT INTO FoodItem_Keywords (food_item_id,keyword_id) VALUES (?,?)";
+            PreparedStatement preparedStatement2 = connection.prepareStatement(sql2);
+            for(Keyword keyword:keywords){
+                preparedStatement2.setInt(1, food.getId());
+                preparedStatement2.setInt(2, keyword.getId());
+                int changed = preparedStatement2.executeUpdate();
+                if(changed == 0){
+                    throw  new SQLException();
+                }
+            }
+            preparedStatement2.close();
+
+        }
+        return generatedKey;
     }
 
     @Override
     public void update(Food food) throws SQLException {
-        return;
+        delete(food.getId());
+        String sql = "INSERT INTO FoodItems (id , restaurant_id , name , image , description , price , supply) VALUES (?,?,?,?,?,?,?)";
+        try (
+                Connection connection = DBConnector.gConnection();
+                PreparedStatement preparedStatement = connection.prepareStatement(sql);
+        ) {
+            preparedStatement.setInt(1, food.getId());
+            preparedStatement.setInt(2, food.getRestaurantId());
+            preparedStatement.setString(3, food.getName());
+            preparedStatement.setString(4, food.getPicture());
+            preparedStatement.setString(5, food.getDescription());
+            preparedStatement.setInt(6, food.getPrice());
+            preparedStatement.setInt(7, food.getSupply());
+
+            List<Keyword> keywords = food.getKeywords();
+            String sql2 = "INSERT INTO FoodItem_Keywords (food_item_id,keyword_id) VALUES (?,?)";
+            PreparedStatement preparedStatement2 = connection.prepareStatement(sql2);
+            for(Keyword keyword:keywords){
+                preparedStatement2.setInt(1, food.getId());
+                preparedStatement2.setInt(2, keyword.getId());
+                int changed = preparedStatement2.executeUpdate();
+                if(changed == 0){
+                    throw  new SQLException();
+                }
+            }
+            preparedStatement2.close();
+            int rows = preparedStatement.executeUpdate();
+            if (rows == 0) {
+                throw new SQLException("Insert failed, no rows affected.");
+            }
+        }
     }
 
     @Override
@@ -74,5 +141,10 @@ public class FoodDAOImp implements FoodDAO {
     @Override
     public void setMenuIdNull(int foodId) throws SQLException {
 
+    }
+
+    @Override
+    public List<Keyword> getKeywords(int id) throws SQLException {
+        return List.of();
     }
 }
