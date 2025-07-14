@@ -1,6 +1,7 @@
 package org.FRFood.DAO;
 
 import org.FRFood.entity.Food;
+import org.FRFood.entity.Keyword;
 
 import java.util.List;
 import java.util.Optional;
@@ -20,4 +21,6 @@ public interface FoodDAO {
     void setMenuId(int menuId, int foodId) throws SQLException;
 
     void setMenuIdNull(int foodId) throws SQLException;
+
+    List<Keyword> getKeywords(int id) throws SQLException;
 }
