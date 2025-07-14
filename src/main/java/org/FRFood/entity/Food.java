@@ -1,14 +1,11 @@
 package org.FRFood.entity;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import java.util.List;
 
 public class Food {
     private int id;
-    @JsonIgnore
-    private int menuID;
     private String name;
     @JsonProperty("imageBase64")
     private String picture;
@@ -19,15 +16,16 @@ public class Food {
     private int supply;
     private List<Keyword> keywords;
 
-    public Food() {}
 
-    public Food(String name, int restaurantId, String description, List<Keyword> keywords, int price){
-        this.setRestaurantId(restaurantId);
+    public Food(String name, int vendorId, String description, List<Keyword> keywords, int price, int pictureId, Restaurant restaurant){
+        this.setVendorId(vendorId);
         this.setName(name);
         this.setDescription(description);
         this.setPrice(price);
         this.setKeywords(keywords);
     }
+
+    public Food(){}
 
     public String getName() {
         return name;
@@ -39,6 +37,10 @@ public class Food {
 
     public int getId() {
         return id;
+    }
+
+    public int getPriceId() {
+        return getPrice();
     }
 
     public String getPicture() {
@@ -69,8 +71,8 @@ public class Food {
         return restaurantId;
     }
 
-    public void setRestaurantId(int restaurantId) {
-        this.restaurantId = restaurantId;
+    public void setRestaurantId(int vendorId) {
+        this.restaurantId = vendorId;
     }
 
     public int getPrice() {
@@ -91,13 +93,5 @@ public class Food {
 
     public void setKeywords(List<Keyword> keywords) {
         this.keywords = keywords;
-    }
-
-    public int getMenuID() {
-        return menuID;
-    }
-
-    public void setMenuID(int menuID) {
-        this.menuID = menuID;
     }
 }

@@ -3,6 +3,7 @@ package org.FRFood.DAO;
 import org.FRFood.entity.Keyword;
 import org.FRFood.util.DataAlreadyExistsException;
 
+import java.util.List;
 import java.util.Optional;
 import java.sql.SQLException;
 
@@ -12,4 +13,6 @@ public interface KeywordDAO {
     Optional<Keyword> getKeywordById(int id) throws SQLException;
 
     Optional<Keyword> getKeywordByName(String Name) throws SQLException;
+
+    List<Keyword> getKeywordsByFoodId(int foodId) throws SQLException;
 }
