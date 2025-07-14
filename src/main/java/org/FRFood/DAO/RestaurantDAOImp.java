@@ -129,11 +129,17 @@ public class RestaurantDAOImp implements RestaurantDAO {
                 while (rs.next()) {
                     Food food = new Food();
                     food.setId(rs.getInt("id"));
-                    food.setName(rs.getString("name"));
                     food.setPrice(rs.getInt("price"));
+                    food.setName(rs.getString("name"));
+                    food.setSupply(rs.getInt("supply"));
+                    food.setMenuID(rs.getInt("menu_id"));
+                    food.setPicture(rs.getString("image"));
                     food.setRestaurantId(rs.getInt("restaurant_id"));
+                    food.setDescription(rs.getString("description"));
+
                     foods.add(food);
                 }
+                return foods;
             }
         }
     }
