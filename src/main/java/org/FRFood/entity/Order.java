@@ -13,7 +13,7 @@ public class Order {
     @JsonProperty("customer_id")
     private int customerId;
     @JsonProperty("vendor_id")
-    private int vendorId;
+    private int restaurantId;
     @JsonProperty("coupon_id")
     private int couponId;
     private List<OrderItemDTO> items;
@@ -40,8 +40,8 @@ public class Order {
     public int getId() { return id; }
     public void setId(int id) { this.id = id; }
 
-    public int getVendorId() { return vendorId; }
-    public void setVendorId(int vendorId) { this.vendorId = vendorId; }
+    public int getRestaurantId() { return restaurantId; }
+    public void setRestaurantId(int restaurantId) { this.restaurantId = restaurantId; }
 
     public int getCouponId() { return couponId; }
     public void setCouponId(int couponId) { this.couponId = couponId; }
