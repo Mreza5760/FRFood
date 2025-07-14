@@ -6,6 +6,7 @@ import org.FRFood.entity.Restaurant;
 import org.FRFood.util.DBConnector;
 
 import java.sql.*;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -161,11 +162,40 @@ public class FoodDAOImp implements FoodDAO {
 
     @Override
     public void setMenuIdNull(int foodId) throws SQLException {
-
+        String sql = "UPDATE FoodItems SET menu_id = null WHERE id = ?";
+        try(
+                Connection connection = DBConnector.gConnection();
+                PreparedStatement preparedStatement = connection.prepareStatement(sql);
+        ){
+            preparedStatement.setInt(1, foodId);
+            int rows = preparedStatement.executeUpdate();
+            if (rows == 0) {
+                throw new SQLException("Update failed, no rows affected.");
+            }
+        }
     }
 
     @Override
-    public List<Keyword> getKeywords(int id) throws SQLException {
-        return List.of();
+    public List<Keyword> getKeywords(int foodId) throws SQLException {
+        List<Keyword> keywords = new ArrayList<>();
+        String sql = "SELECT * FROM FoodItem_Keywords WHERE food_item_id = ?";
+        try(
+                Connection connection = DBConnector.gConnection();
+                PreparedStatement preparedStatement = connection.prepareStatement(sql);
+        ){
+            preparedStatement.setInt(1, foodId);
+            ResultSet resultSet = preparedStatement.executeQuery();
+            while (resultSet.next()) {
+                int id = resultSet.getInt("keyword_id");
+                KeywordDAO keywordDAO = new KeywordDAOImp();
+                if(keywordDAO.getKeywordById(id).isEmpty()){
+                    keywords.add(keywordDAO.getKeywordById(id).get());
+                }else{
+                    throw new SQLException();
+                }
+            }
+            resultSet.close();
+            return keywords;
+        }
     }
 }

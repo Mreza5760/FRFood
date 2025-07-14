@@ -22,5 +22,5 @@ public interface FoodDAO {
 
     void setMenuIdNull(int foodId) throws SQLException;
 
-    List<Keyword> getKeywords(int id) throws SQLException;
+    List<Keyword> getKeywords(int foodId) throws SQLException;
 }
