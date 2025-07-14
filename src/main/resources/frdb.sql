@@ -38,7 +38,7 @@ CREATE TABLE IF NOT EXISTS Restaurants
     FOREIGN KEY (owner_id) REFERENCES Users (id) ON DELETE CASCADE
 );
 
-CREATE TABLE IF NOT EXISTS Keywords
+CREATE TABLE IF NOT EXISTS `Keywords`
 (
     id   INTEGER AUTO_INCREMENT PRIMARY KEY,
     name VARCHAR(100) NOT NULL UNIQUE
@@ -71,13 +71,13 @@ CREATE TABLE IF NOT EXISTS FoodItems
     FOREIGN KEY (menu_id) REFERENCES Menus (id) ON DELETE CASCADE
 );
 
-CREATE TABLE IF NOT EXISTS FoodItem_Keywords
+CREATE TABLE IF NOT EXISTS FoodItem_keywords
 (
     food_item_id INTEGER NOT NULL,
     keyword_id   INTEGER NOT NULL,
     PRIMARY KEY (food_item_id, keyword_id),
     FOREIGN KEY (food_item_id) REFERENCES FoodItems (id) ON DELETE CASCADE,
-    FOREIGN KEY (keyword_id) REFERENCES Keywords (id) ON DELETE CASCADE
+    FOREIGN KEY (keyword_id) REFERENCES `Keywords` (id) ON DELETE CASCADE
 );
 
 CREATE TABLE IF NOT EXISTS Coupons
