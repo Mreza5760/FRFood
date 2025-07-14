@@ -130,7 +130,17 @@ public class FoodDAOImp implements FoodDAO {
 
     @Override
     public void delete(int id) throws SQLException {
-        return;
+        String sql = "DELETE FROM FoodItems WHERE id = ?";
+        try(
+                Connection connection = DBConnector.gConnection();
+                PreparedStatement preparedStatement = connection.prepareStatement(sql);
+                ){
+            preparedStatement.setInt(1, id);
+            int rows = preparedStatement.executeUpdate();
+            if (rows == 0) {
+                throw new SQLException("Delete failed, no rows affected.");
+            }
+        }
     }
 
     @Override
