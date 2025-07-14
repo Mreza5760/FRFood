@@ -4,8 +4,10 @@ import org.FRFood.entity.Order;
 import org.FRFood.util.DBConnector;
 import org.FRFood.DTO.OrderItemDTO;
 import org.FRFood.util.DataAlreadyExistsException;
+import org.FRFood.util.Status;
 
 import java.sql.*;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -35,21 +37,98 @@ public class OrderDAOImp implements OrderDAO {
 
     @Override
     public Optional<Order> getById(Integer id) throws SQLException {
-        return Optional.empty();
+        String sql = "SELECT * FROM orders WHERE id = ?";
+        try (
+                Connection conn = DBConnector.gConnection();
+                 PreparedStatement stmt = conn.prepareStatement(sql)
+        ) {
+            stmt.setInt(1, id);
+            try (ResultSet rs = stmt.executeQuery()) {
+                if (rs.next()) {
+                    Order order = new Order();
+                    order.setId(id);
+                    order.setTaxFee(rs.getInt("tax_fee"));
+                    order.setPayPrice(rs.getInt("pay_price"));
+                    order.setCouponId(rs.getInt("coupon_id"));
+                    order.setRawPrice(rs.getInt("raw_price"));
+                    order.setCourierId(rs.getInt("courier_id"));
+                    order.setCustomerId(rs.getInt("customer_id"));
+                    order.setCourierFee(rs.getInt("courier_fee"));
+                    order.setCreatedAt(rs.getString("created_at"));
+                    order.setUpdatedAt(rs.getString("updated_at"));
+                    order.setRestaurantId(rs.getInt("restaurant_id"));
+                    order.setAdditionalFee(rs.getInt("additional_fee"));
+                    order.setStatus(Status.valueOf(rs.getString("status")));
+                    order.setDeliveryAddress(rs.getString("delivery_address"));
+                }
+            }
+        }
     }
 
     @Override
     public List<Order> getUserOrders(int userID) throws SQLException {
-        return List.of();
+        String sql = "SELECT * FROM orders WHERE user_id = ?";
+        try (
+                Connection conn = DBConnector.gConnection();
+                PreparedStatement stmt = conn.prepareStatement(sql)
+        ) {
+            stmt.setInt(1, userID);
+            try (ResultSet rs = stmt.executeQuery()) {
+                List<Order> orders = new ArrayList<>();
+                while (rs.next()) {
+                    Order order = new Order();
+                    order.setCustomerId(userID);
+                    order.setId(rs.getInt("id"));
+                    order.setTaxFee(rs.getInt("tax_fee"));
+                    order.setPayPrice(rs.getInt("pay_price"));
+                    order.setCouponId(rs.getInt("coupon_id"));
+                    order.setRawPrice(rs.getInt("raw_price"));
+                    order.setCourierId(rs.getInt("courier_id"));
+                    order.setCourierFee(rs.getInt("courier_fee"));
+                    order.setCreatedAt(rs.getString("created_at"));
+                    order.setUpdatedAt(rs.getString("updated_at"));
+                    order.setRestaurantId(rs.getInt("restaurant_id"));
+                    order.setAdditionalFee(rs.getInt("additional_fee"));
+                    order.setStatus(Status.valueOf(rs.getString("status")));
+                    order.setDeliveryAddress(rs.getString("delivery_address"));
+                }
+            }
+        }
     }
 
     @Override
     public List<Order> getRestaurantOrders(int restaurantID) throws SQLException {
-        return List.of();
+        String sql = "SELECT * FROM orders WHERE restaurant_id = ?";
+        try (
+                Connection conn = DBConnector.gConnection();
+                PreparedStatement stmt = conn.prepareStatement(sql)
+        ) {
+            stmt.setInt(1, restaurantID);
+            try (ResultSet rs = stmt.executeQuery()) {
+                List<Order> orders = new ArrayList<>();
+                while (rs.next()) {
+                    Order order = new Order();
+                    order.setRestaurantId((restaurantID);
+                    order.setId(rs.getInt("id"));
+                    order.setTaxFee(rs.getInt("tax_fee"));
+                    order.setPayPrice(rs.getInt("pay_price"));
+                    order.setCouponId(rs.getInt("coupon_id"));
+                    order.setRawPrice(rs.getInt("raw_price"));
+                    order.setCourierId(rs.getInt("courier_id"));
+                    order.setCustomerId(rs.getInt("customer_id"));
+                    order.setCourierFee(rs.getInt("courier_fee"));
+                    order.setCreatedAt(rs.getString("created_at"));
+                    order.setUpdatedAt(rs.getString("updated_at"));
+                    order.setAdditionalFee(rs.getInt("additional_fee"));
+                    order.setStatus(Status.valueOf(rs.getString("status")));
+                    order.setDeliveryAddress(rs.getString("delivery_address"));
+                }
+            }
+        }
     }
 
     @Override
     public void changeStatus(Integer orderID, String status) throws SQLException {
-        return;
+
     }
 }
