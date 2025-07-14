@@ -216,7 +216,6 @@ public class BuyerHandler implements HttpHandler {
         order.setCustomerId(authenticatedUserOptional.get().getId());
         try {
             order.setId(orderDAO.insert(order));
-
             /*
                 اورد رو باید خروجی داد
              */
@@ -284,6 +283,8 @@ public class BuyerHandler implements HttpHandler {
         try {
             int customerId = authenticatedUserOptional.get().getId();
             List<Restaurant> restaurants = userDAO.getFavorites(customerId);
+            String json = objectMapper.writeValueAsString(restaurants);
+            JsonResponse.sendJsonResponse(exchange, 200, json);
             /*
             لیسیت رستوران رو خروجی بده
              */
@@ -312,6 +313,7 @@ public class BuyerHandler implements HttpHandler {
             }
             Restaurant restaurant = optionalRestaurant.get();
             userDAO.insertFavorite(customerId, restaurant);
+            JsonResponse.sendJsonResponse(exchange,200,"{\"message\":\"Added to favorites\"}");
             /*
             پیام موفقیت باید بدی
              */
@@ -340,6 +342,7 @@ public class BuyerHandler implements HttpHandler {
             }
             Restaurant restaurant = optionalRestaurant.get();
             userDAO.deleteFavorite(customerId, restaurant);
+            JsonResponse.sendJsonResponse(exchange,200,"{\"message\":\"Removed from favorites\"}");
             /*
             پیام موفقیت باید بدی
              */

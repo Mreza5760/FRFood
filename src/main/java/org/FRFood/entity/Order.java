@@ -8,14 +8,15 @@ import java.util.List;
 
 public class Order {
     private int id;
+    @JsonProperty("delivery_address")
+    private String deliveryAddress;
     @JsonProperty("customer_id")
     private int customerId;
     @JsonProperty("vendor_id")
     private int vendorId;
     @JsonProperty("coupon_id")
     private int couponId;
-    @JsonProperty("delivery_address")
-    private String deliveryAddress;
+    private List<OrderItemDTO> items;
     @JsonProperty("raw_price")
     private int rawPrice;
     @JsonProperty("tax_fee")
@@ -33,7 +34,8 @@ public class Order {
     private String createdAt;
     @JsonProperty("updated_at")
     private String updatedAt;
-    private List<OrderItemDTO> items;
+
+    public Order(){}
 
     public int getId() { return id; }
     public void setId(int id) { this.id = id; }
