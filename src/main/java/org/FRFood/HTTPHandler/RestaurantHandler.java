@@ -1,5 +1,6 @@
 package org.FRFood.HTTPHandler;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.sun.net.httpserver.HttpExchange;
@@ -52,7 +53,11 @@ public class RestaurantHandler implements HttpHandler {
                     deleteItem(exchange, Integer.parseInt(parts[2]), Integer.parseInt(parts[4]));
                 } else if (parts[3].equals("menu") && method.equals("DELETE")) {
                     deleteMenu(exchange, Integer.parseInt(parts[2]), parts[4]);
+                } else if (parts[3].equals("menu") && method.equals("PUT")) {
+                    addItemToMenu(exchange, Integer.parseInt(parts[2]), parts[4]);
                 }
+            }else if (parts.length == 6) {
+                deleteItemFromMenu(exchange,Integer.parseInt(parts[2]),parts[4],Integer.parseInt(parts[5]));
             }
             if (path.equals("/restaurants")) {
                 handleRestaurants(exchange);
@@ -239,6 +244,32 @@ public class RestaurantHandler implements HttpHandler {
         }
     }
 
+    private void addItemToMenu(HttpExchange exchange, int restaurantId, String title) throws IOException {
+        Menu menu = new Menu();
+        try {
+            if (restaurantDAO.getMenuByTitle(title, restaurantId).isPresent()) {
+                menu = restaurantDAO.getMenuByTitle(title, restaurantId).get();
+            }
+            JsonNode node = objectMapper.readTree(exchange.getRequestBody());
+            int itemId = node.get("item_id").asInt();
+            FoodDAO foodDAO = new FoodDAOImp();
+            foodDAO.setMenuId(itemId, menu.getId());
+            JsonResponse.sendJsonResponse(exchange, 200, "{\"message\":\"Food item created and added to restaurant successfully\"}");
+        } catch (SQLException e) {
+            JsonResponse.sendJsonResponse(exchange, 500, "{\"error\":\"Internal Server Error\"}");
+            System.out.println(e.getMessage());
+        }
+    }
 
+    private void deleteItemFromMenu(HttpExchange exchange, int restaurantId, String menuTitle,int foodId) throws IOException {
+        FoodDAO foodDAO = new FoodDAOImp();
+        try{
+            foodDAO.setMenuIdNull(foodId);
+            JsonResponse.sendJsonResponse(exchange, 200, "{\"message\":\"Item removed from restaurant menu successfully\"}");
+        }catch (SQLException e){
+            JsonResponse.sendJsonResponse(exchange, 500, "{\"error\":\"Internal Server Error\"}");
+            System.out.println(e.getMessage());
+        }
+    }
 
 }

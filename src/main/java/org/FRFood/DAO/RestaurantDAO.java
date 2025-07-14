@@ -19,4 +19,5 @@ public interface RestaurantDAO {
     int insert(Restaurant restaurant,int userId) throws SQLException, DataAlreadyExistsException;
     int insertMenu(Menu menu) throws SQLException;
     void deleteMenuByTitle(String title,int restaurantId) throws SQLException;
+    Optional<Menu> getMenuByTitle(String title,int restaurantId) throws SQLException;
 }

@@ -32,7 +32,17 @@ public class FoodDAOImp implements FoodDAO{
     }
 
     @Override
-    public void delete(Food food) throws SQLException {
+    public void delete(int id) throws SQLException {
         return;
+    }
+
+    @Override
+    public void setMenuId(int menuId, int foodId) throws SQLException {
+
+    }
+
+    @Override
+    public void setMenuIdNull(int foodId) throws SQLException {
+
     }
 }
