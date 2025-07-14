@@ -21,12 +21,14 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 
 public class BuyerHandler implements HttpHandler {
     private final FoodDAO foodDAO;
+    private final UserDAO userDAO;
     private final OrderDAO orderDAO;
     private final ObjectMapper objectMapper;
     private final RestaurantDAO restaurantDAO;
 
     public BuyerHandler() {
         foodDAO = new FoodDAOImp();
+        userDAO = new UserDAOImp();
         orderDAO = new OrderDAOImp();
         objectMapper = new ObjectMapper();
         restaurantDAO = new RestaurantDAOImp();
@@ -51,6 +53,7 @@ public class BuyerHandler implements HttpHandler {
                         case "^/vendors/[^/]+$" -> handleVendorsMenu(exchange);
                         case "^/items/[^/]+$" -> handleGetItem(exchange);
                         case  "/orders/history" -> handleOrdersHistory(exchange);
+                        case "/favorites" -> handleGetFavorites(exchange);
                         default -> {
                             if (path.equals("^/orders/[^/]+$")) {
                                 handleGetOrder(exchange);
@@ -257,6 +260,24 @@ public class BuyerHandler implements HttpHandler {
             List<Order> orders = orderDAO.getUserOrders(customerId);
             /*
             لیست اوردر ها رو خروجی بده
+             */
+        } catch (Exception e) {
+//            e.printStackTrace();
+            JsonResponse.sendJsonResponse(exchange, 500, "{\"error\":\"Internal server error\"}");
+        }
+    }
+
+    void handleGetFavorites(HttpExchange exchange) throws IOException {
+        Optional<User> authenticatedUserOptional = authenticate(exchange);
+        if (authenticatedUserOptional.isEmpty()) {
+            return;
+        }
+
+        try {
+            int customerId = authenticatedUserOptional.get().getId();
+            List<Restaurant> restaurants = userDAO.getFavorites(customerId);
+            /*
+            لیسیت رستوران رو خروجی بده
              */
         } catch (Exception e) {
 //            e.printStackTrace();

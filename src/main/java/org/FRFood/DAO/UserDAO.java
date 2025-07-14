@@ -15,4 +15,5 @@ public interface UserDAO {
     List<Restaurant> getFavorites(int id) throws SQLException;
     Optional<User> getByPhone(String phoneNumber) throws SQLException;
     int insert(User user) throws SQLException, DataAlreadyExistsException;
+    boolean insertFavorite(int id, Restaurant restaurant) throws SQLException;
 }
