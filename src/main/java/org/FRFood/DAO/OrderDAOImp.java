@@ -2,6 +2,7 @@ package org.FRFood.DAO;
 
 import org.FRFood.entity.Order;
 import org.FRFood.util.DBConnector;
+import org.FRFood.DTO.OrderItemDTO;
 import org.FRFood.util.DataAlreadyExistsException;
 
 import java.sql.*;
@@ -11,7 +12,7 @@ import java.util.Optional;
 public class OrderDAOImp implements OrderDAO {
     @Override
     public int insert(Order order) throws SQLException {
-        String sql = "INSERT INTO orders (customer_id, restaurant_id, courier_id, coupon_id, delivery_address, raw_price, tax_fee, additional_fee, courier_fee, discount_amount, pay_price, status, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+        String sql = "INSERT INTO orders (customer_id, restaurant_id, courier_id, coupon_id, delivery_address, raw_price, tax_fee, courier_fee, pay_price, status) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
         try (
                 Connection conn = DBConnector.gConnection();
                 PreparedStatement stmt = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)
@@ -25,8 +26,11 @@ public class OrderDAOImp implements OrderDAO {
             stmt.setInt(7, order.getTaxFee());
             stmt.setInt(8, order.getAdditionalFee());
             stmt.setInt(9, order.getCourierFee());
-            stmt.setInt(10, );
+            stmt.setInt(10, order.getPayPrice());
+            stmt.setString(11, order.getStatus().toString());
+
         }
+        return 0;
     }
 
     @Override
