@@ -126,10 +126,10 @@ public class UserDAOImp implements UserDAO {
         BankAccountDAO bankAccountDAO = new BankAccountDAOImp();
         User user = null;
         BankAccount bankAccount;
-        try(
+        try (
                 Connection conn = DBConnector.gConnection();
                 PreparedStatement stmt = conn.prepareStatement(sql)
-                ){
+        ) {
             stmt.setString(1, phoneNumber);
             try (ResultSet rs = stmt.executeQuery()) {
                 if (rs.next()) {
@@ -144,30 +144,30 @@ public class UserDAOImp implements UserDAO {
                     user.setPicture(rs.getString("profile_image"));
                     bankAccount = bankAccountDAO.getById(rs.getInt("bank_id")).get();
                     user.setBankAccount(bankAccount);
-                }else{
+                } else {
                     return Optional.empty();
                 }
             }
-        }catch(SQLException e){
+        } catch (SQLException e) {
             System.out.println(e.getMessage());
         }
         return Optional.ofNullable(user);
     }
 
     @Override
-    public void update(User currentUser) throws SQLException{
+    public void update(User currentUser) throws SQLException {
         String temp = "UPDATE Users SET full_name = ? , email = ? , password_hash = ? , address = ? , profile_image = ? , bank_id = ? WHERE id = ?";
         try (
                 Connection conn = DBConnector.gConnection();
                 PreparedStatement stmt = conn.prepareStatement(temp)
-        ){
+        ) {
             stmt.setString(1, currentUser.getFullName());
             stmt.setString(2, currentUser.getEmail());
             stmt.setString(3, currentUser.getPassword());
             stmt.setString(4, currentUser.getAddress());
-            stmt.setString(5,currentUser.getPicture());
-            stmt.setInt(6,currentUser.getBank().getId());
-            stmt.setInt(7,currentUser.getId());
+            stmt.setString(5, currentUser.getPicture());
+            stmt.setInt(6, currentUser.getBank().getId());
+            stmt.setInt(7, currentUser.getId());
             stmt.executeUpdate();
         }
     }

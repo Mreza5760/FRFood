@@ -34,6 +34,6 @@ public class PictureDAOImp implements PictureDAO {
         } catch (Exception e) {
             System.out.println("an error occurred" + e);
         }
-        return  0;
+        return 0;
     }
 }

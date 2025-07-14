@@ -14,8 +14,8 @@ public class KeywordDAOImp implements KeywordDAO {
         Keyword keyword = null;
 
         try (Connection connection = DBConnector.gConnection();
-            PreparedStatement statement = connection.prepareStatement(temp)){
-            statement.setString(1 , Integer.toString(id));
+             PreparedStatement statement = connection.prepareStatement(temp)) {
+            statement.setString(1, Integer.toString(id));
             try (ResultSet result = statement.executeQuery()) {
                 if (result.next()) {
                     keyword = new Keyword();
@@ -28,11 +28,11 @@ public class KeywordDAOImp implements KeywordDAO {
     }
 
     @Override
-    public Optional<Keyword> getKeywordByName(String name) throws SQLException{
+    public Optional<Keyword> getKeywordByName(String name) throws SQLException {
         String temp = "SELECT id, name FROM Keywords WHERE name = ?";
         Keyword keyword = null;
         try (Connection connection = DBConnector.gConnection();
-             PreparedStatement statement = connection.prepareStatement(temp)){
+             PreparedStatement statement = connection.prepareStatement(temp)) {
             statement.setString(1, name);
             try (ResultSet result = statement.executeQuery()) {
                 if (result.next()) {
@@ -47,15 +47,15 @@ public class KeywordDAOImp implements KeywordDAO {
     }
 
     @Override
-    public int insertKeyword(Keyword keyword) throws SQLException , DataAlreadyExistsException {
+    public int insertKeyword(Keyword keyword) throws SQLException, DataAlreadyExistsException {
         int generatedId = -1;
         if (getKeywordByName(keyword.getName()).isPresent()) {
             throw new DataAlreadyExistsException("a Keyword with that name is already in the db");
         } else {
             String temp = "INSERT INTO Keywords (name) VALUES (?)";
             try (Connection connection = DBConnector.gConnection();
-                PreparedStatement statement = connection.prepareStatement(temp , Statement.RETURN_GENERATED_KEYS)){
-                statement.setString(1 , keyword.getName());
+                 PreparedStatement statement = connection.prepareStatement(temp, Statement.RETURN_GENERATED_KEYS)) {
+                statement.setString(1, keyword.getName());
                 int affectedRows = statement.executeUpdate();
 
                 if (affectedRows > 0) {

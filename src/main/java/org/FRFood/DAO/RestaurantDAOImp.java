@@ -14,14 +14,13 @@ import java.util.Optional;
 
 public class RestaurantDAOImp implements RestaurantDAO {
     @Override
-    public int insert (Restaurant restaurant,int userId)throws SQLException, DataAlreadyExistsException {
+    public int insert(Restaurant restaurant, int userId) throws SQLException, DataAlreadyExistsException {
         String sql = "INSERT INTO restaurants (owner_id , name , address , phone , logo , tax_fee , additional_fee) VALUES (?,?,?,?,?,?,?)";
-        try(
+        try (
                 Connection connection = DBConnector.gConnection();
-                PreparedStatement preparedStatement = connection.prepareStatement(sql , Statement.RETURN_GENERATED_KEYS);
-                )
-        {
-            preparedStatement.setInt(1,userId );
+                PreparedStatement preparedStatement = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
+        ) {
+            preparedStatement.setInt(1, userId);
             preparedStatement.setString(2, restaurant.getName());
             preparedStatement.setString(3, restaurant.getAddress());
             preparedStatement.setString(4, restaurant.getPhone());
@@ -48,14 +47,13 @@ public class RestaurantDAOImp implements RestaurantDAO {
     }
 
     @Override
-    public Optional<Restaurant> getById(int id) throws SQLException{
-        String sql =  "SELECT * FROM restaurants WHERE id = ?";
-        try(
+    public Optional<Restaurant> getById(int id) throws SQLException {
+        String sql = "SELECT * FROM restaurants WHERE id = ?";
+        try (
                 Connection connection = DBConnector.gConnection();
                 PreparedStatement preparedStatement = connection.prepareStatement(sql);
-                )
-        {
-            preparedStatement.setInt(1,id);
+        ) {
+            preparedStatement.setInt(1, id);
             try (ResultSet rs = preparedStatement.executeQuery()) {
                 if (rs.next()) {
                     Restaurant restaurant = new Restaurant();
@@ -82,13 +80,13 @@ public class RestaurantDAOImp implements RestaurantDAO {
     }
 
     @Override
-    public void DeleteById(int id) throws SQLException{
+    public void DeleteById(int id) throws SQLException {
         String sql = "DELETE FROM restaurants WHERE id = ?";
-        try(
+        try (
                 Connection connection = DBConnector.gConnection();
                 PreparedStatement preparedStatement = connection.prepareStatement(sql);
-        ){
-            preparedStatement.setInt(1,id);
+        ) {
+            preparedStatement.setInt(1, id);
             int rows = preparedStatement.executeUpdate();
             if (rows == 0) {
                 throw new SQLException("Delete failed, no rows affected.");
@@ -104,13 +102,12 @@ public class RestaurantDAOImp implements RestaurantDAO {
     @Override
     public void Update(Restaurant restaurant) throws SQLException {
         String sql = "INSERT INTO restaurants (id,owner_id , name , address , phone , logo , tax_fee , additional_fee) VALUES (?,?,?,?,?,?,?,?)";
-        try(
+        try (
                 Connection connection = DBConnector.gConnection();
                 PreparedStatement preparedStatement = connection.prepareStatement(sql);
-        )
-        {
-            preparedStatement.setInt(1,restaurant.getId());
-            preparedStatement.setInt(2,restaurant.getOwner().getId() );
+        ) {
+            preparedStatement.setInt(1, restaurant.getId());
+            preparedStatement.setInt(2, restaurant.getOwner().getId());
             preparedStatement.setString(3, restaurant.getName());
             preparedStatement.setString(4, restaurant.getAddress());
             preparedStatement.setString(5, restaurant.getPhone());

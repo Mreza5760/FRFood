@@ -8,10 +8,16 @@ import java.sql.SQLException;
 
 public interface FoodDAO {
     Optional<Food> getById(int id) throws SQLException;
+
     boolean doesHaveKeywords(List<String> input) throws SQLException;
+
     int insert(Food food) throws SQLException;
+
     void update(Food food) throws SQLException;
-    void  delete(int id) throws SQLException;
-    void setMenuId(int menuId,int foodId) throws SQLException;
+
+    void delete(int id) throws SQLException;
+
+    void setMenuId(int menuId, int foodId) throws SQLException;
+
     void setMenuIdNull(int foodId) throws SQLException;
 }

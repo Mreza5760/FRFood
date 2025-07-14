@@ -21,4 +21,14 @@ public class OrderDAOImp implements OrderDAO {
     public List<Order> getUserOrders(int userID) throws SQLException {
         return List.of();
     }
+
+    @Override
+    public List<Order> getRestaurantOrders(int restaurantID) throws SQLException {
+        return List.of();
+    }
+
+    @Override
+    public void changeStatus(Integer orderID, String status) throws SQLException {
+        return;
+    }
 }
