@@ -265,6 +265,7 @@ public class RestaurantHandler implements HttpHandler {
         FoodDAO foodDAO = new FoodDAOImp();
         try{
             foodDAO.setMenuIdNull(foodId);
+            JsonResponse.sendJsonResponse(exchange, 200, "{\"message\":\"Item removed from restaurant menu successfully\"}");
         }catch (SQLException e){
             JsonResponse.sendJsonResponse(exchange, 500, "{\"error\":\"Internal Server Error\"}");
             System.out.println(e.getMessage());
