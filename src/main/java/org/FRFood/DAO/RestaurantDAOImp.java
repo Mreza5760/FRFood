@@ -9,6 +9,7 @@ import org.FRFood.util.DataAlreadyExistsException;
 import org.FRFood.util.Role;
 
 import java.sql.*;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -76,7 +77,28 @@ public class RestaurantDAOImp implements RestaurantDAO {
 
     @Override
     public List<Restaurant> searchByString(String search) throws SQLException {
-        return List.of();
+        String sql = "SELECT * FROM restaurants WHERE name LIKE ?";
+        try (
+                Connection connection = DBConnector.gConnection();
+                PreparedStatement preparedStatement = connection.prepareStatement(sql);
+        ) {
+            preparedStatement.setString(1, "%" + search + "%");
+            try (ResultSet rs = preparedStatement.executeQuery()) {
+                List<Restaurant> restaurants = new ArrayList<>();
+                while (rs.next()) {
+                    Restaurant restaurant = new Restaurant();
+                    restaurant.setId(rs.getInt("id"));
+                    restaurant.setName(rs.getString("name"));
+                    restaurant.setAddress(rs.getString("address"));
+                    restaurant.setPhone(rs.getString("phone"));
+                    restaurant.setLogo(rs.getString("logo"));
+                    restaurant.setTaxFee(rs.getInt("tax_fee"));
+                    restaurant.setAdditionalFee(rs.getInt("additional_fee"));
+                    restaurants.add(restaurant);
+                }
+                return restaurants;
+            }
+        }
     }
 
     @Override

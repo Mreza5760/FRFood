@@ -1,15 +1,27 @@
 package org.FRFood.DAO;
 
 import org.FRFood.entity.Order;
+import org.FRFood.util.DBConnector;
+import org.FRFood.util.DataAlreadyExistsException;
 
+import java.sql.*;
 import java.util.List;
 import java.util.Optional;
-import java.sql.SQLException;
 
 public class OrderDAOImp implements OrderDAO {
     @Override
     public int insert(Order order) throws SQLException {
-        return 0;
+        String sql = "INSERT INTO Orders";
+        try (
+                Connection conn = DBConnector.gConnection();
+                PreparedStatement stmt = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)
+        ) {
+//
+        } catch (SQLException e) {
+//            if ("23000".equals(e.getSQLState())) {
+//            }
+//            throw new RuntimeException("Insert failed: " + e.getMessage(), e);
+        }
     }
 
     @Override
