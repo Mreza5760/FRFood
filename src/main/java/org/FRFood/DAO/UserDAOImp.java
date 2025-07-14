@@ -1,8 +1,10 @@
 package org.FRFood.DAO;
 
 import java.sql.*;
+import java.util.List;
 import java.util.Optional;
 
+import org.FRFood.entity.Restaurant;
 import org.FRFood.util.Role;
 import org.FRFood.entity.User;
 import org.FRFood.util.DBConnector;
@@ -87,6 +89,11 @@ public class UserDAOImp implements UserDAO {
             throw new RuntimeException("Query failed: " + e.getMessage(), e);
         }
         return Optional.empty();
+    }
+
+    @Override
+    public List<Restaurant> getFavorites(int id) throws SQLException {
+        return List.of();
     }
 
     @Override
