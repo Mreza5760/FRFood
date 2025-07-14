@@ -10,29 +10,8 @@ import java.util.List;
 import java.util.Optional;
 
 public class FoodDAOImp implements FoodDAO{
-//    @Override
-    public int insert(Food food) {
-        String sql = "INSERT INTO FoodItems (vendor_id, name, image, count, price_id, picture_id) VALUES (? , ? , ? , ? )";
 
-        try(
-                Connection connection = DBConnector.gConnection();
-                PreparedStatement statement = connection.prepareStatement(sql);
-        )
-
-        {
-            statement.setString(1, food.getName());
-            statement.setString(2, food.getDescription());
-            statement.setString(5, food.getPicture());
-
-            statement.executeUpdate();
-
-        } catch (Exception e) {
-            System.out.println(e);
-        }
-        return 0;
-    }
-
-//    @Override
+    @Override
     public Optional<Food> getById(int id) {
         return Optional.empty();
     }
@@ -40,5 +19,20 @@ public class FoodDAOImp implements FoodDAO{
     @Override
     public boolean doesHaveKeywords(List<String> input) throws SQLException {
         return false;
+    }
+
+    @Override
+    public int insert(Food food) throws SQLException{
+        return 0;
+    }
+
+    @Override
+    public void update(Food food) throws SQLException {
+        return;
+    }
+
+    @Override
+    public void delete(Food food) throws SQLException {
+        return;
     }
 }

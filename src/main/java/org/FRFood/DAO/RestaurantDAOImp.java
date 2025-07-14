@@ -102,7 +102,7 @@ public class RestaurantDAOImp implements RestaurantDAO {
     }
 
     @Override
-    public void UpdateById(Restaurant restaurant) throws SQLException {
+    public void Update(Restaurant restaurant) throws SQLException {
         String sql = "INSERT INTO restaurants (id,owner_id , name , address , phone , logo , tax_fee , additional_fee) VALUES (?,?,?,?,?,?,?,?)";
         try(
                 Connection connection = DBConnector.gConnection();
@@ -129,5 +129,15 @@ public class RestaurantDAOImp implements RestaurantDAO {
     @Override
     public List<Menu> getMenus(int id) throws SQLException {
         return List.of();
+    }
+
+    @Override
+    public int insertMenu(Menu menu) throws SQLException {
+        return 0;
+    }
+
+    @Override
+    public void deleteMenuByTitle(String title, int restaurantId) throws SQLException {
+
     }
 }

@@ -99,7 +99,7 @@ CREATE TABLE IF NOT EXISTS Orders
 (
     id               INTEGER AUTO_INCREMENT PRIMARY KEY,
     customer_id      INTEGER NOT NULL,
-    vendor_id        INTEGER NOT NULL,
+    restaurant_id        INTEGER NOT NULL,
     courier_id       INTEGER NULL,
     coupon_id        INTEGER NULL,
     delivery_address TEXT    NOT NULL,
@@ -126,7 +126,7 @@ CREATE TABLE IF NOT EXISTS Orders
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   FOREIGN KEY (customer_id) REFERENCES Users (id) ON DELETE RESTRICT,
-  FOREIGN KEY (vendor_id) REFERENCES Restaurants (id) ON DELETE RESTRICT,
+  FOREIGN KEY (restaurant_id) REFERENCES Restaurants (id) ON DELETE RESTRICT,
   FOREIGN KEY (courier_id) REFERENCES Users (id) ON DELETE SET NULL,
   FOREIGN KEY (coupon_id) REFERENCES Coupons (id) ON DELETE SET NULL
 );
