@@ -140,4 +140,9 @@ public class RestaurantDAOImp implements RestaurantDAO {
     public void deleteMenuByTitle(String title, int restaurantId) throws SQLException {
 
     }
+
+    @Override
+    public Optional<Menu> getMenuByTitle(String title, int restaurantId) throws SQLException {
+        return Optional.empty();
+    }
 }
