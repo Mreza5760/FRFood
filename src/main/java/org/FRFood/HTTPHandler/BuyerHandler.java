@@ -62,6 +62,14 @@ public class BuyerHandler implements HttpHandler {
                     }
                 }
                 case "PUT" -> {
+                    switch (path) {
+                        case "^/favorites/[^/]+$" -> handleInsertFavorite(exchange);
+                    }
+                }
+                case "DELETE" -> {
+                    switch (path) {
+                        case "^/favorites/[^/]+$" -> handleDeleteFavorite(exchange);
+                    }
                 }
                 default -> JsonResponse.sendJsonResponse(exchange, 404, "Not Found");
             }
@@ -278,6 +286,62 @@ public class BuyerHandler implements HttpHandler {
             List<Restaurant> restaurants = userDAO.getFavorites(customerId);
             /*
             لیسیت رستوران رو خروجی بده
+             */
+        } catch (Exception e) {
+//            e.printStackTrace();
+            JsonResponse.sendJsonResponse(exchange, 500, "{\"error\":\"Internal server error\"}");
+        }
+    }
+
+    void handleInsertFavorite(HttpExchange exchange) throws IOException {
+        Optional<User> authenticatedUserOptional = authenticate(exchange);
+        if (authenticatedUserOptional.isEmpty()) {
+            return;
+        }
+
+        String path = exchange.getRequestURI().getPath();
+        String[] parts = path.split("/");
+        int restaurantID = Integer.parseInt(parts[2]);
+
+        try {
+            int customerId = authenticatedUserOptional.get().getId();
+            Optional<Restaurant> optionalRestaurant = restaurantDAO.getById(restaurantID);
+            if (optionalRestaurant.isEmpty()) {
+                // ارور
+                return;
+            }
+            Restaurant restaurant = optionalRestaurant.get();
+            userDAO.insertFavorite(customerId, restaurant);
+            /*
+            پیام موفقیت باید بدی
+             */
+        } catch (Exception e) {
+//            e.printStackTrace();
+            JsonResponse.sendJsonResponse(exchange, 500, "{\"error\":\"Internal server error\"}");
+        }
+    }
+
+    void handleDeleteFavorite(HttpExchange exchange) throws IOException {
+        Optional<User> authenticatedUserOptional = authenticate(exchange);
+        if (authenticatedUserOptional.isEmpty()) {
+            return;
+        }
+
+        String path = exchange.getRequestURI().getPath();
+        String[] parts = path.split("/");
+        int restaurantID = Integer.parseInt(parts[2]);
+
+        try {
+            int customerId = authenticatedUserOptional.get().getId();
+            Optional<Restaurant> optionalRestaurant = restaurantDAO.getById(restaurantID);
+            if (optionalRestaurant.isEmpty()) {
+                // ارور
+                return;
+            }
+            Restaurant restaurant = optionalRestaurant.get();
+            userDAO.deleteFavorite(customerId, restaurant);
+            /*
+            پیام موفقیت باید بدی
              */
         } catch (Exception e) {
 //            e.printStackTrace();

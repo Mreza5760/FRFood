@@ -62,6 +62,11 @@ public class UserDAOImp implements UserDAO {
     }
 
     @Override
+    public boolean deleteFavorite(int id, Restaurant restaurant) throws SQLException {
+        return false;
+    }
+
+    @Override
     public Optional<User> getById(int id) {
         String sql = "SELECT * FROM Users WHERE id = ?";
         try (
