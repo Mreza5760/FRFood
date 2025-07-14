@@ -137,6 +137,9 @@ public class RestaurantDAOImp implements RestaurantDAO {
                     food.setRestaurantId(rs.getInt("restaurant_id"));
                     food.setDescription(rs.getString("description"));
 
+                    FoodDAO foodDAO = new FoodDAOImp();
+                    food.setKeywords(foodDAO.getKeywords(food.getId()));
+
                     foods.add(food);
                 }
                 return foods;
@@ -170,7 +173,26 @@ public class RestaurantDAOImp implements RestaurantDAO {
 
     @Override
     public List<Menu> getMenus(int id) throws SQLException {
-        return List.of();
+        String sql = "SELECT * FROM menus WHERE restaurant_id = ?";
+        try (
+                Connection connection = DBConnector.gConnection();
+                PreparedStatement preparedStatement = connection.prepareStatement(sql);
+        ) {
+            preparedStatement.setInt(1, id);
+            try (ResultSet rs = preparedStatement.executeQuery()) {
+                List<Menu> menus = new ArrayList<>();
+                while (rs.next()) {
+                    Menu menu = new Menu();
+                    menu.setId(rs.getInt("id"));
+                    menu.setTitle(rs.getString("title"));
+                    RestaurantDAO restaurantDAO = new RestaurantDAOImp();
+                    Optional<Restaurant> restaurant = restaurantDAO.getById(rs.getInt("restaurant_id"));
+                    menu.setRestaurant(restaurant.orElse(null));
+                    menus.add(menu);
+                }
+                return menus;
+            }
+        }
     }
 
     @Override
