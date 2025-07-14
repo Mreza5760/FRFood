@@ -9,12 +9,19 @@ import java.util.Optional;
 import java.sql.SQLException;
 
 public interface UserDAO {
-    boolean deleteById(int id)throws SQLException;
+    boolean deleteById(int id) throws SQLException;
+
     void update(User currentUser) throws SQLException;
+
     Optional<User> getById(int id) throws SQLException;
+
     List<Restaurant> getFavorites(int id) throws SQLException;
+
     Optional<User> getByPhone(String phoneNumber) throws SQLException;
+
     int insert(User user) throws SQLException, DataAlreadyExistsException;
+
     boolean insertFavorite(int id, Restaurant restaurant) throws SQLException;
+
     boolean deleteFavorite(int id, Restaurant restaurant) throws SQLException;
 }

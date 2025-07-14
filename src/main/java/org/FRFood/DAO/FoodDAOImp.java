@@ -9,7 +9,7 @@ import java.sql.SQLException;
 import java.util.List;
 import java.util.Optional;
 
-public class FoodDAOImp implements FoodDAO{
+public class FoodDAOImp implements FoodDAO {
 
     @Override
     public Optional<Food> getById(int id) {
@@ -22,7 +22,7 @@ public class FoodDAOImp implements FoodDAO{
     }
 
     @Override
-    public int insert(Food food) throws SQLException{
+    public int insert(Food food) throws SQLException {
         return 0;
     }
 

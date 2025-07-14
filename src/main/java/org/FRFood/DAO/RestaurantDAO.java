@@ -11,13 +11,22 @@ import java.sql.SQLException;
 
 public interface RestaurantDAO {
     void DeleteById(int id) throws SQLException;
+
     List<Food> getFoods(int id) throws SQLException;
+
     List<Menu> getMenus(int id) throws SQLException;
+
     Optional<Restaurant> getById(int id) throws SQLException;
+
     void Update(Restaurant restaurant) throws SQLException;
+
     List<Restaurant> searchByString(String search) throws SQLException;
-    int insert(Restaurant restaurant,int userId) throws SQLException, DataAlreadyExistsException;
+
+    int insert(Restaurant restaurant, int userId) throws SQLException, DataAlreadyExistsException;
+
     int insertMenu(Menu menu) throws SQLException;
-    void deleteMenuByTitle(String title,int restaurantId) throws SQLException;
-    Optional<Menu> getMenuByTitle(String title,int restaurantId) throws SQLException;
+
+    void deleteMenuByTitle(String title, int restaurantId) throws SQLException;
+
+    Optional<Menu> getMenuByTitle(String title, int restaurantId) throws SQLException;
 }
