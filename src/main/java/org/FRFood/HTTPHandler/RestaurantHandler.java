@@ -181,7 +181,7 @@ public class RestaurantHandler implements HttpHandler {
         }
         User currentUser = Authenticate.authenticate(exchange).get();
         Food food = objectMapper.readValue(exchange.getRequestBody(), Food.class);
-        food.setVendorId(restaurantId);
+        food.setRestaurantId(restaurantId);
         FoodDAO foodDAO = new FoodDAOImp();
         try {
             food.setId(foodDAO.insert(food));
@@ -195,7 +195,7 @@ public class RestaurantHandler implements HttpHandler {
 
     private void editItem(HttpExchange exchange, int restaurantId, int foodId) throws IOException {
         Food food = objectMapper.readValue(exchange.getRequestBody(), Food.class);
-        food.setVendorId(restaurantId);
+        food.setRestaurantId(restaurantId);
         food.setId(foodId);
         FoodDAO foodDAO = new FoodDAOImp();
         try {

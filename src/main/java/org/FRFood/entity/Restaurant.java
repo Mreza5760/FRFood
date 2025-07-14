@@ -17,6 +17,8 @@ public class Restaurant {
     @JsonProperty("additional_fee")
     private int additionalFee;
 
+    public Restaurant() {}
+
     public Restaurant(User owner, String name, String address, String phone, String logo, int taxFee, int additionalFee) {
         this.owner = owner;
         this.name = name;
@@ -26,8 +28,6 @@ public class Restaurant {
         this.taxFee = taxFee;
         this.additionalFee = additionalFee;
     }
-
-    public Restaurant() {}
 
     public int getId() {
         return id;

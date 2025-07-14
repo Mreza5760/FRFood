@@ -11,14 +11,15 @@ public class Food {
     private String picture;
     private String description;
     @JsonProperty("vendor_id")
-    private int vendorId;
+    private int restaurantId;
     private int price;
     private int supply;
     private List<Keyword> keywords;
 
+    public Food() {}
 
-    Food(String name,int vendorId , String description, List<Keyword> keywords, int price, int pictureId, Restaurant restaurant){
-        this.setVendorId(vendorId);
+    public Food(String name, int restaurantId, String description, List<Keyword> keywords, int price, int pictureId, Restaurant restaurant){
+        this.setRestaurantId(restaurantId);
         this.setName(name);
         this.setDescription(description);
         this.setPrice(price);
@@ -65,12 +66,12 @@ public class Food {
         this.description = description;
     }
 
-    public int getVendorId() {
-        return vendorId;
+    public int getRestaurantId() {
+        return restaurantId;
     }
 
-    public void setVendorId(int vendorId) {
-        this.vendorId = vendorId;
+    public void setRestaurantId(int restaurantId) {
+        this.restaurantId = restaurantId;
     }
 
     public int getPrice() {

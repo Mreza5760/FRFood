@@ -1,17 +1,17 @@
 package org.FRFood.DAO;
 
+import org.FRFood.util.Role;
 import org.FRFood.entity.Food;
 import org.FRFood.entity.Menu;
-import org.FRFood.entity.Restaurant;
 import org.FRFood.entity.User;
 import org.FRFood.util.DBConnector;
+import org.FRFood.entity.Restaurant;
 import org.FRFood.util.DataAlreadyExistsException;
-import org.FRFood.util.Role;
 
 import java.sql.*;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.ArrayList;
 
 public class RestaurantDAOImp implements RestaurantDAO {
     @Override
@@ -118,7 +118,24 @@ public class RestaurantDAOImp implements RestaurantDAO {
 
     @Override
     public List<Food> getFoods(int id) throws SQLException {
-        return List.of();
+        String sql = "SELECT * FROM fooditems WHERE restaurant_id = ?";
+        try (
+                Connection connection = DBConnector.gConnection();
+                PreparedStatement preparedStatement = connection.prepareStatement(sql);
+        ) {
+            preparedStatement.setInt(1, id);
+            try (ResultSet rs = preparedStatement.executeQuery()) {
+                List<Food> foods = new ArrayList<>();
+                while (rs.next()) {
+                    Food food = new Food();
+                    food.setId(rs.getInt("id"));
+                    food.setName(rs.getString("name"));
+                    food.setPrice(rs.getInt("price"));
+                    food.setRestaurantId(rs.getInt("restaurant_id"));
+                    foods.add(food);
+                }
+            }
+        }
     }
 
     @Override
