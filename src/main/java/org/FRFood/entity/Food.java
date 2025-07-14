@@ -17,12 +17,13 @@ public class Food {
     private List<Keyword> keywords;
 
 
-    public Food(String name, int vendorId, String description, List<Keyword> keywords, int price, int pictureId, Restaurant restaurant){
-        this.setVendorId(vendorId);
+    public Food(String name, int vendorId, String description, List<Keyword> keywords, int price,String picture){
+        this.setRestaurantId(vendorId);
         this.setName(name);
         this.setDescription(description);
         this.setPrice(price);
         this.setKeywords(keywords);
+        this.setPicture(picture);
     }
 
     public Food(){}
@@ -94,4 +95,5 @@ public class Food {
     public void setKeywords(List<Keyword> keywords) {
         this.keywords = keywords;
     }
+
 }
