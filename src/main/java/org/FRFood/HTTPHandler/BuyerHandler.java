@@ -361,6 +361,7 @@ public class BuyerHandler implements HttpHandler {
         }
         try {
             rate.setId(rateDAO.insert(rate));
+            rate.setUserId(authenticatedUserOptional.get().getId());
             String json = objectMapper.writeValueAsString(rate);
             JsonResponse.sendJsonResponse(exchange, 200, json);
         } catch (Exception e) {
@@ -424,6 +425,15 @@ public class BuyerHandler implements HttpHandler {
         String[] parts = path.split("/");
         int id = Integer.parseInt(parts[2]);
         try {
+            Optional<Rate> optionalRate = rateDAO.getById(id);
+            if (optionalRate.isEmpty()) {
+                return;
+            }
+            Rate rate = optionalRate.get();
+            if (rate.getUserId() != authenticatedUserOptional.get().getId()) {
+                // صاحب اش نیست
+                return;
+            }
             rateDAO.deleteById(id);
             JsonResponse.sendJsonResponse(exchange,200,"{\"message\":\"Rate deleted\"}");
         } catch (Exception e) {
@@ -443,6 +453,15 @@ public class BuyerHandler implements HttpHandler {
         try {
             Rate rate = objectMapper.readValue(exchange.getRequestBody(), Rate.class);
             rate.setId(id);
+            Optional<Rate> optionalRate = rateDAO.getById(id);
+            if (optionalRate.isEmpty()) {
+                return;
+            }
+            Rate currRate = optionalRate.get();
+            if (currRate.getUserId() != authenticatedUserOptional.get().getId()) {
+                // صاحب اش نیست
+                return;
+            }
             rateDAO.updateById(id, rate);
             JsonResponse.sendJsonResponse(exchange,200,"{\"message\":\"Rate updated\"}");
         }  catch (Exception e) {
