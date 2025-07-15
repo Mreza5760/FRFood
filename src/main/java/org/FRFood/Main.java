@@ -16,6 +16,11 @@ public class Main {
             server.setExecutor(Executors.newFixedThreadPool(4));
             server.start();
             System.out.println("Server started. Listening on port " + port);
+            try {
+                Class.forName("com.mysql.cj.jdbc.Driver");
+            } catch (ClassNotFoundException e) {
+                e.printStackTrace();
+            }
         }catch (Exception e){
             System.err.println(e.getMessage());
         }
