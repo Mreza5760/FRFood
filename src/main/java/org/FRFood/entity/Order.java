@@ -1,11 +1,32 @@
 package org.FRFood.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import org.FRFood.util.Status;
 import org.FRFood.DTO.OrderItemDTO;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
+@JsonPropertyOrder({
+        "id",
+        "delivery_address",
+        "customer_id",
+        "vendor_id",
+        "coupon_id",
+        "item_ids",
+        "raw_price",
+        "tax_fee",
+        "additional_fee",
+        "courier_fee",
+        "pay_price",
+        "courier_id",
+        "status",
+        "created_at",
+        "updated_at"
+})
 public class Order {
     private int id;
     @JsonProperty("delivery_address")
@@ -16,6 +37,7 @@ public class Order {
     private int restaurantId;
     @JsonProperty("coupon_id")
     private int couponId;
+    @JsonIgnore
     private List<OrderItemDTO> items;
     @JsonProperty("raw_price")
     private int rawPrice;
@@ -130,5 +152,14 @@ public class Order {
 
     public void setUpdatedAt(String updatedAt) {
         this.updatedAt = updatedAt;
+    }
+
+    @JsonProperty("item_ids")
+    public List<Integer> getItemIds() {
+        List<Integer> itemIds = new ArrayList<>();
+        for(OrderItemDTO item : items){
+            itemIds.add(item.getItemId());
+        }
+        return itemIds;
     }
 }

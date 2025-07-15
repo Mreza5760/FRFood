@@ -276,14 +276,15 @@ public class RestaurantHandler implements HttpHandler {
 
     private void getOrders(HttpExchange exchange, int restaurantId) throws IOException {
         OrderDAO orderDAO = new OrderDAOImp();
-        List<Order> orders;
+        List<Order> orders = null;
         try {
             orders = orderDAO.getRestaurantOrders(restaurantId);
         } catch (SQLException e) {
             JsonResponse.sendJsonResponse(exchange, 500, "{\"error\":\"Internal Server Error\"}");
             System.out.println(e.getMessage());
         }
-        /* خروجی میدهیم */
+        String json = objectMapper.writeValueAsString(orders);
+        JsonResponse.sendJsonResponse(exchange, 200, json);
     }
 
     private void setStatus(HttpExchange exchange, int orderId) throws IOException {
