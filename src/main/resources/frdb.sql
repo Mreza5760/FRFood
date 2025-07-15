@@ -110,11 +110,11 @@ CREATE TABLE IF NOT EXISTS Orders
     pay_price        INTEGER NOT NULL,
     status           ENUM(
         'submitted',
-    'unpaid and cancelled',
-    'waiting vendor',
+    'unpaidAndCancelled',
+    'waitingVendor',
     'cancelled',
-    'finding courier',
-    'on the way',
+    'findingCourier',
+    'onTheWay',
     'completed'
 ) NOT NULL,
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,

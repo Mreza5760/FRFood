@@ -217,7 +217,7 @@ public class BuyerHandler implements HttpHandler {
         try {
             order.setId(orderDAO.insert(order));
             /*
-                اورد رو باید خروجی داد
+                اوردر رو باید خروجی داد
              */
         } catch (Exception e) {
 //            e.printStackTrace();
