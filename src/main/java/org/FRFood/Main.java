@@ -18,8 +18,9 @@ public class Main {
             System.out.println("Server started. Listening on port " + port);
             try {
                 Class.forName("com.mysql.cj.jdbc.Driver");
+                System.out.println("Connecting to database...");
             } catch (ClassNotFoundException e) {
-                e.printStackTrace();
+                System.out.println(e.getMessage());
             }
         }catch (Exception e){
             System.err.println(e.getMessage());
