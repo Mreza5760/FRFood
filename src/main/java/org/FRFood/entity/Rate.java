@@ -4,7 +4,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 
 import java.util.List;
 
-public class Rating {
+public class Rate {
     private int id;
     @JsonProperty("user_id")
     private int userId;

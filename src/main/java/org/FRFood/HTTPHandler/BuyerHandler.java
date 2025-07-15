@@ -22,6 +22,7 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 public class BuyerHandler implements HttpHandler {
     private final FoodDAO foodDAO;
     private final UserDAO userDAO;
+    private final RateDAO rateDAO;
     private final OrderDAO orderDAO;
     private final ObjectMapper objectMapper;
     private final RestaurantDAO restaurantDAO;
@@ -29,6 +30,7 @@ public class BuyerHandler implements HttpHandler {
     public BuyerHandler() {
         foodDAO = new FoodDAOImp();
         userDAO = new UserDAOImp();
+        rateDAO = new RateDAOImp();
         orderDAO = new OrderDAOImp();
         objectMapper = new ObjectMapper();
         restaurantDAO = new RestaurantDAOImp();
@@ -46,6 +48,7 @@ public class BuyerHandler implements HttpHandler {
                         case "/vendors" -> handleVendorsList(exchange);
                         case "/items" -> handleItemsList(exchange);
                         case "/orders" -> handleSubmitOrder(exchange);
+                        case "/ratings" -> handeSubmitRate(exchange);
                     }
                 }
                 case "GET" -> {
@@ -54,9 +57,12 @@ public class BuyerHandler implements HttpHandler {
                         case "^/items/[^/]+$" -> handleGetItem(exchange);
                         case  "/orders/history" -> handleOrdersHistory(exchange);
                         case "/favorites" -> handleGetFavorites(exchange);
+                        case "^/ratings/items/[^/]+$" -> handeGetFoodRates(exchange);
                         default -> {
                             if (path.equals("^/orders/[^/]+$")) {
                                 handleGetOrder(exchange);
+                            } else if (path.equals("^/ratings/[^/]+$")) {
+                                handleGetRate(exchange);
                             }
                         }
                     }
@@ -64,11 +70,13 @@ public class BuyerHandler implements HttpHandler {
                 case "PUT" -> {
                     switch (path) {
                         case "^/favorites/[^/]+$" -> handleInsertFavorite(exchange);
+                        case "^/ratings/[^/]+$" -> handleUpdateRate(exchange);
                     }
                 }
                 case "DELETE" -> {
                     switch (path) {
                         case "^/favorites/[^/]+$" -> handleDeleteFavorite(exchange);
+                        case "^/ratings/[^/]+$" -> handleDeleteRate(exchange);
                     }
                 }
                 default -> JsonResponse.sendJsonResponse(exchange, 404, "Not Found");
@@ -348,6 +356,109 @@ public class BuyerHandler implements HttpHandler {
              */
         } catch (Exception e) {
 //            e.printStackTrace();
+            JsonResponse.sendJsonResponse(exchange, 500, "{\"error\":\"Internal server error\"}");
+        }
+    }
+
+    void handeSubmitRate(HttpExchange exchange) throws IOException {
+        Optional<User> authenticatedUserOptional = authenticate(exchange);
+        if (authenticatedUserOptional.isEmpty()) {
+            return;
+        }
+        Rate rate = objectMapper.readValue(exchange.getRequestBody(), Rate.class);
+        // رای ندادن نیز 0
+        if (rate.getRating() == 0 || rate.getComment() == null) {
+            JsonResponse.sendJsonResponse(exchange, 400, "{\"error\":\"Missing required fields\"}");
+            return;
+        }
+        try {
+            rate.setId(rateDAO.insert(rate));
+            String json = objectMapper.writeValueAsString(rate);
+            JsonResponse.sendJsonResponse(exchange, 200, json);
+        } catch (Exception e) {
+//            e.printStackTrace();
+            JsonResponse.sendJsonResponse(exchange, 500, "{\"error\":\"Internal server error\"}");
+        }
+    }
+
+    void handeGetFoodRates(HttpExchange exchange) throws IOException {
+        Optional<User> authenticatedUserOptional = authenticate(exchange);
+        if (authenticatedUserOptional.isEmpty()) {
+            return;
+        }
+        String path = exchange.getRequestURI().getPath();
+        String[] parts = path.split("/");
+        int foodId = Integer.parseInt(parts[3]);
+        try {
+            Optional<Food> optionalFood = foodDAO.getById(foodId);
+            if (optionalFood.isEmpty()) {
+                // ارور
+                return;
+            }
+            Food food = optionalFood.get();
+            List<Rate> rates = rateDAO.getFoodRates(food);
+            String json = objectMapper.writeValueAsString(rates);
+            JsonResponse.sendJsonResponse(exchange, 200, json);
+        } catch (Exception e) {
+//            e.printStackTrace();
+            JsonResponse.sendJsonResponse(exchange, 500, "{\"error\":\"Internal server error\"}");
+        }
+    }
+
+    void handleGetRate(HttpExchange exchange) throws IOException {
+        Optional<User> authenticatedUserOptional = authenticate(exchange);
+        if (authenticatedUserOptional.isEmpty()) {
+            return;
+        }
+        String path = exchange.getRequestURI().getPath();
+        String[] parts = path.split("/");
+        int id = Integer.parseInt(parts[2]);
+        try {
+            Optional<Rate> optionalRate = rateDAO.getById(id);
+            if (optionalRate.isEmpty()) {
+                return;
+            }
+            Rate rate = optionalRate.get();
+            String json = objectMapper.writeValueAsString(rate);
+            JsonResponse.sendJsonResponse(exchange, 200, json);
+        } catch (Exception e) {
+//            e.printStackTrace();
+            JsonResponse.sendJsonResponse(exchange, 500, "{\"error\":\"Internal server error\"}");
+        }
+    }
+
+    void handleDeleteRate(HttpExchange exchange) throws IOException {
+        Optional<User> authenticatedUserOptional = authenticate(exchange);
+        if (authenticatedUserOptional.isEmpty()) {
+            return;
+        }
+        String path = exchange.getRequestURI().getPath();
+        String[] parts = path.split("/");
+        int id = Integer.parseInt(parts[2]);
+        try {
+            rateDAO.deleteById(id);
+            JsonResponse.sendJsonResponse(exchange,200,"{\"message\":\"Rate deleted\"}");
+        } catch (Exception e) {
+//            e.printStackTrace();
+            JsonResponse.sendJsonResponse(exchange, 500, "{\"error\":\"Internal server error\"}");
+        }
+    }
+
+    void handleUpdateRate(HttpExchange exchange) throws IOException {
+        Optional<User> authenticatedUserOptional = authenticate(exchange);
+        if (authenticatedUserOptional.isEmpty()) {
+            return;
+        }
+        String path = exchange.getRequestURI().getPath();
+        String[] parts = path.split("/");
+        int id = Integer.parseInt(parts[2]);
+        try {
+            Rate rate = objectMapper.readValue(exchange.getRequestBody(), Rate.class);
+            rate.setId(id);
+            rateDAO.updateById(id, rate);
+            JsonResponse.sendJsonResponse(exchange,200,"{\"message\":\"Rate updated\"}");
+        }  catch (Exception e) {
+            //            e.printStackTrace();
             JsonResponse.sendJsonResponse(exchange, 500, "{\"error\":\"Internal server error\"}");
         }
     }
