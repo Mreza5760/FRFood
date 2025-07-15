@@ -63,11 +63,12 @@ public class OrderDAOImp implements OrderDAO {
                 }
             }
         }
+        return  Optional.empty();
     }
 
     @Override
     public List<Order> getUserOrders(int userID) throws SQLException {
-        String sql = "SELECT * FROM orders WHERE user_id = ?";
+        String sql = "SELECT * FROM orders WHERE customer_id = ?";
         try (
                 Connection conn = DBConnector.gConnection();
                 PreparedStatement stmt = conn.prepareStatement(sql)
@@ -94,6 +95,7 @@ public class OrderDAOImp implements OrderDAO {
                 }
             }
         }
+        return List.of();
     }
 
     @Override
@@ -108,7 +110,7 @@ public class OrderDAOImp implements OrderDAO {
                 List<Order> orders = new ArrayList<>();
                 while (rs.next()) {
                     Order order = new Order();
-                    order.setRestaurantId((restaurantID);
+                    order.setRestaurantId(restaurantID);
                     order.setId(rs.getInt("id"));
                     order.setTaxFee(rs.getInt("tax_fee"));
                     order.setPayPrice(rs.getInt("pay_price"));
@@ -125,6 +127,7 @@ public class OrderDAOImp implements OrderDAO {
                 }
             }
         }
+        return List.of();
     }
 
     @Override
