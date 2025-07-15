@@ -1,9 +1,7 @@
 package org.FRFood.DAO;
 
-import org.FRFood.util.Role;
 import org.FRFood.entity.Food;
 import org.FRFood.entity.Menu;
-import org.FRFood.entity.User;
 import org.FRFood.util.DBConnector;
 import org.FRFood.entity.Restaurant;
 import org.FRFood.util.DataAlreadyExistsException;

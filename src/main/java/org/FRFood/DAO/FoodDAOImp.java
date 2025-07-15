@@ -2,7 +2,6 @@ package org.FRFood.DAO;
 
 import org.FRFood.entity.Food;
 import org.FRFood.entity.Keyword;
-import org.FRFood.entity.Restaurant;
 import org.FRFood.util.DBConnector;
 
 import java.sql.*;
