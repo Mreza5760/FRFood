@@ -5,9 +5,7 @@ import org.FRFood.entity.Keyword;
 import org.FRFood.util.DBConnector;
 
 import java.sql.*;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 public class FoodDAOImp implements FoodDAO {
 
@@ -43,8 +41,17 @@ public class FoodDAOImp implements FoodDAO {
     }
 
     @Override
-    public boolean doesHaveKeywords(List<String> input) throws SQLException {
-        return false;
+    public boolean doesHaveKeywords(List<String> input, int foodId) throws SQLException {
+        Food food = getById(foodId).orElse(null);
+        if(food==null){
+            throw new SQLException("Food Not Found");
+        }
+        Set<String> foodKeywordNames = new HashSet<String>();
+        for(Keyword keyword : food.getKeywords()){
+            foodKeywordNames.add(keyword.getName());
+        }
+        Set<String> inputSet = new HashSet<>(input);
+        return foodKeywordNames.equals(inputSet);
     }
 
     @Override

@@ -1,6 +1,7 @@
 package org.FRFood.HTTPHandler;
 
 import org.FRFood.DAO.*;
+import org.FRFood.DTO.OrderInputDTO;
 import org.FRFood.util.*;
 import org.FRFood.entity.*;
 import org.FRFood.util.BuyerReq.ItemsReq;
@@ -102,7 +103,7 @@ public class BuyerHandler implements HttpHandler {
                 boolean haveFood = false;
                 List<Food> foods = restaurantDAO.getFoods(restaurant.getId());
                 for (Food food : foods) {
-                   if (foodDAO.doesHaveKeywords(req.keywords)) {
+                   if (foodDAO.doesHaveKeywords(req.keywords, food.getId())) {
                        haveFood = true;
                        break;
                    }
@@ -172,7 +173,7 @@ public class BuyerHandler implements HttpHandler {
                 List<Food> foods = restaurantDAO.getFoods(restaurant.getId());
                 for (Food food : foods) {
                     // تخفیف میشه هم لحاظ بشه هم نه
-                    if (foodDAO.doesHaveKeywords(req.keywords) && food.getPrice() <= req.price) {
+                    if (foodDAO.doesHaveKeywords(req.keywords , food.getId()) && food.getPrice() <= req.price) {
                         foodsFiltered.add(food);
                     }
                 }
@@ -215,15 +216,19 @@ public class BuyerHandler implements HttpHandler {
         if (authenticatedUserOptional.isEmpty()) {
             return;
         }
-        Order order = objectMapper.readValue(exchange.getRequestBody(), Order.class);
+        OrderInputDTO orderDTO = objectMapper.readValue(exchange.getRequestBody(), OrderInputDTO.class);
         // ایدی صفر نمیشه داشت
-        if (order.getDeliveryAddress() == null || order.getRestaurantId() == 0 || order.getItems() == null) {
+        if (orderDTO.getDeliveryAddress() == null || orderDTO.getRestaurantId() == 0 || orderDTO.getItems() == null) {
             JsonResponse.sendJsonResponse(exchange, 400, "{\"error\":\"Missing required fields\"}");
             return;
         }
+        Order order = new Order();
         order.setCustomerId(authenticatedUserOptional.get().getId());
         try {
-            order.setId(orderDAO.insert(order));
+            order.setId(orderDAO.insert(orderDTO));
+            order = orderDAO.getById(order.getId()).orElse(null);
+            String jsonOutput = objectMapper.writeValueAsString(order);
+            JsonResponse.sendJsonResponse(exchange, 200, jsonOutput);
             /*
                 اوردر رو باید خروجی داد
              */

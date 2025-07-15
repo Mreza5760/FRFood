@@ -1,5 +1,6 @@
 package org.FRFood.DAO;
 
+import org.FRFood.DTO.OrderInputDTO;
 import org.FRFood.entity.Order;
 import org.FRFood.util.DBConnector;
 import org.FRFood.util.Status;
@@ -11,7 +12,8 @@ import java.util.Optional;
 
 public class OrderDAOImp implements OrderDAO {
     @Override
-    public int insert(Order order) throws SQLException {
+    public int insert(OrderInputDTO order) throws SQLException {
+        int orderId = -1;
         String sql = "INSERT INTO orders (customer_id, restaurant_id, courier_id, coupon_id, delivery_address, raw_price, tax_fee, courier_fee, pay_price, status) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
         try (
                 Connection conn = DBConnector.gConnection();
@@ -28,14 +30,19 @@ public class OrderDAOImp implements OrderDAO {
             stmt.setInt(9, order.getCourierFee());
             stmt.setInt(10, order.getPayPrice());
             stmt.setString(11, order.getStatus().toString());
-
+            try(ResultSet rs = stmt.executeQuery()){
+                if (rs.next()) {
+                    orderId = rs.getInt("id");
+                }
+            }
         }
-        return 0;
+        return orderId;
     }
 
     @Override
     public Optional<Order> getById(Integer id) throws SQLException {
         String sql = "SELECT * FROM orders WHERE id = ?";
+        Order order = null;
         try (
                 Connection conn = DBConnector.gConnection();
                  PreparedStatement stmt = conn.prepareStatement(sql)
@@ -43,7 +50,7 @@ public class OrderDAOImp implements OrderDAO {
             stmt.setInt(1, id);
             try (ResultSet rs = stmt.executeQuery()) {
                 if (rs.next()) {
-                    Order order = new Order();
+                    order = new Order();
                     order.setId(id);
                     order.setTaxFee(rs.getInt("tax_fee"));
                     order.setPayPrice(rs.getInt("pay_price"));
@@ -61,7 +68,7 @@ public class OrderDAOImp implements OrderDAO {
                 }
             }
         }
-        return  Optional.empty();
+        return  Optional.ofNullable(order);
     }
 
     @Override

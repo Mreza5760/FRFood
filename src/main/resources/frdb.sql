@@ -12,16 +12,16 @@ CREATE TABLE IF NOT EXISTS Users
     phone         VARCHAR(20)  NOT NULL UNIQUE,
     email         VARCHAR(255),
     password_hash VARCHAR(255) NOT NULL,
-    `role`        ENUM('buyer',
-    'seller',
-    'courier',
-    'admin'
-) NOT NULL,
-  address TEXT NOT NULL,
-  profile_image LONGTEXT NULL,
-  bank_id INTEGER,
-  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-  FOREIGN KEY (bank_id) REFERENCES Bank_account(id)
+    `role`        ENUM ('buyer',
+        'seller',
+        'courier',
+        'admin'
+        )                      NOT NULL,
+    address       TEXT         NOT NULL,
+    profile_image LONGTEXT     NULL,
+    bank_id       INTEGER,
+    created_at    TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (bank_id) REFERENCES Bank_account (id)
 );
 
 CREATE TABLE IF NOT EXISTS Restaurants
@@ -83,23 +83,23 @@ CREATE TABLE IF NOT EXISTS FoodItem_keywords
 CREATE TABLE IF NOT EXISTS Coupons
 (
     id          INTEGER AUTO_INCREMENT PRIMARY KEY,
-    coupon_code VARCHAR(50) NOT NULL UNIQUE,
-    `type`      ENUM('fixed',
-    'percent'
-) NOT NULL,
-  `value` DECIMAL(10, 2) NOT NULL,
-  min_price INTEGER NOT NULL,
-  user_count INTEGER NOT NULL,
-  start_date DATE NOT NULL,
-  end_date DATE NOT NULL,
-  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    coupon_code VARCHAR(50)    NOT NULL UNIQUE,
+    `type`      ENUM ('fixed',
+        'percent'
+        )                      NOT NULL,
+    `value`     DECIMAL(10, 2) NOT NULL,
+    min_price   INTEGER        NOT NULL,
+    user_count  INTEGER        NOT NULL,
+    start_date  DATE           NOT NULL,
+    end_date    DATE           NOT NULL,
+    created_at  TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
 CREATE TABLE IF NOT EXISTS Orders
 (
     id               INTEGER AUTO_INCREMENT PRIMARY KEY,
     customer_id      INTEGER NOT NULL,
-    restaurant_id        INTEGER NOT NULL,
+    restaurant_id    INTEGER NOT NULL,
     courier_id       INTEGER NULL,
     coupon_id        INTEGER NULL,
     delivery_address TEXT    NOT NULL,
@@ -108,29 +108,28 @@ CREATE TABLE IF NOT EXISTS Orders
     additional_fee   INTEGER NOT NULL,
     courier_fee      INTEGER NOT NULL,
     pay_price        INTEGER NOT NULL,
-    status           ENUM(
+    status           ENUM (
         'submitted',
-    'unpaidAndCancelled',
-    'waitingVendor',
-    'cancelled',
-    'findingCourier',
-    'onTheWay',
-    'completed'
-) NOT NULL,
-  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-  FOREIGN KEY (customer_id) REFERENCES Users (id) ON DELETE RESTRICT,
-  FOREIGN KEY (restaurant_id) REFERENCES Restaurants (id) ON DELETE RESTRICT,
-  FOREIGN KEY (courier_id) REFERENCES Users (id) ON DELETE SET NULL,
-  FOREIGN KEY (coupon_id) REFERENCES Coupons (id) ON DELETE SET NULL
+        'unpaid and cancelled',
+        'waiting vendor',
+        'cancelled',
+        'finding courier',
+        'on the way',
+        'completed'
+        )                    NOT NULL,
+    created_at       TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at       TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    FOREIGN KEY (customer_id) REFERENCES Users (id) ON DELETE RESTRICT,
+    FOREIGN KEY (restaurant_id) REFERENCES Restaurants (id) ON DELETE RESTRICT,
+    FOREIGN KEY (courier_id) REFERENCES Users (id) ON DELETE SET NULL,
+    FOREIGN KEY (coupon_id) REFERENCES Coupons (id) ON DELETE SET NULL
 );
 
 CREATE TABLE IF NOT EXISTS Order_Items
 (
-    order_id       INTEGER NOT NULL,
-    item_id        INTEGER NOT NULL,
-    quantity       INTEGER NOT NULL,
-    price_per_item INTEGER NOT NULL,
+    order_id INTEGER NOT NULL,
+    item_id  INTEGER NOT NULL,
+    quantity INTEGER NOT NULL,
     PRIMARY KEY (order_id, item_id),
     FOREIGN KEY (order_id) REFERENCES Orders (id) ON DELETE CASCADE,
     FOREIGN KEY (item_id) REFERENCES FoodItems (id) ON DELETE RESTRICT
@@ -158,20 +157,20 @@ CREATE TABLE IF NOT EXISTS Rating_Images
 
 CREATE TABLE IF NOT EXISTS Transactions
 (
-    id       INTEGER AUTO_INCREMENT PRIMARY KEY,
-    order_id INTEGER NULL,
-    user_id  INTEGER NOT NULL,
-    `type`   ENUM('payment',
-    'top-up',
-    'refund',
-    'payout'
-) NOT NULL,
-  method ENUM('wallet', 'online', 'cash', 'system') NOT NULL,
-  status ENUM('pending', 'success', 'failed') NOT NULL,
-  amount DECIMAL(10, 2) NOT NULL,
-  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-  FOREIGN KEY (order_id) REFERENCES Orders (id) ON DELETE SET NULL,
-  FOREIGN KEY (user_id) REFERENCES Users (id) ON DELETE RESTRICT
+    id         INTEGER AUTO_INCREMENT PRIMARY KEY,
+    order_id   INTEGER                                     NULL,
+    user_id    INTEGER                                     NOT NULL,
+    `type`     ENUM ('payment',
+        'top-up',
+        'refund',
+        'payout'
+        )                                                  NOT NULL,
+    method     ENUM ('wallet', 'online', 'cash', 'system') NOT NULL,
+    status     ENUM ('pending', 'success', 'failed')       NOT NULL,
+    amount     DECIMAL(10, 2)                              NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (order_id) REFERENCES Orders (id) ON DELETE SET NULL,
+    FOREIGN KEY (user_id) REFERENCES Users (id) ON DELETE RESTRICT
 );
 
 CREATE TABLE IF NOT EXISTS Favorite_Restaurants
