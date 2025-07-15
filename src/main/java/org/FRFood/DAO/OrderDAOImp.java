@@ -2,8 +2,6 @@ package org.FRFood.DAO;
 
 import org.FRFood.entity.Order;
 import org.FRFood.util.DBConnector;
-import org.FRFood.DTO.OrderItemDTO;
-import org.FRFood.util.DataAlreadyExistsException;
 import org.FRFood.util.Status;
 
 import java.sql.*;
