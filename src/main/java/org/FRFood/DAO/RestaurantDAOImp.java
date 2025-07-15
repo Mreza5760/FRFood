@@ -197,16 +197,61 @@ public class RestaurantDAOImp implements RestaurantDAO {
 
     @Override
     public int insertMenu(Menu menu) throws SQLException {
-        return 0;
+        int generatedKey = -1;
+        String sql = "INSERT INTO menus (restaurant_id,title) VALUES (?,?)";
+        try (
+                Connection connection = DBConnector.gConnection();
+                PreparedStatement preparedStatement = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
+        ) {
+            preparedStatement.setInt(1, menu.getRestaurant().getId());
+            preparedStatement.setString(2, menu.getTitle());
+            int rows = preparedStatement.executeUpdate();
+            if (rows == 0) {
+                throw new SQLException("Insert failed, no rows affected.");
+            }
+            try (ResultSet generatedKeys = preparedStatement.getGeneratedKeys()) {
+                if (generatedKeys.next()) {
+                    menu.setId(generatedKeys.getInt(1));
+                    generatedKey = menu.getId();
+                }
+            }
+        }
+        return generatedKey;
     }
 
     @Override
     public void deleteMenuByTitle(String title, int restaurantId) throws SQLException {
-
+        String sql = "DELETE FROM menus WHERE restaurant_id = ? AND title = ?";
+        try (
+                Connection connection = DBConnector.gConnection();
+                PreparedStatement preparedStatement = connection.prepareStatement(sql);
+        ){
+            preparedStatement.setInt(1, restaurantId);
+            preparedStatement.setString(2, title);
+            int rows = preparedStatement.executeUpdate();
+            if (rows == 0) {
+                throw new SQLException("Delete failed, no rows affected.");
+            }
+        }
     }
 
     @Override
     public Optional<Menu> getMenuByTitle(String title, int restaurantId) throws SQLException {
-        return Optional.empty();
+        String sql = "SELECT * FROM menus WHERE restaurant_id = ? AND title = ?";
+        Menu menu = new Menu();
+        try(
+                Connection connection = DBConnector.gConnection();
+                PreparedStatement preparedStatement = connection.prepareStatement(sql);
+                ){
+            preparedStatement.setInt(1, restaurantId);
+            preparedStatement.setString(2, title);
+            ResultSet rs = preparedStatement.executeQuery();
+            if (rs.next()) {
+                menu.setId(rs.getInt("id"));
+                menu.setTitle(rs.getString("title"));
+                menu.setRestaurant(getById(rs.getInt("restaurant_id")).orElse(null));
+            }
+        }
+        return Optional.of(menu);
     }
 }

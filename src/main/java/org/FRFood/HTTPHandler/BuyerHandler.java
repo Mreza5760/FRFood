@@ -254,10 +254,8 @@ public class BuyerHandler implements HttpHandler {
             if (order.getCustomerId() !=  authenticatedUserOptional.get().getId()) {
                 return;
             }
-
-            /*
-                خروجی بده اوردر رو
-             */
+            String  json = objectMapper.writeValueAsString(order);
+            JsonResponse.sendJsonResponse(exchange, 200, json);
         } catch (Exception e) {
 //            e.printStackTrace();
             JsonResponse.sendJsonResponse(exchange, 500, "{\"error\":\"Internal server error\"}");
@@ -273,9 +271,8 @@ public class BuyerHandler implements HttpHandler {
         try {
             int customerId = authenticatedUserOptional.get().getId();
             List<Order> orders = orderDAO.getUserOrders(customerId);
-            /*
-            لیست اوردر ها رو خروجی بده
-             */
+            String json = objectMapper.writeValueAsString(orders);
+            JsonResponse.sendJsonResponse(exchange, 200, json);
         } catch (Exception e) {
 //            e.printStackTrace();
             JsonResponse.sendJsonResponse(exchange, 500, "{\"error\":\"Internal server error\"}");
@@ -293,9 +290,6 @@ public class BuyerHandler implements HttpHandler {
             List<Restaurant> restaurants = userDAO.getFavorites(customerId);
             String json = objectMapper.writeValueAsString(restaurants);
             JsonResponse.sendJsonResponse(exchange, 200, json);
-            /*
-            لیسیت رستوران رو خروجی بده
-             */
         } catch (Exception e) {
 //            e.printStackTrace();
             JsonResponse.sendJsonResponse(exchange, 500, "{\"error\":\"Internal server error\"}");
@@ -322,9 +316,6 @@ public class BuyerHandler implements HttpHandler {
             Restaurant restaurant = optionalRestaurant.get();
             userDAO.insertFavorite(customerId, restaurant);
             JsonResponse.sendJsonResponse(exchange,200,"{\"message\":\"Added to favorites\"}");
-            /*
-            پیام موفقیت باید بدی
-             */
         } catch (Exception e) {
 //            e.printStackTrace();
             JsonResponse.sendJsonResponse(exchange, 500, "{\"error\":\"Internal server error\"}");
@@ -351,9 +342,6 @@ public class BuyerHandler implements HttpHandler {
             Restaurant restaurant = optionalRestaurant.get();
             userDAO.deleteFavorite(customerId, restaurant);
             JsonResponse.sendJsonResponse(exchange,200,"{\"message\":\"Removed from favorites\"}");
-            /*
-            پیام موفقیت باید بدی
-             */
         } catch (Exception e) {
 //            e.printStackTrace();
             JsonResponse.sendJsonResponse(exchange, 500, "{\"error\":\"Internal server error\"}");
