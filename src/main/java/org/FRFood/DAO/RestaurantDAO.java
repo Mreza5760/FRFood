@@ -3,7 +3,6 @@ package org.FRFood.DAO;
 import org.FRFood.entity.Food;
 import org.FRFood.entity.Menu;
 import org.FRFood.entity.Restaurant;
-import org.FRFood.util.DataAlreadyExistsException;
 
 import java.util.List;
 import java.util.Optional;
@@ -22,7 +21,7 @@ public interface RestaurantDAO {
 
     List<Restaurant> searchByString(String search) throws SQLException;
 
-    int insert(Restaurant restaurant, int userId) throws SQLException, DataAlreadyExistsException;
+    int insert(Restaurant restaurant, int userId) throws SQLException;
 
     int insertMenu(Menu menu) throws SQLException;
 
