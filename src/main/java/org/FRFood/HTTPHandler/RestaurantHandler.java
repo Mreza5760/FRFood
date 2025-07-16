@@ -18,270 +18,243 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 
 public class RestaurantHandler implements HttpHandler {
+    private final FoodDAO foodDAO;
     private final ObjectMapper objectMapper;
     private final RestaurantDAO restaurantDAO;
 
     public RestaurantHandler() {
-        objectMapper = new ObjectMapper();
+        foodDAO = new FoodDAOImp();
         restaurantDAO = new RestaurantDAOImp();
-        objectMapper.setPropertyNamingStrategy(PropertyNamingStrategies.SNAKE_CASE);
+        objectMapper = new ObjectMapper().setPropertyNamingStrategy(PropertyNamingStrategies.SNAKE_CASE);
     }
 
     @Override
     public void handle(HttpExchange exchange) throws IOException {
-        String method = exchange.getRequestMethod();
         String path = exchange.getRequestURI().getPath();
+        String method = exchange.getRequestMethod();
         try {
-            String[] parts = path.split("/");
-            if (parts.length == 3) {
-                handleUpdateRestaurants(exchange, Integer.parseInt(parts[2]));
-            } else if (parts.length == 4) {
-                if (parts[3].equals("item") && method.equals("POST")) {
-                    addItem(exchange, Integer.parseInt(parts[2]));
-                } else if (parts[3].equals("menu") && method.equals("POST")) {
-                    addMenu(exchange, Integer.parseInt(parts[2]));
-                } else if (parts[3].equals("orders") && method.equals("GET")) {
-                    getOrders(exchange, Integer.parseInt(parts[2]));
-                } else if (parts[2].equals("orders") && method.equals("PATCH")) {
-                    setStatus(exchange, Integer.parseInt(parts[3]));
+            switch (method) {
+                case "POST" -> {
+                    if (path.equals("/restaurants")) handleRestaurants(exchange);
+                    else if (path.matches("^/\\d+/item$")) addItem(exchange);
+                    else if (path.matches("^/\\d+/menu$")) addMenu(exchange);
                 }
-            } else if (parts.length == 5) {
-                if (parts[3].equals("item") && method.equals("PUT")) {
-                    editItem(exchange, Integer.parseInt(parts[2]), Integer.parseInt(parts[4]));
-                } else if (parts[3].equals("item") && method.equals("DELETE")) {
-                    deleteItem(exchange, Integer.parseInt(parts[2]), Integer.parseInt(parts[4]));
-                } else if (parts[3].equals("menu") && method.equals("DELETE")) {
-                    deleteMenu(exchange, Integer.parseInt(parts[2]), parts[4]);
-                } else if (parts[3].equals("menu") && method.equals("PUT")) {
-                    addItemToMenu(exchange, Integer.parseInt(parts[2]), parts[4]);
+                case "GET" -> {
+                    if (path.equals("/restaurants/mine")) myRestaurants(exchange);
+                    else if (path.matches("^/\\d+/orders$")) getOrders(exchange);
                 }
-            } else if (parts.length == 6) {
-                deleteItemFromMenu(exchange, Integer.parseInt(parts[2]), parts[4], Integer.parseInt(parts[5]));
-            }
-            if (path.equals("/restaurants")) {
-                handleRestaurants(exchange);
-            } else if (path.equals("/restaurants/mine")) {
-                myRestaurants(exchange);
+                case "PUT" -> {
+                    if (path.matches("^/\\d+$")) handleUpdateRestaurants(exchange);
+                    else if (path.matches("^/\\d+/item/\\d+$")) editItem(exchange);
+                    else if (path.matches("^/\\d+/menu/[^/]+$")) addItemToMenu(exchange);
+                }
+                case "DELETE" -> {
+                    if (path.matches("^/\\d+/item/\\d+$")) deleteItem(exchange);
+                    else if (path.matches("^/\\d+/menu/[^/]+$")) deleteMenu(exchange);
+                    else if (path.matches("^/\\d+/menu/[^/]+/\\d+$")) deleteItemFromMenu(exchange);
+                }
+                case "PATCH" -> {
+                    if (path.matches("^/orders/\\d+$")) setStatus(exchange);
+                }
+                default -> JsonResponse.sendJsonResponse(exchange, 404, "Not Found");
             }
         } catch (Exception e) {
-            System.out.println(e.getMessage());
-            JsonResponse.sendJsonResponse(exchange, 500, "Internal Server Error");
+            HttpError.internal(exchange, "Unexpected server error: " + e.getMessage());
         }
     }
 
     private void handleRestaurants(HttpExchange exchange) throws IOException {
-        if (Authenticate.authenticate(exchange).isEmpty()) {
-            return;
-        }
-        User currentUser = Authenticate.authenticate(exchange).get();
-        Restaurant restaurant;
+        var userOpt = Authenticate.authenticate(exchange);
+        if (userOpt.isEmpty()) return;
+        User user = userOpt.get();
+
         try {
-            restaurant = objectMapper.readValue(exchange.getRequestBody(), Restaurant.class);
-            if (!currentUser.getRole().equals(buyer)) {
-                JsonResponse.sendJsonResponse(exchange, 401, "{\"error\":\"Unauthorized request\"}");
+            Restaurant restaurant = objectMapper.readValue(exchange.getRequestBody(), Restaurant.class);
+            if (!user.getRole().equals(buyer)) {
+                HttpError.unauthorized(exchange, "Only buyers can register restaurants");
                 return;
             }
-            int restaurantId = restaurantDAO.insert(restaurant, currentUser.getId());
-            restaurant.setId(restaurantId);
-
-            String json = objectMapper.writeValueAsString(restaurant);
-            JsonResponse.sendJsonResponse(exchange, 201, json);
-        } catch (SQLException e1) {
-            System.out.println(e1.getMessage());
+            int id = restaurantDAO.insert(restaurant, user.getId());
+            restaurant.setId(id);
+            JsonResponse.sendJsonResponse(exchange, 201, objectMapper.writeValueAsString(restaurant));
+        } catch (SQLException e) {
+            HttpError.internal(exchange, "Failed to register restaurant");
         }
     }
 
     private void myRestaurants(HttpExchange exchange) throws IOException {
-        if (Authenticate.authenticate(exchange).isEmpty()) {
-            return;
-        }
-        User currentUser = Authenticate.authenticate(exchange).get();
-        if (!currentUser.getRole().equals(buyer)) {
-            JsonResponse.sendJsonResponse(exchange, 401, "{\"error\":\"Unauthorized request\"}");
-            return;
-        }
-        Restaurant restaurant = new Restaurant();
-        String statement = "SELECT * FROM Restaurants WHERE owner_id = ?";
-        try (
-                Connection connection = DBConnector.gConnection();
-                PreparedStatement preparedStatement = connection.prepareStatement(statement)) {
-            preparedStatement.setInt(1, currentUser.getId());
-            try (ResultSet resultSet = preparedStatement.executeQuery()) {
-                if (resultSet.next()) {
-                    restaurant = new Restaurant(currentUser,
-                            resultSet.getString("name"),
-                            resultSet.getString("address"),
-                            resultSet.getString("phone"),
-                            resultSet.getString("logo"),
-                            resultSet.getInt("tax_fee"),
-                            resultSet.getInt("additional_fee"));
-                    restaurant.setId(resultSet.getInt("id"));
-                }
-            }
+        var userOpt = Authenticate.authenticate(exchange);
+        if (userOpt.isEmpty()) return;
+        User user = userOpt.get();
 
-            String json = objectMapper.writeValueAsString(restaurant);
-            JsonResponse.sendJsonResponse(exchange, 200, json);
-        } catch (SQLException e1) {
-            System.out.println(e1.getMessage());
-        }
-    }
-
-    private void handleUpdateRestaurants(HttpExchange exchange, int restaurantId) throws IOException {
-        if (Authenticate.authenticate(exchange).isEmpty()) {
+        if (!user.getRole().equals(buyer)) {
+            HttpError.unauthorized(exchange, "Only buyers can access their restaurants");
             return;
         }
-        User currentUser = Authenticate.authenticate(exchange).get();
-        RestaurantDAO restaurantDAO = new RestaurantDAOImp();
-        Restaurant restaurant = new Restaurant();
-        try {
-            if (restaurantDAO.getById(restaurantId).isPresent()) {
-                restaurant = restaurantDAO.getById(restaurantId).get();
+
+        String query = "SELECT * FROM Restaurants WHERE owner_id = ?";
+        try (Connection conn = DBConnector.gConnection();
+             PreparedStatement stmt = conn.prepareStatement(query)) {
+
+            stmt.setInt(1, user.getId());
+            ResultSet rs = stmt.executeQuery();
+
+            if (rs.next()) {
+                Restaurant restaurant = new Restaurant(user,
+                        rs.getString("name"),
+                        rs.getString("address"),
+                        rs.getString("phone"),
+                        rs.getString("logo"),
+                        rs.getInt("tax_fee"),
+                        rs.getInt("additional_fee"));
+                restaurant.setId(rs.getInt("id"));
+                JsonResponse.sendJsonResponse(exchange, 200, objectMapper.writeValueAsString(restaurant));
             } else {
-                JsonResponse.sendJsonResponse(exchange, 404, "{\"error\":\"Restaurant not found\"}");
+                HttpError.notFound(exchange, "No restaurant found for user");
             }
-        } catch (Exception e1) {
-            System.out.println(e1.getMessage());
-            JsonResponse.sendJsonResponse(exchange, 500, "{\"error\":\"Internal Server Error\"}");
-        }
-        if (restaurant.getOwner().getId() != currentUser.getId()) {
-            JsonResponse.sendJsonResponse(exchange, 401, "{\"error\":\"Unauthorized request\"}");
-        }
-        try {
-            Restaurant newRestaurant = objectMapper.readValue(exchange.getRequestBody(), Restaurant.class);
-            newRestaurant.setId(restaurantId);
-            newRestaurant.setName(restaurant.getName());
-            restaurantDAO.Update(newRestaurant);
-
-            String json = objectMapper.writeValueAsString(restaurant);
-            JsonResponse.sendJsonResponse(exchange, 201, json);
-        } catch (Exception e2) {
-            System.out.println(e2.getMessage());
-            JsonResponse.sendJsonResponse(exchange, 500, "{\"error\":\"Internal Server Error\"}");
+        } catch (SQLException e) {
+            HttpError.internal(exchange, "Failed to retrieve restaurant");
         }
     }
 
-    private void addItem(HttpExchange exchange, int restaurantId) throws IOException {
-        if (Authenticate.authenticate(exchange).isEmpty()) {
-            return;
+    private void handleUpdateRestaurants(HttpExchange exchange) throws IOException {
+        var userOpt = Authenticate.authenticate(exchange);
+        if (userOpt.isEmpty()) return;
+        User user = userOpt.get();
+
+        String[] parts = exchange.getRequestURI().getPath().split("/");
+        int restaurantId = Integer.parseInt(parts[2]);
+
+        try {
+            Restaurant restaurant = restaurantDAO.getById(restaurantId)
+                    .orElseThrow(() -> new RuntimeException("Restaurant not found"));
+
+            if (restaurant.getOwner().getId() != user.getId()) {
+                HttpError.unauthorized(exchange, "You do not own this restaurant");
+                return;
+            }
+
+            Restaurant updated = objectMapper.readValue(exchange.getRequestBody(), Restaurant.class);
+            updated.setId(restaurantId);
+            restaurantDAO.Update(updated);
+            JsonResponse.sendJsonResponse(exchange, 200, objectMapper.writeValueAsString(updated));
+        } catch (Exception e) {
+            HttpError.internal(exchange, "Failed to update restaurant");
         }
-        User currentUser = Authenticate.authenticate(exchange).get();
+    }
+
+    private void addItem(HttpExchange exchange) throws IOException {
+        var userOpt = Authenticate.authenticate(exchange);
+        if (userOpt.isEmpty()) return;
+
+        String[] parts = exchange.getRequestURI().getPath().split("/");
+        int restaurantId = Integer.parseInt(parts[2]);
         Food food = objectMapper.readValue(exchange.getRequestBody(), Food.class);
         food.setRestaurantId(restaurantId);
-        FoodDAO foodDAO = new FoodDAOImp();
+
         try {
             food.setId(foodDAO.insert(food));
+            JsonResponse.sendJsonResponse(exchange, 201, objectMapper.writeValueAsString(food));
         } catch (SQLException e) {
-            JsonResponse.sendJsonResponse(exchange, 500, "{\"error\":\"Internal Server Error\"}");
-            System.out.println(e.getMessage());
+            HttpError.internal(exchange, "Failed to add food item");
         }
-        String json = objectMapper.writeValueAsString(food);
-        JsonResponse.sendJsonResponse(exchange, 200, json);
     }
 
-    private void editItem(HttpExchange exchange, int restaurantId, int foodId) throws IOException {
+    private void editItem(HttpExchange exchange) throws IOException {
+        String[] parts = exchange.getRequestURI().getPath().split("/");
+        int restaurantId = Integer.parseInt(parts[2]);
+        int foodId = Integer.parseInt(parts[4]);
         Food food = objectMapper.readValue(exchange.getRequestBody(), Food.class);
         food.setRestaurantId(restaurantId);
         food.setId(foodId);
-        FoodDAO foodDAO = new FoodDAOImp();
+
         try {
             foodDAO.update(food);
+            JsonResponse.sendJsonResponse(exchange, 200, objectMapper.writeValueAsString(food));
         } catch (SQLException e) {
-            JsonResponse.sendJsonResponse(exchange, 500, "{\"error\":\"Internal Server Error\"}");
-            System.out.println(e.getMessage());
+            HttpError.internal(exchange, "Failed to edit food item");
         }
-        String json = objectMapper.writeValueAsString(food);
-        JsonResponse.sendJsonResponse(exchange, 200, json);
-
     }
 
-    private void deleteItem(HttpExchange exchange, int restaurantId, int foodId) throws IOException {
-        FoodDAO foodDAO = new FoodDAOImp();
+    private void deleteItem(HttpExchange exchange) throws IOException {
+        int foodId = Integer.parseInt(exchange.getRequestURI().getPath().split("/")[4]);
         try {
             foodDAO.delete(foodId);
-            JsonResponse.sendJsonResponse(exchange, 500, "{\"message\":\"Food item removed successfully\"}");
+            JsonResponse.sendJsonResponse(exchange, 200, "{\"message\":\"Food item removed successfully\"}");
         } catch (SQLException e) {
-            JsonResponse.sendJsonResponse(exchange, 500, "{\"error\":\"Internal Server Error\"}");
-            System.out.println(e.getMessage());
+            HttpError.internal(exchange, "Failed to delete food item");
         }
     }
 
-    private void addMenu(HttpExchange exchange, int restaurantId) throws IOException {
+    private void addMenu(HttpExchange exchange) throws IOException {
+        int restaurantId = Integer.parseInt(exchange.getRequestURI().getPath().split("/")[2]);
         Menu menu = objectMapper.readValue(exchange.getRequestBody(), Menu.class);
-        Restaurant restaurant = null;
         try {
-            if (restaurantDAO.getById(restaurantId).isPresent()) {
-                restaurant = restaurantDAO.getById(restaurantId).get();
-            }
+            Restaurant restaurant = restaurantDAO.getById(restaurantId).orElse(null);
             menu.setRestaurant(restaurant);
             menu.setId(restaurantDAO.insertMenu(menu));
-            String json = objectMapper.writeValueAsString(menu);
-            JsonResponse.sendJsonResponse(exchange, 200, json);
+            JsonResponse.sendJsonResponse(exchange, 201, objectMapper.writeValueAsString(menu));
         } catch (SQLException e) {
-            //handle
-            return;
+            HttpError.internal(exchange, "Failed to add menu");
         }
     }
 
-    private void deleteMenu(HttpExchange exchange, int restaurantId, String menuTitle) throws IOException {
+    private void deleteMenu(HttpExchange exchange) throws IOException {
+        String[] parts = exchange.getRequestURI().getPath().split("/");
+        int restaurantId = Integer.parseInt(parts[2]);
+        String menuTitle = parts[4];
         try {
             restaurantDAO.deleteMenuByTitle(menuTitle, restaurantId);
+            JsonResponse.sendJsonResponse(exchange, 200, "{\"message\":\"Menu deleted successfully\"}");
         } catch (SQLException e) {
-            JsonResponse.sendJsonResponse(exchange, 500, "{\"error\":\"Internal Server Error\"}");
-            System.out.println(e.getMessage());
+            HttpError.internal(exchange, "Failed to delete menu");
         }
     }
 
-    private void addItemToMenu(HttpExchange exchange, int restaurantId, String title) throws IOException {
-        Menu menu = new Menu();
+    private void addItemToMenu(HttpExchange exchange) throws IOException {
+        String[] parts = exchange.getRequestURI().getPath().split("/");
+        int restaurantId = Integer.parseInt(parts[2]);
+        String title = parts[4];
         try {
-            if (restaurantDAO.getMenuByTitle(title, restaurantId).isPresent()) {
-                menu = restaurantDAO.getMenuByTitle(title, restaurantId).get();
-            }
+            Menu menu = restaurantDAO.getMenuByTitle(title, restaurantId).orElseThrow();
             JsonNode node = objectMapper.readTree(exchange.getRequestBody());
             int itemId = node.get("item_id").asInt();
-            FoodDAO foodDAO = new FoodDAOImp();
             foodDAO.setMenuId(itemId, menu.getId());
-            JsonResponse.sendJsonResponse(exchange, 200, "{\"message\":\"Food item created and added to restaurant successfully\"}");
+            JsonResponse.sendJsonResponse(exchange, 200, "{\"message\":\"Food item added to menu\"}");
         } catch (SQLException e) {
-            JsonResponse.sendJsonResponse(exchange, 500, "{\"error\":\"Internal Server Error\"}");
-            System.out.println(e.getMessage());
+            HttpError.internal(exchange, "Failed to add item to menu");
         }
     }
 
-    private void deleteItemFromMenu(HttpExchange exchange, int restaurantId, String menuTitle, int foodId) throws IOException {
-        FoodDAO foodDAO = new FoodDAOImp();
+    private void deleteItemFromMenu(HttpExchange exchange) throws IOException {
+        String[] parts = exchange.getRequestURI().getPath().split("/");
+        int foodId = Integer.parseInt(parts[5]);
         try {
             foodDAO.setMenuIdNull(foodId);
-            JsonResponse.sendJsonResponse(exchange, 200, "{\"message\":\"Item removed from restaurant menu successfully\"}");
+            JsonResponse.sendJsonResponse(exchange, 200, "{\"message\":\"Item removed from menu\"}");
         } catch (SQLException e) {
-            JsonResponse.sendJsonResponse(exchange, 500, "{\"error\":\"Internal Server Error\"}");
-            System.out.println(e.getMessage());
+            HttpError.internal(exchange, "Failed to remove item from menu");
         }
     }
 
-    private void getOrders(HttpExchange exchange, int restaurantId) throws IOException {
-        OrderDAO orderDAO = new OrderDAOImp();
-        List<Order> orders = null;
+    private void getOrders(HttpExchange exchange) throws IOException {
+        int restaurantId = Integer.parseInt(exchange.getRequestURI().getPath().split("/")[2]);
         try {
-            orders = orderDAO.getRestaurantOrders(restaurantId);
+            List<Order> orders = new OrderDAOImp().getRestaurantOrders(restaurantId);
+            JsonResponse.sendJsonResponse(exchange, 200, objectMapper.writeValueAsString(orders));
         } catch (SQLException e) {
-            JsonResponse.sendJsonResponse(exchange, 500, "{\"error\":\"Internal Server Error\"}");
-            System.out.println(e.getMessage());
+            HttpError.internal(exchange, "Failed to get restaurant orders");
         }
-        String json = objectMapper.writeValueAsString(orders);
-        JsonResponse.sendJsonResponse(exchange, 200, json);
     }
 
-    private void setStatus(HttpExchange exchange, int orderId) throws IOException {
-        OrderDAO orderDAO = new OrderDAOImp();
-        JsonNode node = objectMapper.readTree(exchange.getRequestBody());
-        String status = node.get("status").asText();
+    private void setStatus(HttpExchange exchange) throws IOException {
+        int orderId = Integer.parseInt(exchange.getRequestURI().getPath().split("/")[3]);
+        String status = objectMapper.readTree(exchange.getRequestBody()).get("status").asText();
         try {
-            orderDAO.changeStatus(orderId, status);
-            JsonResponse.sendJsonResponse(exchange, 200, "{\"message\":\"Order status changed successfully\"}");
+            new OrderDAOImp().changeStatus(orderId, status);
+            JsonResponse.sendJsonResponse(exchange, 200, "{\"message\":\"Order status updated\"}");
         } catch (SQLException e) {
-            JsonResponse.sendJsonResponse(exchange, 500, "{\"error\":\"Internal Server Error\"}");
-            System.out.println(e.getMessage());
+            HttpError.internal(exchange, "Failed to update order status");
         }
     }
 }
