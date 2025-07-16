@@ -18,7 +18,7 @@ public interface FoodDAO {
 
     void delete(int id) throws SQLException;
 
-    void setMenuId(int menuId, int foodId) throws SQLException;
+    void addFood(int menuId, int foodId) throws SQLException;
 
     void setMenuIdNull(int foodId) throws SQLException;
 

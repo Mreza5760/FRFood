@@ -4,6 +4,7 @@ import org.FRFood.DAO.*;
 import org.FRFood.util.*;
 import org.FRFood.entity.*;
 import static org.FRFood.util.Role.*;
+import static org.FRFood.util.Validation.validatePhoneNumber;
 
 import java.util.List;
 import java.sql.ResultSet;
@@ -74,6 +75,18 @@ public class RestaurantHandler implements HttpHandler {
                 HttpError.forbidden(exchange, "Only sellers can register restaurants");
                 return;
             }
+
+            // TODO Tax fee should be more than zero
+            if (restaurant.getName() == null || restaurant.getAddress() == null || restaurant.getPhone() == null || restaurant.getTaxFee() == 0 || restaurant.getAdditionalFee() == 0) {
+                HttpError.badRequest(exchange, "Missing required fields");
+                return;
+            }
+
+            if (!validatePhoneNumber(restaurant.getPhone())) {
+                HttpError.unsupported(exchange, "Invalid phone number");
+                return;
+            }
+
             restaurant.setId(restaurantDAO.insert(restaurant, user.getId()));
             JsonResponse.sendJsonResponse(exchange, 201, objectMapper.writeValueAsString(restaurant));
         } catch (SQLException e) {
@@ -86,11 +99,12 @@ public class RestaurantHandler implements HttpHandler {
         if (userOpt.isEmpty()) return;
         User user = userOpt.get();
 
-        if (!user.getRole().equals(buyer)) {
-            HttpError.unauthorized(exchange, "Only buyers can access their restaurants");
+        if (!user.getRole().equals(seller)) {
+            HttpError.unauthorized(exchange, "Only seller can access their restaurants");
             return;
         }
 
+        // TODO Should add to the restaurantDao, i dont check this shit
         String query = "SELECT * FROM Restaurants WHERE owner_id = ?";
         try (Connection conn = DBConnector.gConnection();
              PreparedStatement stmt = conn.prepareStatement(query)) {
@@ -121,6 +135,11 @@ public class RestaurantHandler implements HttpHandler {
         if (userOpt.isEmpty()) return;
         User user = userOpt.get();
 
+        if (!user.getRole().equals(seller)) {
+            HttpError.unauthorized(exchange, "Only sellers can update restaurants");
+            return;
+        }
+
         String[] parts = exchange.getRequestURI().getPath().split("/");
         int restaurantId = Integer.parseInt(parts[2]);
 
@@ -145,13 +164,30 @@ public class RestaurantHandler implements HttpHandler {
     private void addItem(HttpExchange exchange) throws IOException {
         var userOpt = Authenticate.authenticate(exchange);
         if (userOpt.isEmpty()) return;
+        User user = userOpt.get();
+        if (!user.getRole().equals(seller)) {
+            HttpError.unauthorized(exchange, "Only sellers can add items");
+            return;
+        }
 
         String[] parts = exchange.getRequestURI().getPath().split("/");
         int restaurantId = Integer.parseInt(parts[2]);
         Food food = objectMapper.readValue(exchange.getRequestBody(), Food.class);
         food.setRestaurantId(restaurantId);
 
+        // TODO default val
+        if (food.getName() == null || food.getDescription() == null || food.getPrice() == 0 || food.getSupply() == 0 || food.getKeywords() == null) {
+            HttpError.badRequest(exchange, "Missing required fields");
+            return;
+        }
+
         try {
+            Restaurant restaurant = restaurantDAO.getById(restaurantId)
+                    .orElseThrow(() -> new RuntimeException("Restaurant not found"));
+            if (restaurant.getOwner().getId() != user.getId()) {
+                HttpError.unauthorized(exchange, "You do not own this restaurant");
+                return;
+            }
             food.setId(foodDAO.insert(food));
             JsonResponse.sendJsonResponse(exchange, 201, objectMapper.writeValueAsString(food));
         } catch (SQLException e) {
@@ -160,6 +196,14 @@ public class RestaurantHandler implements HttpHandler {
     }
 
     private void editItem(HttpExchange exchange) throws IOException {
+        var userOpt = Authenticate.authenticate(exchange);
+        if (userOpt.isEmpty()) return;
+        User user = userOpt.get();
+        if (!user.getRole().equals(seller)) {
+            HttpError.unauthorized(exchange, "Only sellers can edit items");
+            return;
+        }
+
         String[] parts = exchange.getRequestURI().getPath().split("/");
         int restaurantId = Integer.parseInt(parts[2]);
         int foodId = Integer.parseInt(parts[4]);
@@ -168,6 +212,12 @@ public class RestaurantHandler implements HttpHandler {
         food.setId(foodId);
 
         try {
+            Restaurant restaurant = restaurantDAO.getById(restaurantId)
+                    .orElseThrow(() -> new RuntimeException("Restaurant not found"));
+            if (restaurant.getOwner().getId() != user.getId()) {
+                HttpError.unauthorized(exchange, "You do not own this restaurant");
+                return;
+            }
             foodDAO.update(food);
             JsonResponse.sendJsonResponse(exchange, 200, objectMapper.writeValueAsString(food));
         } catch (SQLException e) {
@@ -176,8 +226,25 @@ public class RestaurantHandler implements HttpHandler {
     }
 
     private void deleteItem(HttpExchange exchange) throws IOException {
+        var userOpt = Authenticate.authenticate(exchange);
+        if (userOpt.isEmpty()) return;
+        User user = userOpt.get();
+        if (!user.getRole().equals(seller)) {
+            HttpError.unauthorized(exchange, "Only sellers can delete items");
+            return;
+        }
+
         int foodId = Integer.parseInt(exchange.getRequestURI().getPath().split("/")[4]);
+        int restaurantId = Integer.parseInt(exchange.getRequestURI().getPath().split("/")[2]);
+
         try {
+            Restaurant restaurant = restaurantDAO.getById(restaurantId)
+                    .orElseThrow(() -> new RuntimeException("Restaurant not found"));
+            if (restaurant.getOwner().getId() != user.getId()) {
+                HttpError.unauthorized(exchange, "You do not own this restaurant");
+                return;
+            }
+
             foodDAO.delete(foodId);
             JsonResponse.sendJsonResponse(exchange, 200, "{\"message\":\"Food item removed successfully\"}");
         } catch (SQLException e) {
@@ -186,10 +253,29 @@ public class RestaurantHandler implements HttpHandler {
     }
 
     private void addMenu(HttpExchange exchange) throws IOException {
+        var userOpt = Authenticate.authenticate(exchange);
+        if (userOpt.isEmpty()) return;
+        User user = userOpt.get();
+        if (!user.getRole().equals(seller)) {
+            HttpError.unauthorized(exchange, "Only sellers can add menus");
+            return;
+        }
+
         int restaurantId = Integer.parseInt(exchange.getRequestURI().getPath().split("/")[2]);
         Menu menu = objectMapper.readValue(exchange.getRequestBody(), Menu.class);
+
+        if (menu.getTitle() == null) {
+            HttpError.badRequest(exchange, "Missing required fields");
+            return;
+        }
+
         try {
-            Restaurant restaurant = restaurantDAO.getById(restaurantId).orElse(null);
+            Restaurant restaurant = restaurantDAO.getById(restaurantId)
+                    .orElseThrow(() -> new RuntimeException("Restaurant not found"));
+            if (restaurant.getOwner().getId() != user.getId()) {
+                HttpError.unauthorized(exchange, "You do not own this restaurant");
+                return;
+            }
             menu.setRestaurant(restaurant);
             menu.setId(restaurantDAO.insertMenu(menu));
             JsonResponse.sendJsonResponse(exchange, 201, objectMapper.writeValueAsString(menu));
@@ -199,10 +285,25 @@ public class RestaurantHandler implements HttpHandler {
     }
 
     private void deleteMenu(HttpExchange exchange) throws IOException {
+        var userOpt = Authenticate.authenticate(exchange);
+        if (userOpt.isEmpty()) return;
+        User user = userOpt.get();
+        if (!user.getRole().equals(seller)) {
+            HttpError.unauthorized(exchange, "Only sellers can delete menu");
+            return;
+        }
+
         String[] parts = exchange.getRequestURI().getPath().split("/");
         int restaurantId = Integer.parseInt(parts[2]);
         String menuTitle = parts[4];
+
         try {
+            Restaurant restaurant = restaurantDAO.getById(restaurantId)
+                    .orElseThrow(() -> new RuntimeException("Restaurant not found"));
+            if (restaurant.getOwner().getId() != user.getId()) {
+                HttpError.unauthorized(exchange, "You do not own this restaurant");
+                return;
+            }
             restaurantDAO.deleteMenuByTitle(menuTitle, restaurantId);
             JsonResponse.sendJsonResponse(exchange, 200, "{\"message\":\"Menu deleted successfully\"}");
         } catch (SQLException e) {
@@ -211,14 +312,35 @@ public class RestaurantHandler implements HttpHandler {
     }
 
     private void addItemToMenu(HttpExchange exchange) throws IOException {
+        var userOpt = Authenticate.authenticate(exchange);
+        if (userOpt.isEmpty()) return;
+        User user = userOpt.get();
+        if (!user.getRole().equals(seller)) {
+            HttpError.unauthorized(exchange, "Only sellers can add item to menu");
+            return;
+        }
+
         String[] parts = exchange.getRequestURI().getPath().split("/");
         int restaurantId = Integer.parseInt(parts[2]);
+        JsonNode node = objectMapper.readTree(exchange.getRequestBody());
+        int itemId = node.get("item_id").asInt();
         String title = parts[4];
+
+        if (itemId == 0) {
+            HttpError.badRequest(exchange, "Missing required fields");
+            return;
+        }
+
         try {
-            Menu menu = restaurantDAO.getMenuByTitle(title, restaurantId).orElseThrow();
-            JsonNode node = objectMapper.readTree(exchange.getRequestBody());
-            int itemId = node.get("item_id").asInt();
-            foodDAO.setMenuId(itemId, menu.getId());
+            Restaurant restaurant = restaurantDAO.getById(restaurantId)
+                    .orElseThrow(() -> new RuntimeException("Restaurant not found"));
+            if (restaurant.getOwner().getId() != user.getId()) {
+                HttpError.unauthorized(exchange, "You do not own this restaurant");
+                return;
+            }
+            Menu menu = restaurantDAO.getMenuByTitle(title, restaurantId)
+                    .orElseThrow(() -> new RuntimeException("Menu not found"));
+            foodDAO.addFood(itemId, menu.getId());
             JsonResponse.sendJsonResponse(exchange, 200, "{\"message\":\"Food item added to menu\"}");
         } catch (SQLException e) {
             HttpError.internal(exchange, "Failed to add item to menu");
@@ -226,8 +348,17 @@ public class RestaurantHandler implements HttpHandler {
     }
 
     private void deleteItemFromMenu(HttpExchange exchange) throws IOException {
+        var userOpt = Authenticate.authenticate(exchange);
+        if (userOpt.isEmpty()) return;
+        User user = userOpt.get();
+        if (!user.getRole().equals(seller)) {
+            HttpError.unauthorized(exchange, "Only sellers can delete item from menu");
+            return;
+        }
+
         String[] parts = exchange.getRequestURI().getPath().split("/");
         int foodId = Integer.parseInt(parts[5]);
+
         try {
             foodDAO.setMenuIdNull(foodId);
             JsonResponse.sendJsonResponse(exchange, 200, "{\"message\":\"Item removed from menu\"}");

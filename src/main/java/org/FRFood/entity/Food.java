@@ -43,10 +43,6 @@ public class Food {
         return id;
     }
 
-    public int getPriceId() {
-        return getPrice();
-    }
-
     public String getPicture() {
         return picture;
     }
