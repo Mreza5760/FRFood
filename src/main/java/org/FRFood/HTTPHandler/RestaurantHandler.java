@@ -29,8 +29,8 @@ public class RestaurantHandler implements HttpHandler {
 
     @Override
     public void handle(HttpExchange exchange) throws IOException {
-        String path = exchange.getRequestURI().getPath();
         String method = exchange.getRequestMethod();
+        String path = exchange.getRequestURI().getPath();
         try {
             String[] parts = path.split("/");
             if (parts.length == 3) {
@@ -77,9 +77,6 @@ public class RestaurantHandler implements HttpHandler {
         Restaurant restaurant;
         try {
             restaurant = objectMapper.readValue(exchange.getRequestBody(), Restaurant.class);
-            Validate.validatePhone(restaurant.getPhone());
-            Validate.validateName(restaurant.getName());
-            // needs more validation checks
             if (!currentUser.getRole().equals(buyer)) {
                 JsonResponse.sendJsonResponse(exchange, 401, "{\"error\":\"Unauthorized request\"}");
                 return;
@@ -91,8 +88,6 @@ public class RestaurantHandler implements HttpHandler {
             JsonResponse.sendJsonResponse(exchange, 201, json);
         } catch (SQLException e1) {
             System.out.println(e1.getMessage());
-        } catch (DataValidationException e) {
-            JsonResponse.sendJsonResponse(exchange, 400, e.getMessage());
         }
     }
 
@@ -128,8 +123,6 @@ public class RestaurantHandler implements HttpHandler {
             JsonResponse.sendJsonResponse(exchange, 200, json);
         } catch (SQLException e1) {
             System.out.println(e1.getMessage());
-        } catch (DataValidationException e) {
-            JsonResponse.sendJsonResponse(exchange, 400, e.getMessage());
         }
     }
 
@@ -157,15 +150,10 @@ public class RestaurantHandler implements HttpHandler {
             Restaurant newRestaurant = objectMapper.readValue(exchange.getRequestBody(), Restaurant.class);
             newRestaurant.setId(restaurantId);
             newRestaurant.setName(restaurant.getName());
-            Validate.validatePhone(newRestaurant.getPhone());
-            Validate.validateName(newRestaurant.getName());
-            //needs more validations
             restaurantDAO.Update(newRestaurant);
 
             String json = objectMapper.writeValueAsString(restaurant);
             JsonResponse.sendJsonResponse(exchange, 201, json);
-        } catch (DataValidationException e1) {
-            JsonResponse.sendJsonResponse(exchange, 400, e1.getMessage());
         } catch (Exception e2) {
             System.out.println(e2.getMessage());
             JsonResponse.sendJsonResponse(exchange, 500, "{\"error\":\"Internal Server Error\"}");

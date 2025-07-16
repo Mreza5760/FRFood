@@ -4,7 +4,6 @@ import org.FRFood.entity.Food;
 import org.FRFood.entity.Menu;
 import org.FRFood.util.DBConnector;
 import org.FRFood.entity.Restaurant;
-import org.FRFood.util.DataAlreadyExistsException;
 
 import java.sql.*;
 import java.util.List;
@@ -13,7 +12,7 @@ import java.util.ArrayList;
 
 public class RestaurantDAOImp implements RestaurantDAO {
     @Override
-    public int insert(Restaurant restaurant, int userId) throws SQLException, DataAlreadyExistsException {
+    public int insert(Restaurant restaurant, int userId) throws SQLException {
         String sql = "INSERT INTO restaurants (owner_id , name , address , phone , logo , tax_fee , additional_fee) VALUES (?,?,?,?,?,?,?)";
         try (
                 Connection connection = DBConnector.gConnection();
