@@ -4,16 +4,15 @@ import java.sql.*;
 import java.util.List;
 import java.util.Optional;
 
-import org.FRFood.entity.Restaurant;
 import org.FRFood.util.Role;
 import org.FRFood.entity.User;
 import org.FRFood.util.DBConnector;
+import org.FRFood.entity.Restaurant;
 import org.FRFood.entity.BankAccount;
-import org.FRFood.util.DataAlreadyExistsException;
 
 public class UserDAOImp implements UserDAO {
     @Override
-    public int insert(User user) throws DataAlreadyExistsException, SQLException {
+    public int insert(User user) throws SQLException {
         BankAccountDAO bankAccountDAO = new BankAccountDAOImp();
         String sql = "INSERT INTO Users (full_name, phone, email, password_hash, role, address, profile_image, bank_id) " +
                 "VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
@@ -49,9 +48,6 @@ public class UserDAOImp implements UserDAO {
                 }
             }
         } catch (SQLException e) {
-            if ("23000".equals(e.getSQLState())) {
-                throw new DataAlreadyExistsException("User with given phone already exists.");
-            }
             throw new RuntimeException("Insert failed: " + e.getMessage(), e);
         }
     }

@@ -18,8 +18,8 @@ public class User {
     private Role role;
     @JsonProperty("bank_info")
     private BankAccount bank;
-    @JsonIgnore
-    private boolean confirmed;
+//    @JsonIgnore
+//    private boolean confirmed;
 
     public User(){};
 

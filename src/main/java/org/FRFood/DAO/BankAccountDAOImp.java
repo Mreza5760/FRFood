@@ -2,7 +2,6 @@ package org.FRFood.DAO;
 
 import org.FRFood.util.DBConnector;
 import org.FRFood.entity.BankAccount;
-import org.FRFood.util.DataAlreadyExistsException;
 
 import java.sql.*;
 import java.util.Optional;
@@ -29,11 +28,6 @@ public class BankAccountDAOImp implements BankAccountDAO {
                     throw new SQLException("Insert failed, no ID generated.");
                 }
             }
-        } catch (SQLException e) {
-            if (e.getSQLState().equals("23000")) {
-                throw new DataAlreadyExistsException("Bank account already exists.");
-            }
-            throw e;
         }
     }
 

@@ -20,7 +20,7 @@ CREATE TABLE IF NOT EXISTS Users
     address       TEXT         NOT NULL,
     profile_image LONGTEXT     NULL,
     bank_id       INTEGER,
-    confirmed     BOOLEAN,
+##########     confirmed     BOOLEAN,
     created_at    TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (bank_id) REFERENCES Bank_account (id)
 );

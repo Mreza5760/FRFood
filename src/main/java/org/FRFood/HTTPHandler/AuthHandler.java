@@ -81,8 +81,6 @@ public class AuthHandler implements HttpHandler {
                 return;
             }
 
-            int bankId = bankDAO.insert(user.getBank());
-            user.getBank().setId(bankId);
             int userId = userDAO.insert(user);
 
             String token = JwtUtil.generateToken(user);
@@ -186,12 +184,10 @@ public class AuthHandler implements HttpHandler {
                     currentBank.setAccountNumber(bankInfoUpdates.get("account_number"));
                     changed = true;
                 }
-                if (changed && bankDAO.getById(currentBank.getId()).isPresent()) {
+                if (changed && bankDAO.getById(currentBank.getId()).isPresent())
                     bankDAO.update(currentBank);
-                } else if (changed) {
-                    int bankId = bankDAO.insert(currentBank);
-                    currentBank.setId(bankId);
-                }
+                else if (changed)
+                    currentBank.setId(bankDAO.insert(currentBank));
             }
 
             if (changed) {
@@ -201,7 +197,7 @@ public class AuthHandler implements HttpHandler {
             JsonResponse.sendJsonResponse(exchange, 200, "{\"message\":\"Profile updated successfully\"}");
         } catch (com.fasterxml.jackson.core.JsonProcessingException jsonEx) {
             HttpError.badRequest(exchange, "Invalid JSON input");
-        } catch (Exception e) {
+        } catch (SQLException e) {
             HttpError.internal(exchange, "Internal server error while updating profile");
         }
     }
