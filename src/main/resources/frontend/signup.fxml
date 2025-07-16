@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<VBox alignment="CENTER" spacing="10" xmlns="http://javafx.com/javafx"
+      xmlns:fx="http://javafx.com/fxml"
+      fx:controller="org.FRFood.frontend.controller.SignUpController">
+
+    <padding>
+        <Insets top="20" right="30" bottom="20" left="30"/>
+    </padding>
+
+    <Label text="Sign Up" style="-fx-font-size: 24px;"/>
+
+    <TextField fx:id="fullNameField" promptText="full Name"/>
+    <TextField fx:id="phoneNumberField" promptText="phoneNumberField"/>
+    <TextField fx:id="roleField" promptText="roleField"/>
+    <TextField fx:id="bankNameField" promptText="bankNameField"/>
+    <TextField fx:id="bankAccountField" promptText="bankAccountField"/>
+    <TextField fx:id="emailField" promptText="emailField"/>
+    <TextField fx:id="addressField" promptText="address"/>
+    <TextField fx:id="profileField" promptText="profileField"/>
+    <PasswordField fx:id="passwordField" promptText="Password"/>
+
+    <Label fx:id="messageLabel">nothing</Label>
+
+    <Button text="Sign Up" onAction="#handleRegister"/>
+
+</VBox>

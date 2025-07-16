@@ -19,17 +19,17 @@ public class OrderDAOImp implements OrderDAO {
                 Connection conn = DBConnector.gConnection();
                 PreparedStatement stmt = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)
         ) {
-            stmt.setInt(1, order.getCustomerId());
-            stmt.setInt(2, order.getRestaurantId());
-            stmt.setInt(3, order.getCourierId());
-            stmt.setInt(4, order.getCouponId());
-            stmt.setString(5, order.getDeliveryAddress());
-            stmt.setInt(6, order.getRawPrice());
-            stmt.setInt(7, order.getTaxFee());
-            stmt.setInt(8, order.getAdditionalFee());
-            stmt.setInt(9, order.getCourierFee());
-            stmt.setInt(10, order.getPayPrice());
-            stmt.setString(11, order.getStatus().toString());
+//            stmt.setInt(1, order.getCustomerId());
+//            stmt.setInt(2, order.getRestaurantId());
+//            stmt.setInt(3, order.getCourierId());
+//            stmt.setInt(4, order.getCouponId());
+//            stmt.setString(5, order.getDeliveryAddress());
+//            stmt.setInt(6, order.getRawPrice());
+//            stmt.setInt(7, order.getTaxFee());
+//            stmt.setInt(8, order.getAdditionalFee());
+//            stmt.setInt(9, order.getCourierFee());
+//            stmt.setInt(10, order.getPayPrice());
+//            stmt.setString(11, order.getStatus().toString());
             try(ResultSet rs = stmt.executeQuery()){
                 if (rs.next()) {
                     orderId = rs.getInt("id");
