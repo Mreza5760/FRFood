@@ -10,7 +10,7 @@ import java.sql.SQLException;
 public interface FoodDAO {
     Optional<Food> getById(int id) throws SQLException;
 
-    boolean doesHaveKeywords(List<String> input) throws SQLException;
+    boolean doesHaveKeywords(List<String> input,int foodId) throws SQLException;
 
     int insert(Food food) throws SQLException;
 
