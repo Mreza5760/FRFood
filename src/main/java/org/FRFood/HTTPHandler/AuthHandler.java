@@ -7,12 +7,11 @@ import com.sun.net.httpserver.HttpHandler;
 import com.sun.net.httpserver.HttpExchange;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
+import static org.FRFood.util.Authenticate.authenticate;
 
-import java.sql.SQLException;
 import java.util.*;
 import java.io.IOException;
-
-import static org.FRFood.util.Authenticate.authenticate;
+import java.sql.SQLException;
 
 public class AuthHandler implements HttpHandler {
     private final UserDAO userDAO;
@@ -28,8 +27,8 @@ public class AuthHandler implements HttpHandler {
 
     @Override
     public void handle(HttpExchange exchange) throws IOException {
-        String path = exchange.getRequestURI().getPath();
         String method = exchange.getRequestMethod();
+        String path = exchange.getRequestURI().getPath();
         try {
             switch (method) {
                 case "POST" -> {
@@ -70,10 +69,9 @@ public class AuthHandler implements HttpHandler {
             return;
         }
 
-        if (user.getFullName() == null || user.getPassword() == null ||
-                user.getRole() == null || user.getBank() == null ||
-                user.getBank().getName() == null || user.getBank().getAccountNumber() == null) {
-            HttpError.badRequest(exchange, "Missing required fields");
+        // TODO: Bank is not required
+        if (user.getFullName() == null || user.getPhoneNumber() == null || user.getPassword() == null || user.getRole() == null || user.getBank() == null) {
+            HttpError.notFound(exchange, "Missing required fields");
             return;
         }
 

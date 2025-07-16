@@ -1,5 +1,6 @@
 package org.FRFood.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.FRFood.util.Role;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
@@ -17,6 +18,8 @@ public class User {
     private Role role;
     @JsonProperty("bank_info")
     private BankAccount bank;
+    @JsonIgnore
+    private boolean confirmed;
 
     public User(){};
 
