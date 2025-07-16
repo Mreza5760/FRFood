@@ -8,6 +8,7 @@ import com.sun.net.httpserver.HttpExchange;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import static org.FRFood.util.Authenticate.authenticate;
+import static org.FRFood.util.Validation.validatePhoneNumber;
 
 import java.util.*;
 import java.io.IOException;
@@ -72,6 +73,11 @@ public class AuthHandler implements HttpHandler {
         // TODO: Bank is not required
         if (user.getFullName() == null || user.getPhoneNumber() == null || user.getPassword() == null || user.getRole() == null || user.getBank() == null) {
             HttpError.notFound(exchange, "Missing required fields");
+            return;
+        }
+
+        if (!validatePhoneNumber(user.getPhoneNumber())) {
+            HttpError.unsupported(exchange, "Invalid phone number");
             return;
         }
 

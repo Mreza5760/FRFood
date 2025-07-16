@@ -70,12 +70,11 @@ public class RestaurantHandler implements HttpHandler {
 
         try {
             Restaurant restaurant = objectMapper.readValue(exchange.getRequestBody(), Restaurant.class);
-            if (!user.getRole().equals(buyer)) {
-                HttpError.unauthorized(exchange, "Only buyers can register restaurants");
+            if (!user.getRole().equals(seller)) {
+                HttpError.forbidden(exchange, "Only sellers can register restaurants");
                 return;
             }
-            int id = restaurantDAO.insert(restaurant, user.getId());
-            restaurant.setId(id);
+            restaurant.setId(restaurantDAO.insert(restaurant, user.getId()));
             JsonResponse.sendJsonResponse(exchange, 201, objectMapper.writeValueAsString(restaurant));
         } catch (SQLException e) {
             HttpError.internal(exchange, "Failed to register restaurant");
