@@ -1,33 +1,30 @@
 package org.FRFood.HTTPHandler;
 
+import org.FRFood.DAO.*;
+import org.FRFood.util.*;
+import org.FRFood.entity.*;
+import static org.FRFood.util.Role.*;
+
+import java.util.List;
+import java.sql.ResultSet;
+import java.io.IOException;
+import java.sql.Connection;
+import java.sql.SQLException;
+import java.sql.PreparedStatement;
+import com.sun.net.httpserver.HttpHandler;
+import com.sun.net.httpserver.HttpExchange;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
-import com.sun.net.httpserver.HttpExchange;
-import com.sun.net.httpserver.HttpHandler;
-import org.FRFood.DAO.*;
-import org.FRFood.entity.*;
-import org.FRFood.util.*;
-
-import java.io.IOException;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.util.List;
-
-import static org.FRFood.util.Role.*;
 
 public class RestaurantHandler implements HttpHandler {
-    private final RestaurantDAO restaurantDAO;
     private final ObjectMapper objectMapper;
-    private final UserDAO userDAO;
+    private final RestaurantDAO restaurantDAO;
 
     public RestaurantHandler() {
-        restaurantDAO = new RestaurantDAOImp();
         objectMapper = new ObjectMapper();
+        restaurantDAO = new RestaurantDAOImp();
         objectMapper.setPropertyNamingStrategy(PropertyNamingStrategies.SNAKE_CASE);
-        userDAO = new UserDAOImp();
     }
 
     @Override
@@ -299,5 +296,4 @@ public class RestaurantHandler implements HttpHandler {
             System.out.println(e.getMessage());
         }
     }
-
 }
