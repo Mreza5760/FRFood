@@ -1,7 +1,10 @@
 package org.FRFood.util;
 
 import io.jsonwebtoken.*;
+import org.FRFood.DAO.RestaurantDAO;
+import org.FRFood.DAO.RestaurantDAOImp;
 import org.FRFood.DAO.UserDAO;
+import org.FRFood.entity.Restaurant;
 import org.FRFood.entity.User;
 import org.FRFood.DAO.UserDAOImp;
 import com.sun.net.httpserver.HttpExchange;
@@ -45,5 +48,20 @@ public class Authenticate {
         }
 
         return Optional.empty();
+    }
+
+    public static Optional<Restaurant> restaurantChecker(HttpExchange exchange, User user, int restaurantId) throws SQLException, IOException {
+        RestaurantDAO restaurantDAO = new RestaurantDAOImp();
+        Optional<Restaurant> optionalRestaurant = restaurantDAO.getById(restaurantId);
+        if (optionalRestaurant.isEmpty()) {
+            HttpError.notFound(exchange, "Restaurant not found");
+            return Optional.empty();
+        }
+        Restaurant restaurant = optionalRestaurant.get();
+        if (restaurant.getOwner().getId() != user.getId()) {
+            HttpError.unauthorized(exchange, "You do not own this restaurant");
+            return Optional.empty();
+        }
+        return optionalRestaurant;
     }
 }
