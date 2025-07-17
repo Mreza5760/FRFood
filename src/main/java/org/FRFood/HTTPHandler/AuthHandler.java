@@ -117,8 +117,13 @@ public class AuthHandler implements HttpHandler {
                 HttpError.unauthorized(exchange, "Phone number not found");
                 return;
             }
-
             User user = OpUser.get();
+
+            if (!user.isConfirmed()) {
+                HttpError.forbidden(exchange, "User not confirmed");
+                return;
+            }
+
             if (!user.getPassword().equals(loginRequest.getPassword())) {
                 HttpError.unauthorized(exchange, "Invalid password");
                 return;

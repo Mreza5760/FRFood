@@ -14,7 +14,13 @@ public interface OrderDAO {
 
     List<Order> getUserOrders(int userID) throws SQLException;
 
+    List<Order> getAvailableOrders() throws SQLException;
+
+    List<Order> getCourierOrders(int courierID) throws SQLException;
+
     List<Order> getRestaurantOrders(int restaurantID) throws SQLException;
 
     void changeStatus(Integer orderID, String status) throws SQLException;
+
+    List<Order> getAllOrders() throws SQLException;
 }

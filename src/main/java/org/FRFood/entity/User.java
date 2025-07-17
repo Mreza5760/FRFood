@@ -20,6 +20,8 @@ public class User {
     private BankAccount bank;
     @JsonIgnore
     private boolean confirmed;
+    @JsonIgnore
+    private int wallet;
 
     public User(){};
 
@@ -116,5 +118,13 @@ public class User {
 
     public boolean isConfirmed() {
         return confirmed;
+    }
+
+    public int getWallet() {
+        return wallet;
+    }
+
+    public void setWallet(int wallet) {
+        this.wallet = wallet;
     }
 }

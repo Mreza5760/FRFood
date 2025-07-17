@@ -104,6 +104,16 @@ public class OrderDAOImp implements OrderDAO {
     }
 
     @Override
+    public List<Order> getAvailableOrders() throws SQLException {
+        return List.of();
+    }
+
+    @Override
+    public List<Order> getCourierOrders(int courierID) throws SQLException {
+        return List.of();
+    }
+
+    @Override
     public List<Order> getRestaurantOrders(int restaurantID) throws SQLException {
         String sql = "SELECT * FROM orders WHERE restaurant_id = ?";
         try (
@@ -138,5 +148,10 @@ public class OrderDAOImp implements OrderDAO {
     @Override
     public void changeStatus(Integer orderID, String status) throws SQLException {
 
+    }
+
+    @Override
+    public List<Order> getAllOrders() throws SQLException {
+        return List.of();
     }
 }
