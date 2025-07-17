@@ -71,7 +71,7 @@ public class AuthHandler implements HttpHandler {
         }
 
         // TODO: Bank is not required
-        if (user.getFullName() == null || user.getPhoneNumber() == null || user.getPassword() == null || user.getRole() == null || user.getBank() == null) {
+        if ((user.getBank() == null && user.getRole() != Role.buyer) || user.getFullName() == null || user.getPhoneNumber() == null || user.getPassword() == null || user.getRole() == null) {
             HttpError.notFound(exchange, "Missing required fields");
             return;
         }
