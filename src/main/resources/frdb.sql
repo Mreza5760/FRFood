@@ -161,14 +161,9 @@ CREATE TABLE IF NOT EXISTS Transactions
     id         INTEGER AUTO_INCREMENT PRIMARY KEY,
     order_id   INTEGER                                     NULL,
     user_id    INTEGER                                     NOT NULL,
-    `type`     ENUM ('payment',
-        'top-up',
-        'refund',
-        'payout'
-        )                                                  NOT NULL,
     method     ENUM ('wallet', 'online', 'cash', 'system') NOT NULL,
     status     ENUM ('pending', 'success', 'failed')       NOT NULL,
-    amount     DECIMAL(10, 2)                              NOT NULL,
+    amount     INTEGER                                     NOT NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (order_id) REFERENCES Orders (id) ON DELETE SET NULL,
     FOREIGN KEY (user_id) REFERENCES Users (id) ON DELETE RESTRICT
