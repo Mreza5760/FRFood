@@ -18,8 +18,8 @@ public class User {
     private Role role;
     @JsonProperty("bank_info")
     private BankAccount bank;
-//    @JsonIgnore
-//    private boolean confirmed;
+    @JsonIgnore
+    private boolean confirmed;
 
     public User(){};
 
@@ -108,5 +108,13 @@ public class User {
 
     public void setBank(BankAccount bank) {
         this.bank = bank;
+    }
+
+    public void setConfirmed(boolean confirmed) {
+        this.confirmed = confirmed;
+    }
+
+    public boolean isConfirmed() {
+        return confirmed;
     }
 }

@@ -14,8 +14,8 @@ public class UserDAOImp implements UserDAO {
     @Override
     public int insert(User user) throws SQLException {
         BankAccountDAO bankAccountDAO = new BankAccountDAOImp();
-        String sql = "INSERT INTO Users (full_name, phone, email, password_hash, role, address, profile_image, bank_id) " +
-                "VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
+        String sql = "INSERT INTO Users (full_name, phone, email, password_hash, role, address, profile_image, bank_id,confirmed) " +
+                "VALUES (?, ?, ?, ?, ?, ?, ?, ?,?)";
         try (
                 Connection conn = DBConnector.gConnection();
                 PreparedStatement stmt = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)
@@ -34,6 +34,9 @@ public class UserDAOImp implements UserDAO {
             } else {
                 stmt.setNull(8, Types.INTEGER);
             }
+
+            stmt.setBoolean(9, user.getRole() == Role.buyer);
+
 
             int rows = stmt.executeUpdate();
             if (rows == 0) {
@@ -81,6 +84,7 @@ public class UserDAOImp implements UserDAO {
                     user.setRole(Role.valueOf(rs.getString("role")));
                     user.setAddress(rs.getString("address"));
                     user.setPicture(rs.getString("profile_image"));
+                    user.setConfirmed(rs.getBoolean("confirmed"));
 
                     int bankId = rs.getInt("bank_id");
                     if (!rs.wasNull()) {
