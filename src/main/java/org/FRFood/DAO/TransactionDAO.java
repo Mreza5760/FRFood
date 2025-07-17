@@ -6,7 +6,9 @@ import java.sql.SQLException;
 import java.util.List;
 
 public interface TransactionDAO {
-    List<Transaction> getAllTransactions(int userId) throws SQLException;
+    List<Transaction> getUserTransactions(int userId) throws SQLException;
+
+    List<Transaction> getAllTransactions() throws SQLException;
 
     int insert(Transaction transaction) throws SQLException;
 }

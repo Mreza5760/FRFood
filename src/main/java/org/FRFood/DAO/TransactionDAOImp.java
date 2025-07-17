@@ -7,7 +7,12 @@ import java.util.List;
 
 public class TransactionDAOImp implements TransactionDAO {
     @Override
-    public List<Transaction> getAllTransactions(int userId) throws SQLException {
+    public List<Transaction> getUserTransactions(int userId) throws SQLException {
+        return List.of();
+    }
+
+    @Override
+    public List<Transaction> getAllTransactions() throws SQLException {
         return List.of();
     }
 

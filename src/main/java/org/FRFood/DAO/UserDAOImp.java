@@ -69,6 +69,11 @@ public class UserDAOImp implements UserDAO {
     }
 
     @Override
+    public List<User> getAllUser() throws SQLException {
+        return List.of();
+    }
+
+    @Override
     public Optional<User> getById(int id) {
         String sql = "SELECT * FROM Users WHERE id = ?";
         try (

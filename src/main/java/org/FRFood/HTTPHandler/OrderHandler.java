@@ -38,7 +38,7 @@ public class OrderHandler implements HttpHandler {
             switch (method) {
                 case "GET" -> {
                     if (path.equals("/transactions")) {
-                        handleGetTransaction(exchange);
+                        handleGetTransactions(exchange);
                     } else {
                         HttpError.notFound(exchange, "Not Found");
                     }
@@ -59,13 +59,13 @@ public class OrderHandler implements HttpHandler {
         }
     }
 
-    private void handleGetTransaction(HttpExchange exchange) throws IOException {
+    private void handleGetTransactions(HttpExchange exchange) throws IOException {
         Optional<User> authenticatedUserOptional = authenticate(exchange);
         if (authenticatedUserOptional.isEmpty()) return;
         User user = authenticatedUserOptional.get();
 
         try {
-            List<Transaction> transactions = transactionDAO.getAllTransactions(user.getId());
+            List<Transaction> transactions = transactionDAO.getUserTransactions(user.getId());
             JsonResponse.sendJsonResponse(exchange, 200, objectMapper.writeValueAsString(transactions));
         } catch (SQLException e) {
             HttpError.internal(exchange, "Internal server error while updating profile");
@@ -90,6 +90,7 @@ public class OrderHandler implements HttpHandler {
             transaction.setUserID(user.getId());
             transaction.setId(transactionDAO.insert(transaction));
             userDAO.setWallet(user.getId(), user.getWallet()+amount);
+            JsonResponse.sendJsonResponse(exchange, 200, "{message: wallet updated}");
         } catch (SQLException e) {
             HttpError.internal(exchange, "Internal server error while updating profile");
         }
@@ -112,6 +113,7 @@ public class OrderHandler implements HttpHandler {
             transaction.setUserID(user.getId());
             transaction.setAmount(order.getPayPrice());
             transaction.setId(transactionDAO.insert(transaction));
+            JsonResponse.sendJsonResponse(exchange, 200, "{message: payed}");
         } catch (SQLException e) {
             HttpError.internal(exchange, "Internal server error while updating profile");
         }

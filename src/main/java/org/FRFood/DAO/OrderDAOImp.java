@@ -149,4 +149,9 @@ public class OrderDAOImp implements OrderDAO {
     public void changeStatus(Integer orderID, String status) throws SQLException {
 
     }
+
+    @Override
+    public List<Order> getAllOrders() throws SQLException {
+        return List.of();
+    }
 }

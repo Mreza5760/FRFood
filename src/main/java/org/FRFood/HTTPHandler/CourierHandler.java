@@ -101,6 +101,7 @@ public class CourierHandler implements HttpHandler {
             }
 
             orderDAO.changeStatus(orderId, status);
+            JsonResponse.sendJsonResponse(exchange, 200, "{message: success}");
         } catch (SQLException e) {
             HttpError.internal(exchange, "Internal server error while updating profile");
         }

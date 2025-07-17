@@ -21,4 +21,6 @@ public interface OrderDAO {
     List<Order> getRestaurantOrders(int restaurantID) throws SQLException;
 
     void changeStatus(Integer orderID, String status) throws SQLException;
+
+    List<Order> getAllOrders() throws SQLException;
 }

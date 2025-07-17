@@ -25,4 +25,8 @@ public interface UserDAO {
     void deleteFavorite(int id, Restaurant restaurant) throws SQLException;
 
     void setWallet(int userId, int wallet) throws SQLException;
+
+    List<User> getAllUser() throws SQLException;
+
+    void setConfirmed(int id) throws SQLException;
 }
