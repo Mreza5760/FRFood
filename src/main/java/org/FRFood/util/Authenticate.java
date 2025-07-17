@@ -30,9 +30,12 @@ public class Authenticate {
 
             UserDAO userDAO = new UserDAOImp();
             Optional<User> userOptional = userDAO.getById(userId);
-
             if (userOptional.isEmpty()) {
                 HttpError.unauthorized(exchange, "User associated with token not found");
+                return Optional.empty();
+            }
+            if(!userOptional.get().isConfirmed()){
+                HttpError.forbidden(exchange, "you are not confirmed by Admin yet");
                 return Optional.empty();
             }
 
