@@ -1,4 +1,4 @@
-package org.FRFood.frontend;
+package org.FRFood.frontEnd;
 
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
@@ -9,7 +9,7 @@ public class App extends Application {
 
     @Override
     public void start(Stage primaryStage) throws Exception {
-        FXMLLoader loader = new FXMLLoader(getClass().getResource("/frontend/signup.fxml"));
+        FXMLLoader loader = new FXMLLoader(getClass().getResource("/frontEnd/signup.fxml"));
         Scene scene = new Scene(loader.load(), 400, 500);
 
         primaryStage.setTitle("Sign Up");

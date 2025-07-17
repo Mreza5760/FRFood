@@ -1,4 +1,4 @@
-package org.FRFood.frontend.controller;
+package org.FRFood.frontEnd.controller;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import javafx.fxml.FXML;
