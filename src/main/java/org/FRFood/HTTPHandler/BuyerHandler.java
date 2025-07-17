@@ -1,9 +1,10 @@
 package org.FRFood.HTTPHandler;
 
 import org.FRFood.DAO.*;
-import org.FRFood.DTO.OrderInputDTO;
 import org.FRFood.util.*;
 import org.FRFood.entity.*;
+import org.FRFood.DTO.OrderInputDTO;
+import static org.FRFood.util.Role.*;
 import org.FRFood.util.BuyerReq.ItemsReq;
 import com.sun.net.httpserver.HttpHandler;
 import org.FRFood.util.BuyerReq.VendorsReq;
@@ -11,6 +12,7 @@ import com.sun.net.httpserver.HttpExchange;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import static org.FRFood.util.Authenticate.authenticate;
 
+import java.net.http.HttpRequest;
 import java.util.List;
 import java.util.Optional;
 import java.io.IOException;
@@ -41,7 +43,6 @@ public class BuyerHandler implements HttpHandler {
     public void handle(HttpExchange exchange) throws IOException {
         String path = exchange.getRequestURI().getPath();
         String method = exchange.getRequestMethod();
-        // سوییچ کیس های داخلی هم نیازمند حالت دیفالت هستند
         try {
             switch (method) {
                 case "POST" -> {
@@ -50,51 +51,42 @@ public class BuyerHandler implements HttpHandler {
                         case "/items" -> handleItemsList(exchange);
                         case "/orders" -> handleSubmitOrder(exchange);
                         case "/ratings" -> handeSubmitRate(exchange);
+                        default -> HttpError.notFound(exchange, "Not Found");
                     }
                 }
                 case "GET" -> {
-                    switch (path) {
-                        case "^/vendors/[^/]+$" -> handleVendorsMenu(exchange);
-                        case "^/items/[^/]+$" -> handleGetItem(exchange);
-                        case  "/orders/history" -> handleOrdersHistory(exchange);
-                        case "/favorites" -> handleGetFavorites(exchange);
-                        case "^/ratings/items/[^/]+$" -> handeGetFoodRates(exchange);
-                        default -> {
-                            if (path.equals("^/orders/[^/]+$")) {
-                                handleGetOrder(exchange);
-                            } else if (path.equals("^/ratings/[^/]+$")) {
-                                handleGetRate(exchange);
-                            }
-                        }
-                    }
+                    if (path.matches("^/vendors/\\d+$")) handleVendorsMenu(exchange);
+                    else if (path.matches("^/items/\\d+$")) handleGetItem(exchange);
+                    else if (path.equals("/orders/history")) handleOrdersHistory(exchange);
+                    else if (path.equals("/favorites")) handleGetFavorites(exchange);
+                    else if (path.matches("^/ratings/items/\\d+$")) handeGetFoodRates(exchange);
+                    else if (path.matches("^/orders/\\d+$")) handleGetOrder(exchange);
+                    else if (path.matches("^/ratings/\\d+$")) handleGetRate(exchange);
+                    else HttpError.notFound(exchange, "Not Found");
                 }
                 case "PUT" -> {
-                    switch (path) {
-                        case "^/favorites/[^/]+$" -> handleInsertFavorite(exchange);
-                        case "^/ratings/[^/]+$" -> handleUpdateRate(exchange);
-                    }
+                    if (path.matches("^/favorites/\\d+$")) handleInsertFavorite(exchange);
+                    else if (path.matches("^/ratings/\\d+$")) handleUpdateRate(exchange);
+                    else HttpError.notFound(exchange, "Not Found");
                 }
                 case "DELETE" -> {
-                    switch (path) {
-                        case "^/favorites/[^/]+$" -> handleDeleteFavorite(exchange);
-                        case "^/ratings/[^/]+$" -> handleDeleteRate(exchange);
-                    }
+                    if (path.matches("^/favorites/\\d+$")) handleDeleteFavorite(exchange);
+                    else if (path.matches("^/ratings/\\d+$")) handleDeleteRate(exchange);
+                    else HttpError.notFound(exchange, "Not Found");
                 }
-                default -> JsonResponse.sendJsonResponse(exchange, 404, "Not Found");
+                default -> HttpError.notFound(exchange, "Not Found");
             }
+
         } catch (Exception e) {
-//            e.printStackTrace();
-            JsonResponse.sendJsonResponse(exchange, 500, "Internal Server Error");
+            HttpError.internal(exchange, "Internal Server Error");
         }
     }
 
     private void handleVendorsList(HttpExchange exchange) throws IOException {
-        Optional<User> authenticatedUserOptional = authenticate(exchange);
-        if (authenticatedUserOptional.isEmpty()) {
-            return;
-        }
+        if (authenticate(exchange).isEmpty()) return;
 
-        VendorsReq req = objectMapper.readValue(exchange.getRequestBody(), VendorsReq.class);
+        VendorsReq req;
+        req = objectMapper.readValue(exchange.getRequestBody(), VendorsReq.class);
 
         try {
             List<Restaurant> restaurantsFiltered = new ArrayList<>();
@@ -103,28 +95,25 @@ public class BuyerHandler implements HttpHandler {
                 boolean haveFood = false;
                 List<Food> foods = restaurantDAO.getFoods(restaurant.getId());
                 for (Food food : foods) {
-                   if (foodDAO.doesHaveKeywords(req.keywords, food.getId())) {
-                       haveFood = true;
-                       break;
-                   }
+                    if (foodDAO.doesHaveKeywords(req.keywords, food.getId())) {
+                        haveFood = true;
+                        break;
+                    }
                 }
                 if (haveFood) {
                     restaurantsFiltered.add(restaurant);
                 }
             }
+
             String json = objectMapper.writeValueAsString(restaurantsFiltered);
             JsonResponse.sendJsonResponse(exchange, 200, json);
         } catch (SQLException e) {
-//            e.printStackTrace();
-            JsonResponse.sendJsonResponse(exchange, 500, "Database error");
+            HttpError.internal(exchange, "Database error");
         }
     }
 
     void handleVendorsMenu(HttpExchange exchange) throws IOException {
-        Optional<User> authenticatedUserOptional = authenticate(exchange);
-        if (authenticatedUserOptional.isEmpty()) {
-            return;
-        }
+        if (authenticate(exchange).isEmpty()) return;
 
         String path = exchange.getRequestURI().getPath();
         String[] parts = path.split("/");
@@ -133,7 +122,7 @@ public class BuyerHandler implements HttpHandler {
         try {
             Optional<Restaurant> optionalRestaurant = restaurantDAO.getById(id);
             if (optionalRestaurant.isEmpty()) {
-                // باید ارور وجود نداشتن رستوران داد
+                HttpError.notFound(exchange, "Restaurant not found");
                 return;
             }
             Restaurant restaurant = optionalRestaurant.get();
@@ -143,26 +132,25 @@ public class BuyerHandler implements HttpHandler {
             ObjectNode root = objectMapper.createObjectNode();
             JsonNode vendorNode = objectMapper.valueToTree(restaurant);
             root.set("vendor", vendorNode);
+
             ArrayNode menuTitlesArray = objectMapper.createArrayNode();
             for (Menu menu : menus) {
                 menuTitlesArray.add(menu.getTitle());
             }
             root.set("menu_titles", menuTitlesArray);
+
             JsonNode foodArrayNode = objectMapper.valueToTree(foods);
             root.set("menu_title", foodArrayNode);
+
             String jsonOutput = objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(root);
             JsonResponse.sendJsonResponse(exchange, 200, jsonOutput);
         } catch (SQLException e) {
-//            e.printStackTrace();
-            JsonResponse.sendJsonResponse(exchange, 500, "Database error");
+            HttpError.internal(exchange, "Database error");
         }
     }
 
     void handleItemsList(HttpExchange exchange) throws IOException {
-        Optional<User> authenticatedUserOptional = authenticate(exchange);
-        if (authenticatedUserOptional.isEmpty()) {
-            return;
-        }
+        if (authenticate(exchange).isEmpty()) return;
 
         ItemsReq req = objectMapper.readValue(exchange.getRequestBody(), ItemsReq.class);
 
@@ -172,8 +160,7 @@ public class BuyerHandler implements HttpHandler {
             for (Restaurant restaurant : restaurants) {
                 List<Food> foods = restaurantDAO.getFoods(restaurant.getId());
                 for (Food food : foods) {
-                    // تخفیف میشه هم لحاظ بشه هم نه
-                    if (foodDAO.doesHaveKeywords(req.keywords , food.getId()) && food.getPrice() <= req.price) {
+                    if (foodDAO.doesHaveKeywords(req.keywords, food.getId()) && food.getPrice() <= req.price) {
                         foodsFiltered.add(food);
                     }
                 }
@@ -181,16 +168,12 @@ public class BuyerHandler implements HttpHandler {
             String json = objectMapper.writeValueAsString(foodsFiltered);
             JsonResponse.sendJsonResponse(exchange, 200, json);
         } catch (SQLException e) {
-//            e.printStackTrace();
-            JsonResponse.sendJsonResponse(exchange, 500, "Database error");
+            HttpError.internal(exchange, "Database error");
         }
     }
 
-    void  handleGetItem(HttpExchange exchange) throws IOException {
-        Optional<User> authenticatedUserOptional = authenticate(exchange);
-        if (authenticatedUserOptional.isEmpty()) {
-            return;
-        }
+    void handleGetItem(HttpExchange exchange) throws IOException {
+        if (authenticate(exchange).isEmpty()) return;
 
         String path = exchange.getRequestURI().getPath();
         String[] parts = path.split("/");
@@ -199,137 +182,153 @@ public class BuyerHandler implements HttpHandler {
         try {
             Optional<Food> optionalFood = foodDAO.getById(id);
             if (optionalFood.isEmpty()) {
-                // باید ارور وجود نداشتن رستوران داد
+                HttpError.notFound(exchange, "Food not found");
                 return;
             }
+
             Food food = optionalFood.get();
             String json = objectMapper.writeValueAsString(food);
             JsonResponse.sendJsonResponse(exchange, 200, json);
         } catch (SQLException e) {
-//            e.printStackTrace();
-            JsonResponse.sendJsonResponse(exchange, 500, "Database error");
+            HttpError.internal(exchange, "Database error");
         }
     }
 
     void handleSubmitOrder(HttpExchange exchange) throws IOException {
-        Optional<User> authenticatedUserOptional = authenticate(exchange);
-        if (authenticatedUserOptional.isEmpty()) {
+        var userOpt = Authenticate.authenticate(exchange);
+        if (userOpt.isEmpty()) return;
+        User user = userOpt.get();
+
+        if (!user.getRole().equals(buyer)) {
+            HttpError.unauthorized(exchange, "Only buyers can submit orders");
             return;
         }
+
         OrderInputDTO orderDTO = objectMapper.readValue(exchange.getRequestBody(), OrderInputDTO.class);
-        // ایدی صفر نمیشه داشت
+
         if (orderDTO.getDeliveryAddress() == null || orderDTO.getRestaurantId() == 0 || orderDTO.getItems() == null) {
-            JsonResponse.sendJsonResponse(exchange, 400, "{\"error\":\"Missing required fields\"}");
+            HttpError.badRequest(exchange, "Missing required fields");
             return;
         }
+
         Order order = new Order();
-        order.setCustomerId(authenticatedUserOptional.get().getId());
+        order.setCustomerId(user.getId());
+
         try {
             order.setId(orderDAO.insert(orderDTO));
             order = orderDAO.getById(order.getId()).orElse(null);
             String jsonOutput = objectMapper.writeValueAsString(order);
             JsonResponse.sendJsonResponse(exchange, 200, jsonOutput);
-            /*
-                اوردر رو باید خروجی داد
-             */
         } catch (Exception e) {
-//            e.printStackTrace();
-            JsonResponse.sendJsonResponse(exchange, 500, "{\"error\":\"Internal server error\"}");
+            HttpError.internal(exchange, "Internal server error");
         }
     }
 
     void handleGetOrder(HttpExchange exchange) throws IOException {
-        Optional<User> authenticatedUserOptional = authenticate(exchange);
-        if (authenticatedUserOptional.isEmpty()) {
+        var userOpt = Authenticate.authenticate(exchange);
+        if (userOpt.isEmpty()) return;
+        User user = userOpt.get();
+
+        if (!user.getRole().equals(buyer)) {
+            HttpError.unauthorized(exchange, "Only buyers can get orders");
             return;
         }
 
         String path = exchange.getRequestURI().getPath();
         String[] parts = path.split("/");
-        int id = Integer.parseInt(parts[2]);
+        int orderId = Integer.parseInt(parts[2]);
 
         try {
-            Optional<Order> optionalOrder = orderDAO.getById(id);
-            if (optionalOrder.isEmpty()) {
+            Optional<Order> orderOpt = orderDAO.getById(orderId);
+            if (orderOpt.isEmpty()) {
+                HttpError.notFound(exchange, "Order not found");
                 return;
             }
-            Order order = optionalOrder.get();
+            Order order = orderOpt.get();
+            if (order.getCustomerId() != user.getId()) {
+                HttpError.unauthorized(exchange, "You are not authorized to view this order");
+                return;
+            }
 
-            // ارور بده صاحب اش نبود
-            if (order.getCustomerId() !=  authenticatedUserOptional.get().getId()) {
-                return;
-            }
-            String  json = objectMapper.writeValueAsString(order);
+            String json = objectMapper.writeValueAsString(order);
             JsonResponse.sendJsonResponse(exchange, 200, json);
         } catch (Exception e) {
-//            e.printStackTrace();
-            JsonResponse.sendJsonResponse(exchange, 500, "{\"error\":\"Internal server error\"}");
+            HttpError.internal(exchange, "Internal server error");
         }
     }
 
     void handleOrdersHistory(HttpExchange exchange) throws IOException {
-        Optional<User> authenticatedUserOptional = authenticate(exchange);
-        if (authenticatedUserOptional.isEmpty()) {
+        var userOpt = Authenticate.authenticate(exchange);
+        if (userOpt.isEmpty()) return;
+        User user = userOpt.get();
+
+        if (!user.getRole().equals(buyer)) {
+            HttpError.unauthorized(exchange, "Only buyers can get orders history");
             return;
         }
 
         try {
-            int customerId = authenticatedUserOptional.get().getId();
-            List<Order> orders = orderDAO.getUserOrders(customerId);
+            List<Order> orders = orderDAO.getUserOrders(user.getId());
             String json = objectMapper.writeValueAsString(orders);
             JsonResponse.sendJsonResponse(exchange, 200, json);
         } catch (Exception e) {
-//            e.printStackTrace();
-            JsonResponse.sendJsonResponse(exchange, 500, "{\"error\":\"Internal server error\"}");
+            HttpError.internal(exchange, "Internal server error");
         }
     }
 
     void handleGetFavorites(HttpExchange exchange) throws IOException {
-        Optional<User> authenticatedUserOptional = authenticate(exchange);
-        if (authenticatedUserOptional.isEmpty()) {
+        var userOpt = Authenticate.authenticate(exchange);
+        if (userOpt.isEmpty()) return;
+        User user = userOpt.get();
+
+        if  (!user.getRole().equals(buyer)) {
+            HttpError.unauthorized(exchange, "Only buyers can get favorites");
             return;
         }
 
         try {
-            int customerId = authenticatedUserOptional.get().getId();
-            List<Restaurant> restaurants = userDAO.getFavorites(customerId);
-            String json = objectMapper.writeValueAsString(restaurants);
+            List<Restaurant> favorites = userDAO.getFavorites(user.getId());
+            String json = objectMapper.writeValueAsString(favorites);
             JsonResponse.sendJsonResponse(exchange, 200, json);
         } catch (Exception e) {
-//            e.printStackTrace();
-            JsonResponse.sendJsonResponse(exchange, 500, "{\"error\":\"Internal server error\"}");
+            HttpError.internal(exchange, "Internal server error");
         }
     }
 
     void handleInsertFavorite(HttpExchange exchange) throws IOException {
-        Optional<User> authenticatedUserOptional = authenticate(exchange);
-        if (authenticatedUserOptional.isEmpty()) {
+        var userOpt = Authenticate.authenticate(exchange);
+        if (userOpt.isEmpty()) return;
+        User user = userOpt.get();
+
+        if (!user.getRole().equals(buyer)) {
+            HttpError.unauthorized(exchange, "Only buyers can add favorites");
             return;
         }
 
         String path = exchange.getRequestURI().getPath();
         String[] parts = path.split("/");
-        int restaurantID = Integer.parseInt(parts[2]);
+        int restaurantId = Integer.parseInt(parts[2]);
 
         try {
-            int customerId = authenticatedUserOptional.get().getId();
-            Optional<Restaurant> optionalRestaurant = restaurantDAO.getById(restaurantID);
-            if (optionalRestaurant.isEmpty()) {
-                // ارور
+            Optional<Restaurant> restaurantOpt = restaurantDAO.getById(restaurantId);
+            if (restaurantOpt.isEmpty()) {
+                HttpError.notFound(exchange, "Restaurant not found");
                 return;
             }
-            Restaurant restaurant = optionalRestaurant.get();
-            userDAO.insertFavorite(customerId, restaurant);
-            JsonResponse.sendJsonResponse(exchange,200,"{\"message\":\"Added to favorites\"}");
+            userDAO.insertFavorite(user.getId(), restaurantOpt.get());
+            JsonResponse.sendJsonResponse(exchange, 200, "{\"message\":\"Added to favorites\"}");
         } catch (Exception e) {
-//            e.printStackTrace();
-            JsonResponse.sendJsonResponse(exchange, 500, "{\"error\":\"Internal server error\"}");
+            HttpError.internal(exchange, "Internal server error");
         }
     }
 
     void handleDeleteFavorite(HttpExchange exchange) throws IOException {
-        Optional<User> authenticatedUserOptional = authenticate(exchange);
-        if (authenticatedUserOptional.isEmpty()) {
+        var userOpt = Authenticate.authenticate(exchange);
+        if (userOpt.isEmpty()) return;
+        User user = userOpt.get();
+
+        if (!user.getRole().equals(buyer)) {
+            HttpError.unauthorized(exchange, "Only buyers can delete favorites");
             return;
         }
 
@@ -338,18 +337,21 @@ public class BuyerHandler implements HttpHandler {
         int restaurantID = Integer.parseInt(parts[2]);
 
         try {
-            int customerId = authenticatedUserOptional.get().getId();
             Optional<Restaurant> optionalRestaurant = restaurantDAO.getById(restaurantID);
             if (optionalRestaurant.isEmpty()) {
-                // ارور
+                HttpError.notFound(exchange, "Restaurant not found");
                 return;
             }
             Restaurant restaurant = optionalRestaurant.get();
-            userDAO.deleteFavorite(customerId, restaurant);
-            JsonResponse.sendJsonResponse(exchange,200,"{\"message\":\"Removed from favorites\"}");
+            if (!userDAO.getFavorites(user.getId()).contains(restaurant)) {
+                HttpError.notFound(exchange, "Restaurant is not in the favorites");
+                return;
+            }
+
+            userDAO.deleteFavorite(user.getId(), restaurant);
+            JsonResponse.sendJsonResponse(exchange, 200, "{\"message\":\"Removed from favorites\"}");
         } catch (Exception e) {
-//            e.printStackTrace();
-            JsonResponse.sendJsonResponse(exchange, 500, "{\"error\":\"Internal server error\"}");
+            HttpError.internal(exchange, "Internal server error");
         }
     }
 
