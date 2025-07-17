@@ -15,7 +15,7 @@ public class JwtUtil {
     public static String generateToken(User user) {
         return Jwts.builder()
                 .setSubject(String.valueOf(user.getId()))
-                .claim("role", user.getRole().name()) // optional
+                .claim("confirmed", user.isConfirmed()) // optional
                 .setIssuedAt(new Date())
                 .setExpiration(new Date(System.currentTimeMillis() + EXPIRATION_TIME))
                 .signWith(SECRET_KEY, SignatureAlgorithm.HS256)
@@ -34,8 +34,4 @@ public class JwtUtil {
         return Integer.parseInt(claims.getSubject());
     }
 
-    public static String getUserRoleFromToken(String token) {
-        Claims claims = validateToken(token).getBody();
-        return claims.get("role", String.class);
-    }
 }
