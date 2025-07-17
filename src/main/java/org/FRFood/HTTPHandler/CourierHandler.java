@@ -106,6 +106,7 @@ public class CourierHandler implements HttpHandler {
         }
     }
 
+    // TODO has query
     private void handleGetHistory(HttpExchange exchange) throws IOException {
         Optional<User> authenticatedUserOptional = authenticate(exchange);
         if (authenticatedUserOptional.isEmpty()) return;
