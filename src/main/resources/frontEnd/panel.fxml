@@ -18,9 +18,9 @@
     <Label text="👤 User Panel"
            style="-fx-font-size: 28px; -fx-font-weight: bold; -fx-text-fill: #1e2a38;"/>
 
-    <Label fx:id="walletLabel"
-           text="Wallet Balance: $0.00"
-           style="-fx-font-size: 20px; -fx-text-fill: #4a5a6a; -fx-font-weight: bold;"/>
+<!--    <Label fx:id="walletLabel"-->
+<!--           text="Wallet Balance: $0.00"-->
+<!--           style="-fx-font-size: 20px; -fx-text-fill: #4a5a6a; -fx-font-weight: bold;"/>-->
 
     <VBox spacing="15" alignment="CENTER" maxWidth="250">
         <Button fx:id="ordersButton" text="Orders"

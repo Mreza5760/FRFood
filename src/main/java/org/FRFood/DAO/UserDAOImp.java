@@ -166,6 +166,7 @@ public class UserDAOImp implements UserDAO {
             stmt.setString(5, currentUser.getPicture());
             stmt.setInt(6, currentUser.getBank().getId());
             stmt.setInt(7, currentUser.getId());
+            System.out.println(currentUser.getPicture());
             stmt.executeUpdate();
         }
     }

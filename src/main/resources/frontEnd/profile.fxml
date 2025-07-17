@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.geometry.Pos?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.*?>
+
+<VBox xmlns="http://javafx.com/javafx"
+      xmlns:fx="http://javafx.com/fxml"
+      fx:controller="org.FRFood.frontEnd.controller.ProfileController"
+      alignment="TOP_CENTER"
+      spacing="25"
+      style="-fx-background-color: linear-gradient(to bottom, #eef3f9, #dbe5f1);"
+>
+
+    <padding>
+        <Insets top="40" right="50" bottom="40" left="50"/>
+    </padding>
+
+    <Label text="👤 Your Profile"
+           style="-fx-font-size: 28px; -fx-font-weight: bold; -fx-text-fill: #1e2a38;"/>
+
+    <ImageView fx:id="profileImage"
+               fitHeight="120" fitWidth="120"
+               style="-fx-effect: dropshadow(gaussian, rgba(0,0,0,0.15), 10, 0, 0, 2); -fx-background-radius: 60;"
+               pickOnBounds="true" preserveRatio="true"
+    />
+
+    <Button text="Change Picture" onAction="#handleChangePicture"
+            prefWidth="140" prefHeight="36"
+            style="-fx-background-color: #0077cc; -fx-text-fill: white; -fx-font-weight: bold; -fx-background-radius: 8;"
+    />
+
+    <GridPane hgap="15" vgap="15" maxWidth="500">
+        <columnConstraints>
+            <ColumnConstraints halignment="RIGHT" minWidth="110" />
+            <ColumnConstraints halignment="LEFT" minWidth="300" />
+        </columnConstraints>
+
+        <Label text="Full Name:" GridPane.rowIndex="0" GridPane.columnIndex="0"
+               style="-fx-font-weight: bold; -fx-text-fill: #1e2a38;"/>
+        <TextField fx:id="fullNameField" GridPane.rowIndex="0" GridPane.columnIndex="1"/>
+
+        <Label text="Phone:" GridPane.rowIndex="1" GridPane.columnIndex="0"
+               style="-fx-font-weight: bold; -fx-text-fill: #1e2a38;"/>
+        <TextField fx:id="phoneField" GridPane.rowIndex="1" GridPane.columnIndex="1"/>
+
+        <Label text="Email:" GridPane.rowIndex="2" GridPane.columnIndex="0"
+               style="-fx-font-weight: bold; -fx-text-fill: #1e2a38;"/>
+        <TextField fx:id="emailField" GridPane.rowIndex="2" GridPane.columnIndex="1"/>
+
+        <Label text="Address:" GridPane.rowIndex="3" GridPane.columnIndex="0"
+               style="-fx-font-weight: bold; -fx-text-fill: #1e2a38;"/>
+        <TextField fx:id="addressField" GridPane.rowIndex="3" GridPane.columnIndex="1"/>
+
+        <Label text="Bank Name:" GridPane.rowIndex="4" GridPane.columnIndex="0"
+               style="-fx-font-weight: bold; -fx-text-fill: #1e2a38;"/>
+        <TextField fx:id="bankNameField" GridPane.rowIndex="4" GridPane.columnIndex="1"/>
+
+        <Label text="Account Number:" GridPane.rowIndex="5" GridPane.columnIndex="0"
+               style="-fx-font-weight: bold; -fx-text-fill: #1e2a38;"/>
+        <TextField fx:id="accountNumberField" GridPane.rowIndex="5" GridPane.columnIndex="1"/>
+    </GridPane>
+
+    <HBox spacing="25" alignment="CENTER" maxWidth="500" >
+        <Button text="Cancel" onAction="#handleCancel"
+                prefWidth="120" prefHeight="40"
+                style="-fx-background-color: #999999; -fx-text-fill: white; -fx-font-weight: bold; -fx-background-radius: 8;"/>
+        <Button text="Save Changes" onAction="#handleSaveChanges"
+                prefWidth="140" prefHeight="40"
+                style="-fx-background-color: #00aa88; -fx-text-fill: white; -fx-font-weight: bold; -fx-background-radius: 8;"/>
+    </HBox>
+
+</VBox>

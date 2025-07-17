@@ -174,8 +174,8 @@ public class AuthHandler implements HttpHandler {
                 currentUser.setAddress((String) updates.get("address"));
                 changed = true;
             }
-            if (updates.containsKey("profile_image")) {
-                currentUser.setPicture((String) updates.get("profile_image"));
+            if (updates.containsKey("profileImageBase64")) {
+                currentUser.setPicture((String) updates.get("profileImageBase64"));
                 changed = true;
             }
             if (updates.containsKey("bank_info")) {
