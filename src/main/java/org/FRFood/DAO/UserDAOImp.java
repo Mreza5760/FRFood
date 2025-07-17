@@ -50,8 +50,6 @@ public class UserDAOImp implements UserDAO {
                     throw new SQLException("Insert failed, no ID generated.");
                 }
             }
-        } catch (SQLException e) {
-            throw new RuntimeException("Insert failed: " + e.getMessage(), e);
         }
     }
 

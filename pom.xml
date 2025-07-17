@@ -79,7 +79,7 @@
                 <artifactId>javafx-maven-plugin</artifactId>
                 <version>0.0.8</version>
                 <configuration>
-                    <mainClass>org.FRFood.frontٍnd.App</mainClass>
+                    <mainClass>org.FRFood.frontEnd.App</mainClass>
                 </configuration>
             </plugin>
         </plugins>

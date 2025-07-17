@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<ScrollPane xmlns="http://javafx.com/javafx"
+            xmlns:fx="http://javafx.com/fxml"
+            fx:controller="org.FRFood.frontEnd.controller.LoginController"
+            fitToWidth="true"
+            style="-fx-background-color: #f2f6fc;">
+
+    <content>
+        <VBox alignment="CENTER" spacing="14" padding="30" style="-fx-background-color: #f2f6fc;">
+
+            <Label text="Log In"
+                   style="-fx-font-size: 26px; -fx-text-fill: #1e2a38;"/>
+
+            <TextField fx:id="phoneField"
+                       promptText="Phone Number"
+                       style="-fx-background-radius: 6;"/>
+
+            <PasswordField fx:id="passwordField"
+                           promptText="Password"
+                           style="-fx-background-radius: 6;"/>
+
+            <Label fx:id="messageLabel"
+                   text=" "
+                   style="-fx-text-fill: red; -fx-font-size: 13px;"/>
+
+            <Button text="Log In"
+                    style="-fx-background-color: #0077cc; -fx-text-fill: white; -fx-font-weight: bold; -fx-background-radius: 8;"
+                    onAction="#handleLogin"/>
+
+            <Hyperlink text="Don't have an account? Sign up"
+                       onAction="#goToSignup"
+                       style="-fx-text-fill: #0077cc; -fx-font-size: 12px;"/>
+
+        </VBox>
+    </content>
+</ScrollPane>

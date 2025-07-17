@@ -1,10 +1,18 @@
 package org.FRFood.frontEnd.controller;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonNode;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.event.ActionEvent;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import javafx.stage.Stage;
+import org.FRFood.frontEnd.SessionManager;
+
+import java.io.IOException;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.io.OutputStream;
@@ -13,16 +21,26 @@ import java.util.Map;
 
 public class SignUpController {
 
-    @FXML private TextField fullNameField;
-    @FXML private PasswordField passwordField;
-    @FXML private TextField phoneNumberField;
-    @FXML private TextField roleField;
-    @FXML private TextField bankNameField;
-    @FXML private TextField bankAccountField;
-    @FXML private TextField emailField;
-    @FXML private TextField addressField;
-    @FXML private TextField profileField;
-    @FXML private Label messageLabel;
+    @FXML
+    private TextField fullNameField;
+    @FXML
+    private PasswordField passwordField;
+    @FXML
+    private TextField phoneNumberField;
+    @FXML
+    private TextField roleField;
+    @FXML
+    private TextField bankNameField;
+    @FXML
+    private TextField bankAccountField;
+    @FXML
+    private TextField emailField;
+    @FXML
+    private TextField addressField;
+    @FXML
+    private TextField profileField;
+    @FXML
+    private Label messageLabel;
 
     private static final String REGISTER_URL = "http://localhost:8080/auth/register";
 
@@ -32,11 +50,13 @@ public class SignUpController {
             String jsonRequest = getString();
             System.out.println(jsonRequest);
             // Send HTTP POST
+            if (!chek()) return;
             URL url = new URL(REGISTER_URL);
             HttpURLConnection conn = (HttpURLConnection) url.openConnection();
             conn.setRequestMethod("POST");
             conn.setDoOutput(true);
             conn.setRequestProperty("Content-Type", "application/json");
+
 
             try (OutputStream os = conn.getOutputStream()) {
                 os.write(jsonRequest.getBytes());
@@ -45,16 +65,36 @@ public class SignUpController {
 
             int responseCode = conn.getResponseCode();
             if (responseCode == 200) {
+                ObjectMapper mapper = new ObjectMapper();
+                JsonNode node = mapper.readTree(conn.getInputStream());
+                String token = node.get("token").asText();
+                SessionManager.setAuthToken(token);
+                messageLabel.setStyle("-fx-text-fill: #00cc66;");
                 messageLabel.setText("Registered successfully!");
             } else {
-                messageLabel.setText(" Registration failed (" + responseCode + ")" + conn.getResponseMessage());
+                ObjectMapper mapper = new ObjectMapper();
+                JsonNode node = mapper.readTree(conn.getErrorStream());
+                messageLabel.setStyle("-fx-text-fill: red;");
+                messageLabel.setText("Login failed: " + node.get("error").asText());
             }
 
             conn.disconnect();
 
         } catch (Exception e) {
             System.out.println(e.getMessage());
-            messageLabel.setText("❌ Error: " + e.getMessage());
+            messageLabel.setStyle("-fx-text-fill: red;");
+            messageLabel.setText("Login failed: " + e);
+        }
+    }
+    @FXML
+    private void goToLogin() {
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/frontend/Login.fxml"));
+            Parent root = loader.load();
+            Stage stage = (Stage) fullNameField.getScene().getWindow();
+            stage.setScene(new Scene(root));
+        } catch (IOException e) {
+            System.out.println(e.getMessage());
         }
     }
 
@@ -77,4 +117,25 @@ public class SignUpController {
         ObjectMapper mapper = new ObjectMapper();
         return mapper.writeValueAsString(userData);
     }
+
+    private boolean chek() {
+        String name = fullNameField.getText().trim();
+        String password = passwordField.getText().trim();
+        String phone = phoneNumberField.getText().trim();
+        String role = roleField.getText().trim();
+        String address = addressField.getText().trim();
+
+        phoneNumberField.setStyle(phone.isEmpty() ? "-fx-border-color: red;" : null);
+        passwordField.setStyle(phone.isEmpty() ? "-fx-border-color: red;" : null);
+        fullNameField.setStyle(phone.isEmpty() ? "-fx-border-color: red;" : null);
+        roleField.setStyle(phone.isEmpty() ? "-fx-border-color: red;" : null);
+        addressField.setStyle(phone.isEmpty() ? "-fx-border-color: red;" : null);
+
+        if (phone.isEmpty() || password.isEmpty() || name.isEmpty() || role.isEmpty() || address.isEmpty()) {
+            messageLabel.setText("Please fill in all fields.");
+            return false;
+        }
+        return true;
+    }
+
 }
