@@ -64,7 +64,7 @@ public class CourierHandler implements HttpHandler {
         try {
             List<Order> orders = orderDAO.getAvailableOrders();
             JsonResponse.sendJsonResponse(exchange, 200, objectMapper.writeValueAsString(orders));
-        }  catch (SQLException e) {
+        } catch (SQLException e) {
             HttpError.internal(exchange, "Internal server error while updating profile");
         }
     }

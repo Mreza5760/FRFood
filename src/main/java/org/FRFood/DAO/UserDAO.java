@@ -20,7 +20,9 @@ public interface UserDAO {
 
     int insert(User user) throws SQLException;
 
-    boolean insertFavorite(int id, Restaurant restaurant) throws SQLException;
+    void insertFavorite(int id, Restaurant restaurant) throws SQLException;
 
-    boolean deleteFavorite(int id, Restaurant restaurant) throws SQLException;
+    void deleteFavorite(int id, Restaurant restaurant) throws SQLException;
+
+    void setWallet(int userId, int wallet) throws SQLException;
 }

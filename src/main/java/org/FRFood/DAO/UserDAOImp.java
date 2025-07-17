@@ -56,13 +56,16 @@ public class UserDAOImp implements UserDAO {
     }
 
     @Override
-    public boolean insertFavorite(int id, Restaurant restaurant) throws SQLException {
-        return false;
+    public void insertFavorite(int id, Restaurant restaurant) throws SQLException {
     }
 
     @Override
-    public boolean deleteFavorite(int id, Restaurant restaurant) throws SQLException {
-        return false;
+    public void deleteFavorite(int id, Restaurant restaurant) throws SQLException {
+    }
+
+    @Override
+    public void setWallet(int userId, int wallet) throws SQLException {
+
     }
 
     @Override
