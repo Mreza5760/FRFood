@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.geometry.Insets?>
+<?import javafx.geometry.Pos?>
+
+<VBox xmlns="http://javafx.com/javafx"
+      xmlns:fx="http://javafx.com/fxml"
+      fx:controller="org.FRFood.frontEnd.controller.PanelController"
+      alignment="CENTER" spacing="30"
+      style="-fx-background-color: linear-gradient(to bottom, #eef3f9, #dbe5f1);">
+
+    <padding>
+        <Insets top="40" right="50" bottom="40" left="50"/>
+    </padding>
+
+    <Label text="👤 User Panel"
+           style="-fx-font-size: 28px; -fx-font-weight: bold; -fx-text-fill: #1e2a38;"/>
+
+    <Label fx:id="walletLabel"
+           text="Wallet Balance: $0.00"
+           style="-fx-font-size: 20px; -fx-text-fill: #4a5a6a; -fx-font-weight: bold;"/>
+
+    <VBox spacing="15" alignment="CENTER" maxWidth="250">
+        <Button fx:id="ordersButton" text="Orders"
+                prefWidth="250" prefHeight="45"
+                style="-fx-background-color: #0077cc; -fx-text-fill: white; -fx-font-size: 16px; -fx-font-weight: bold; -fx-background-radius: 8;"/>
+
+        <Button fx:id="walletButton" text="Wallet"
+                prefWidth="250" prefHeight="45"
+                style="-fx-background-color: #00aa88; -fx-text-fill: white; -fx-font-size: 16px; -fx-font-weight: bold; -fx-background-radius: 8;"/>
+
+        <Button fx:id="profileButton" text="Profile"
+                prefWidth="250" prefHeight="45"
+                style="-fx-background-color: #555555; -fx-text-fill: white; -fx-font-size: 16px; -fx-font-weight: bold; -fx-background-radius: 8;"/>
+
+        <Button fx:id="logoutButton" text="Logout"
+                prefWidth="250" prefHeight="45"
+                style="-fx-background-color: #cc3300; -fx-text-fill: white; -fx-font-size: 16px; -fx-font-weight: bold; -fx-background-radius: 8;"/>
+    </VBox>
+</VBox>

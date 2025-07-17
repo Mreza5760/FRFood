@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.geometry.Insets?>
+<?import javafx.geometry.Pos?>
+
+<VBox xmlns="http://javafx.com/javafx"
+      xmlns:fx="http://javafx.com/fxml"
+      fx:controller="org.FRFood.frontEnd.controller.HomeController"
+      alignment="CENTER" spacing="30"
+      style="-fx-background-color: linear-gradient(to bottom, #eef3f9, #dbe5f1);">
+
+    <padding>
+        <Insets top="60" right="50" bottom="60" left="50"/>
+    </padding>
+
+    <Label text="🍽 Welcome to FRFood App"
+           style="-fx-font-size: 32px; -fx-font-weight: bold; -fx-text-fill: #1e2a38;"/>
+
+    <Label text="Order and deliver food with ease!"
+           style="-fx-font-size: 16px; -fx-text-fill: #4a5a6a;"/>
+
+    <HBox spacing="20" alignment="CENTER">
+        <Button fx:id="loginButton" text="Log In"
+                onAction="#goToLogin"
+                prefWidth="120" prefHeight="40"
+                style="-fx-background-color: #0077cc; -fx-text-fill: white; -fx-font-size: 14px; -fx-font-weight: bold; -fx-background-radius: 8;"/>
+
+        <Button fx:id="signupButton" text="Sign Up"
+                onAction="#goToSignup"
+                prefWidth="120" prefHeight="40"
+                style="-fx-background-color: #00aa88; -fx-text-fill: white; -fx-font-size: 14px; -fx-font-weight: bold; -fx-background-radius: 8;"/>
+
+        <Button fx:id="panelButton" text="Go to Panel"
+                onAction="#goToPanel"
+                prefWidth="140" prefHeight="40"
+                style="-fx-background-color: #444444; -fx-text-fill: white; -fx-font-size: 14px; -fx-font-weight: bold; -fx-background-radius: 8;"/>
+    </HBox>
+</VBox>

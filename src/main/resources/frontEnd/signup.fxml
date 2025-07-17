@@ -8,48 +8,46 @@
             xmlns:fx="http://javafx.com/fxml"
             fx:controller="org.FRFood.frontEnd.controller.SignUpController"
             fitToWidth="true"
-            style="-fx-background-color: #f2f6fc;">
-<VBox alignment="CENTER" spacing="14" style="-fx-background-color: #f2f6fc;" xmlns="http://javafx.com/javafx"
-      xmlns:fx="http://javafx.com/fxml">
+            style="-fx-background: linear-gradient(to bottom, #eef3f9, #dbe5f1);">
 
-    <padding>
-        <Insets top="30" right="50" bottom="30" left="50"/>
-    </padding>
+    <VBox alignment="CENTER" spacing="20" style="-fx-background-color: transparent;">
+        <padding>
+            <Insets top="40" right="50" bottom="40" left="50"/>
+        </padding>
 
-    <Label text="Create Your Account"
-           style="-fx-font-size: 26px; -fx-text-fill: #1e2a38; -fx-font-weight: bold;"/>
+        <Label text="📝 Create Your Account"
+               style="-fx-font-size: 30px; -fx-text-fill: #1e2a38; -fx-font-weight: bold;"/>
 
-    <VBox spacing="10" style="-fx-padding: 0 0 10 0;">
-        <TextField fx:id="fullNameField" promptText="Full Name"
-                   style="-fx-background-radius: 8; -fx-padding: 8;"/>
-        <TextField fx:id="phoneNumberField" promptText="Phone Number"
-                   style="-fx-background-radius: 8; -fx-padding: 8;"/>
-        <TextField fx:id="roleField" promptText="Role (e.g., user/admin)"
-                   style="-fx-background-radius: 8; -fx-padding: 8;"/>
-        <TextField fx:id="bankNameField" promptText="Bank Name"
-                   style="-fx-background-radius: 8; -fx-padding: 8;"/>
-        <TextField fx:id="bankAccountField" promptText="Bank Account Number"
-                   style="-fx-background-radius: 8; -fx-padding: 8;"/>
-        <TextField fx:id="emailField" promptText="Email"
-                   style="-fx-background-radius: 8; -fx-padding: 8;"/>
-        <TextField fx:id="addressField" promptText="Address"
-                   style="-fx-background-radius: 8; -fx-padding: 8;"/>
-        <TextField fx:id="profileField" promptText="Profile Picture URL (optional)"
-                   style="-fx-background-radius: 8; -fx-padding: 8;"/>
-        <PasswordField fx:id="passwordField" promptText="Password"
-                       style="-fx-background-radius: 8; -fx-padding: 8;"/>
+        <VBox spacing="12" style="-fx-background-color: white; -fx-padding: 20 25; -fx-background-radius: 12; -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.05), 10, 0, 0, 4);">
+            <TextField fx:id="fullNameField" promptText="👤 Full Name"
+                       style="-fx-background-radius: 8; -fx-padding: 8; -fx-font-size: 14px;"/>
+            <TextField fx:id="phoneNumberField" promptText="📱 Phone Number"
+                       style="-fx-background-radius: 8; -fx-padding: 8; -fx-font-size: 14px;"/>
+            <TextField fx:id="roleField" promptText="🔧 Role (e.g., user/admin)"
+                       style="-fx-background-radius: 8; -fx-padding: 8; -fx-font-size: 14px;"/>
+            <TextField fx:id="bankNameField" promptText="🏦 Bank Name"
+                       style="-fx-background-radius: 8; -fx-padding: 8; -fx-font-size: 14px;"/>
+            <TextField fx:id="bankAccountField" promptText="💳 Bank Account Number"
+                       style="-fx-background-radius: 8; -fx-padding: 8; -fx-font-size: 14px;"/>
+            <TextField fx:id="emailField" promptText="📧 Email"
+                       style="-fx-background-radius: 8; -fx-padding: 8; -fx-font-size: 14px;"/>
+            <TextField fx:id="addressField" promptText="🏠 Address"
+                       style="-fx-background-radius: 8; -fx-padding: 8; -fx-font-size: 14px;"/>
+            <TextField fx:id="profileField" promptText="🌄 Profile Picture URL (optional)"
+                       style="-fx-background-radius: 8; -fx-padding: 8; -fx-font-size: 14px;"/>
+            <PasswordField fx:id="passwordField" promptText="🔑 Password"
+                           style="-fx-background-radius: 8; -fx-padding: 8; -fx-font-size: 14px;"/>
+        </VBox>
+
+        <Label fx:id="messageLabel" text=" "
+               style="-fx-text-fill: red; -fx-font-size: 13px;"/>
+
+        <Button text="Sign Up"
+                style="-fx-background-color: #0077cc; -fx-text-fill: white; -fx-font-size: 15px; -fx-font-weight: bold; -fx-background-radius: 10; -fx-padding: 10 30;"
+                onAction="#handleRegister"/>
+
+        <Hyperlink text="Already have an account? Log in"
+                   onAction="#goToLogin"
+                   style="-fx-text-fill: #0077cc; -fx-font-size: 13px; -fx-underline: true;"/>
     </VBox>
-
-    <Label fx:id="messageLabel" text=" "
-           style="-fx-text-fill: red; -fx-font-size: 13px;"/>
-
-    <Button text="Sign Up"
-            style="-fx-background-color: #0077cc; -fx-text-fill: white; -fx-font-size: 14px; -fx-font-weight: bold; -fx-background-radius: 10; -fx-padding: 8 20;"
-            onAction="#handleRegister"/>
-
-    <Hyperlink text="Already have an account? Log in"
-               onAction="#goToLogin"
-               style="-fx-text-fill: #0077cc; -fx-font-size: 12px; -fx-padding: 10;"/>
-
-</VBox>
 </ScrollPane>

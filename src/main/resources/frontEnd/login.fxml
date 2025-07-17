@@ -3,39 +3,43 @@
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
+<?import javafx.geometry.Pos?>
 
 <ScrollPane xmlns="http://javafx.com/javafx"
             xmlns:fx="http://javafx.com/fxml"
             fx:controller="org.FRFood.frontEnd.controller.LoginController"
             fitToWidth="true"
-            style="-fx-background-color: #f2f6fc;">
+            style="-fx-background: linear-gradient(to bottom, #eef3f9, #dbe5f1);">
 
-    <content>
-        <VBox alignment="CENTER" spacing="14" padding="30" style="-fx-background-color: #f2f6fc;">
+    <VBox alignment="CENTER" spacing="20" style="-fx-background-color: transparent;">
+        <padding>
+            <Insets top="60" right="50" bottom="60" left="50"/>
+        </padding>
 
-            <Label text="Log In"
-                   style="-fx-font-size: 26px; -fx-text-fill: #1e2a38;"/>
+        <Label text="🔐 Log In"
+               style="-fx-font-size: 30px; -fx-font-weight: bold; -fx-text-fill: #1e2a38;"/>
 
-            <TextField fx:id="phoneField"
-                       promptText="Phone Number"
-                       style="-fx-background-radius: 6;"/>
+        <TextField fx:id="phoneField"
+                   promptText="📱 Phone Number"
+                   prefWidth="260"
+                   style="-fx-background-radius: 8; -fx-padding: 8; -fx-font-size: 14px;"/>
 
-            <PasswordField fx:id="passwordField"
-                           promptText="Password"
-                           style="-fx-background-radius: 6;"/>
+        <PasswordField fx:id="passwordField"
+                       promptText="🔑 Password"
+                       prefWidth="260"
+                       style="-fx-background-radius: 8; -fx-padding: 8; -fx-font-size: 14px;"/>
 
-            <Label fx:id="messageLabel"
-                   text=" "
-                   style="-fx-text-fill: red; -fx-font-size: 13px;"/>
+        <Label fx:id="messageLabel"
+               text=" "
+               style="-fx-text-fill: red; -fx-font-size: 13px;"/>
 
-            <Button text="Log In"
-                    style="-fx-background-color: #0077cc; -fx-text-fill: white; -fx-font-weight: bold; -fx-background-radius: 8;"
-                    onAction="#handleLogin"/>
+        <Button text="Log In"
+                onAction="#handleLogin"
+                prefWidth="140" prefHeight="40"
+                style="-fx-background-color: #0077cc; -fx-text-fill: white; -fx-font-size: 14px; -fx-font-weight: bold; -fx-background-radius: 8;"/>
 
-            <Hyperlink text="Don't have an account? Sign up"
-                       onAction="#goToSignup"
-                       style="-fx-text-fill: #0077cc; -fx-font-size: 12px;"/>
-
-        </VBox>
-    </content>
+        <Hyperlink text="Don't have an account? Sign up"
+                   onAction="#goToSignUp"
+                   style="-fx-text-fill: #0077cc; -fx-font-size: 13px; -fx-underline: true;"/>
+    </VBox>
 </ScrollPane>

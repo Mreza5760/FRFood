@@ -2,8 +2,10 @@ package org.FRFood.frontEnd.controller;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
+import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
@@ -67,10 +69,14 @@ public class LoginController {
                 String token = node.get("token").asText();
                 SessionManager.setAuthToken(token);
 
+                Alert alert = new Alert(Alert.AlertType.INFORMATION);
+                alert.setTitle("Login Successful");
+                alert.setHeaderText(null);
+                alert.setContentText("You have logged in successfully!");
 
-                messageLabel.setStyle("-fx-text-fill: #00cc66;");
-                messageLabel.setText("Login successful!");
+                alert.showAndWait();
 
+                goToHome();
                 // Navigate to dashboard or next screen
             } else {
                 ObjectMapper mapper = new ObjectMapper();
@@ -88,6 +94,7 @@ public class LoginController {
     @FXML
     private void goToSignUp() {
         try {
+            System.out.println("Going to sign up...");
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/frontEnd/signup.fxml"));
             Parent root = loader.load();
             Stage stage = (Stage) phoneField.getScene().getWindow();
@@ -96,7 +103,19 @@ public class LoginController {
             System.out.println(e.getMessage());
         }
     }
+    public void goToHome() {
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/frontend/Home.fxml"));
+            Parent root = loader.load();
 
+            Stage stage = (Stage) phoneField.getScene().getWindow(); // see below
+            stage.setScene(new Scene(root));
+            stage.setTitle("Home");
+            stage.show();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
 
 
 }

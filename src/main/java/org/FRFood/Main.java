@@ -6,6 +6,8 @@ import org.FRFood.HTTPHandler.RestaurantHandler;
 
 import java.net.InetSocketAddress;
 import java.util.concurrent.Executors;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public class Main {
     private static final int port = 8080;
