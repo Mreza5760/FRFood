@@ -20,7 +20,7 @@ public interface FoodDAO {
 
     void addFoodToMenu(int menuId, int foodId) throws SQLException;
 
-    void setMenuIdNull(int foodId) throws SQLException;
+    void deleteMenuItem(int menuId, int foodId) throws SQLException;
 
     List<Keyword> getKeywords(int foodId) throws SQLException;
 }

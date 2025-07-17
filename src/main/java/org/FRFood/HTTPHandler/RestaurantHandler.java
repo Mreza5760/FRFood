@@ -8,12 +8,9 @@ import static org.FRFood.util.Role.*;
 import static org.FRFood.util.Validation.validatePhoneNumber;
 
 import java.util.List;
-import java.util.Optional;
-import java.sql.ResultSet;
 import java.io.IOException;
-import java.sql.Connection;
 import java.sql.SQLException;
-import java.sql.PreparedStatement;
+import java.util.Optional;
 
 import com.sun.net.httpserver.HttpHandler;
 import com.sun.net.httpserver.HttpExchange;
@@ -23,11 +20,13 @@ import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 
 public class RestaurantHandler implements HttpHandler {
     private final FoodDAO foodDAO;
+    private final OrderDAO orderDAO;
     private final ObjectMapper objectMapper;
     private final RestaurantDAO restaurantDAO;
 
     public RestaurantHandler() {
         foodDAO = new FoodDAOImp();
+        orderDAO = new OrderDAOImp();
         restaurantDAO = new RestaurantDAOImp();
         objectMapper = new ObjectMapper().setPropertyNamingStrategy(PropertyNamingStrategies.SNAKE_CASE);
     }
@@ -247,7 +246,7 @@ public class RestaurantHandler implements HttpHandler {
         }
 
         try {
-            var restaurantOpt = restaurantChecker(exchange, user, restaurantId);
+            var restaurantOpt = Authenticate.restaurantChecker(exchange, user, restaurantId);
             if (restaurantOpt.isEmpty()) return;
 
             menu.setId(restaurantDAO.insertMenu(menu));
@@ -271,7 +270,7 @@ public class RestaurantHandler implements HttpHandler {
         String menuTitle = parts[4];
 
         try {
-            var  restaurantOpt = restaurantChecker(exchange, user, restaurantId);
+            var  restaurantOpt = Authenticate.restaurantChecker(exchange, user, restaurantId);
             if (restaurantOpt.isEmpty()) return;
 
             if (restaurantDAO.getMenuByTitle(menuTitle, restaurantId).isEmpty()) {
@@ -307,15 +306,16 @@ public class RestaurantHandler implements HttpHandler {
         }
 
         try {
-            Restaurant restaurant = restaurantDAO.getById(restaurantId)
-                    .orElseThrow(() -> new RuntimeException("Restaurant not found"));
-            if (restaurant.getOwner().getId() != user.getId()) {
-                HttpError.unauthorized(exchange, "You do not own this restaurant");
+            var restaurantOpt = Authenticate.restaurantChecker(exchange, user, restaurantId);
+            if (restaurantOpt.isEmpty()) return;
+            Optional<Menu> optionalMenu = restaurantDAO.getMenuByTitle(title, itemId);
+            if (optionalMenu.isEmpty()) {
+                HttpError.notFound(exchange, "Menu title not found");
                 return;
             }
-            Menu menu = restaurantDAO.getMenuByTitle(title, restaurantId)
-                    .orElseThrow(() -> new RuntimeException("Menu not found"));
-            foodDAO.addFood(itemId, menu.getId());
+            Menu menu = optionalMenu.get();
+
+            foodDAO.addFoodToMenu(menu.getId(), itemId);
             JsonResponse.sendJsonResponse(exchange, 200, "{\"message\":\"Food item added to menu\"}");
         } catch (SQLException e) {
             HttpError.internal(exchange, "Failed to add item to menu");
@@ -332,20 +332,44 @@ public class RestaurantHandler implements HttpHandler {
         }
 
         String[] parts = exchange.getRequestURI().getPath().split("/");
+        String menuTitle = parts[4];
         int foodId = Integer.parseInt(parts[5]);
+        int restaurantId = Integer.parseInt(parts[2]);
 
         try {
-            foodDAO.setMenuIdNull(foodId);
+            var restaurantOpt = Authenticate.restaurantChecker(exchange, user, restaurantId);
+            if (restaurantOpt.isEmpty()) return;
+            Optional<Menu> optionalMenu = restaurantDAO.getMenuByTitle(menuTitle, restaurantId);
+            if (optionalMenu.isEmpty()) {
+                HttpError.notFound(exchange, "Menu title not found");
+                return;
+            }
+            Menu menu = optionalMenu.get();
+
+            foodDAO.deleteMenuItem(menu.getId(), foodId);
             JsonResponse.sendJsonResponse(exchange, 200, "{\"message\":\"Item removed from menu\"}");
         } catch (SQLException e) {
             HttpError.internal(exchange, "Failed to remove item from menu");
         }
     }
 
+    // TODO can have query
     private void getOrders(HttpExchange exchange) throws IOException {
+        var userOpt = Authenticate.authenticate(exchange);
+        if (userOpt.isEmpty()) return;
+        if (userOpt.get().getRole().equals(seller)) {
+            HttpError.unauthorized(exchange, "Only sellers can get orders");
+            return;
+        }
+        User user = userOpt.get();
+
         int restaurantId = Integer.parseInt(exchange.getRequestURI().getPath().split("/")[2]);
+
         try {
-            List<Order> orders = new OrderDAOImp().getRestaurantOrders(restaurantId);
+            var  restaurantOpt = Authenticate.restaurantChecker(exchange, user, restaurantId);
+            if (restaurantOpt.isEmpty()) return;
+
+            List<Order> orders = orderDAO.getRestaurantOrders(restaurantId);
             JsonResponse.sendJsonResponse(exchange, 200, objectMapper.writeValueAsString(orders));
         } catch (SQLException e) {
             HttpError.internal(exchange, "Failed to get restaurant orders");
@@ -353,10 +377,30 @@ public class RestaurantHandler implements HttpHandler {
     }
 
     private void setStatus(HttpExchange exchange) throws IOException {
+        var userOpt = Authenticate.authenticate(exchange);
+        if (userOpt.isEmpty()) return;
+        User user = userOpt.get();
+
         int orderId = Integer.parseInt(exchange.getRequestURI().getPath().split("/")[3]);
         String status = objectMapper.readTree(exchange.getRequestBody()).get("status").asText();
+        // TODO need to check
+        if (status.equals("0")) {
+            HttpError.notFound(exchange, "Status not found");
+            return;
+        }
+
         try {
-            new OrderDAOImp().changeStatus(orderId, status);
+            Optional<Order> optionalOrder = orderDAO.getById(orderId);
+            if (optionalOrder.isEmpty()) {
+                HttpError.notFound(exchange, "Order not found");
+                return;
+            }
+            Order order = optionalOrder.get();
+            int restaurantId = order.getRestaurantId();
+            var restaurantOpt = Authenticate.restaurantChecker(exchange, user, restaurantId);
+            if (restaurantOpt.isEmpty()) return;
+
+            orderDAO.changeStatus(orderId, status);
             JsonResponse.sendJsonResponse(exchange, 200, "{\"message\":\"Order status updated\"}");
         } catch (SQLException e) {
             HttpError.internal(exchange, "Failed to update order status");
