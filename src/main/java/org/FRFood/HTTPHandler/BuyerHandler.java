@@ -112,7 +112,7 @@ public class BuyerHandler implements HttpHandler {
         }
     }
 
-    void handleVendorsMenu(HttpExchange exchange) throws IOException {
+    private void handleVendorsMenu(HttpExchange exchange) throws IOException {
         if (authenticate(exchange).isEmpty()) return;
 
         String path = exchange.getRequestURI().getPath();
@@ -149,7 +149,7 @@ public class BuyerHandler implements HttpHandler {
         }
     }
 
-    void handleItemsList(HttpExchange exchange) throws IOException {
+    private void handleItemsList(HttpExchange exchange) throws IOException {
         if (authenticate(exchange).isEmpty()) return;
 
         ItemsReq req = objectMapper.readValue(exchange.getRequestBody(), ItemsReq.class);
@@ -172,7 +172,7 @@ public class BuyerHandler implements HttpHandler {
         }
     }
 
-    void handleGetItem(HttpExchange exchange) throws IOException {
+    private void handleGetItem(HttpExchange exchange) throws IOException {
         if (authenticate(exchange).isEmpty()) return;
 
         String path = exchange.getRequestURI().getPath();
@@ -194,7 +194,7 @@ public class BuyerHandler implements HttpHandler {
         }
     }
 
-    void handleSubmitOrder(HttpExchange exchange) throws IOException {
+    private void handleSubmitOrder(HttpExchange exchange) throws IOException {
         var userOpt = Authenticate.authenticate(exchange);
         if (userOpt.isEmpty()) return;
         User user = userOpt.get();
@@ -224,7 +224,7 @@ public class BuyerHandler implements HttpHandler {
         }
     }
 
-    void handleGetOrder(HttpExchange exchange) throws IOException {
+    private void handleGetOrder(HttpExchange exchange) throws IOException {
         var userOpt = Authenticate.authenticate(exchange);
         if (userOpt.isEmpty()) return;
         User user = userOpt.get();
@@ -258,7 +258,7 @@ public class BuyerHandler implements HttpHandler {
     }
 
     // TODO has query
-    void handleOrdersHistory(HttpExchange exchange) throws IOException {
+    private void handleOrdersHistory(HttpExchange exchange) throws IOException {
         var userOpt = Authenticate.authenticate(exchange);
         if (userOpt.isEmpty()) return;
         User user = userOpt.get();
@@ -277,7 +277,7 @@ public class BuyerHandler implements HttpHandler {
         }
     }
 
-    void handleGetFavorites(HttpExchange exchange) throws IOException {
+    private void handleGetFavorites(HttpExchange exchange) throws IOException {
         var userOpt = Authenticate.authenticate(exchange);
         if (userOpt.isEmpty()) return;
         User user = userOpt.get();
@@ -296,7 +296,7 @@ public class BuyerHandler implements HttpHandler {
         }
     }
 
-    void handleInsertFavorite(HttpExchange exchange) throws IOException {
+    private void handleInsertFavorite(HttpExchange exchange) throws IOException {
         var userOpt = Authenticate.authenticate(exchange);
         if (userOpt.isEmpty()) return;
         User user = userOpt.get();
@@ -323,7 +323,7 @@ public class BuyerHandler implements HttpHandler {
         }
     }
 
-    void handleDeleteFavorite(HttpExchange exchange) throws IOException {
+    private void handleDeleteFavorite(HttpExchange exchange) throws IOException {
         var userOpt = Authenticate.authenticate(exchange);
         if (userOpt.isEmpty()) return;
         User user = userOpt.get();
@@ -356,7 +356,7 @@ public class BuyerHandler implements HttpHandler {
         }
     }
 
-    void handeSubmitRate(HttpExchange exchange) throws IOException {
+    private void handeSubmitRate(HttpExchange exchange) throws IOException {
         Optional<User> authenticatedUserOptional = authenticate(exchange);
         if (authenticatedUserOptional.isEmpty()) {
             return;
@@ -378,7 +378,7 @@ public class BuyerHandler implements HttpHandler {
         }
     }
 
-    void handeGetFoodRates(HttpExchange exchange) throws IOException {
+    private void handeGetFoodRates(HttpExchange exchange) throws IOException {
         Optional<User> authenticatedUserOptional = authenticate(exchange);
         if (authenticatedUserOptional.isEmpty()) {
             return;
@@ -402,7 +402,7 @@ public class BuyerHandler implements HttpHandler {
         }
     }
 
-    void handleGetRate(HttpExchange exchange) throws IOException {
+    private void handleGetRate(HttpExchange exchange) throws IOException {
         Optional<User> authenticatedUserOptional = authenticate(exchange);
         if (authenticatedUserOptional.isEmpty()) {
             return;
@@ -424,7 +424,7 @@ public class BuyerHandler implements HttpHandler {
         }
     }
 
-    void handleDeleteRate(HttpExchange exchange) throws IOException {
+    private void handleDeleteRate(HttpExchange exchange) throws IOException {
         Optional<User> authenticatedUserOptional = authenticate(exchange);
         if (authenticatedUserOptional.isEmpty()) {
             return;
@@ -450,7 +450,7 @@ public class BuyerHandler implements HttpHandler {
         }
     }
 
-    void handleUpdateRate(HttpExchange exchange) throws IOException {
+    private void handleUpdateRate(HttpExchange exchange) throws IOException {
         Optional<User> authenticatedUserOptional = authenticate(exchange);
         if (authenticatedUserOptional.isEmpty()) {
             return;
