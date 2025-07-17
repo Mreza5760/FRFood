@@ -151,8 +151,8 @@ public class FoodDAOImp implements FoodDAO {
     }
 
     @Override
-    public void addFood(int menuId, int foodId) throws SQLException {
-        String sql = "UPDATE FoodItems SET menu_id = ? WHERE id = ?";
+    public void addFoodToMenu(int menuId, int foodId) throws SQLException {
+        String sql = "INSERT INTO FoodItem_Menus (menu_id , food_item_id) VALUES (? , ?)";
         try(
                 Connection connection = DBConnector.gConnection();
                 PreparedStatement preparedStatement = connection.prepareStatement(sql);

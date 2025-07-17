@@ -132,11 +132,9 @@ public class RestaurantDAOImp implements RestaurantDAO {
                     food.setPrice(rs.getInt("price"));
                     food.setName(rs.getString("name"));
                     food.setSupply(rs.getInt("supply"));
-                    food.setMenuID(rs.getInt("menu_id"));
                     food.setPicture(rs.getString("image"));
                     food.setRestaurantId(rs.getInt("restaurant_id"));
                     food.setDescription(rs.getString("description"));
-
                     FoodDAO foodDAO = new FoodDAOImp();
                     food.setKeywords(foodDAO.getKeywords(food.getId()));
 

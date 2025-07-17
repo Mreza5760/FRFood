@@ -7,8 +7,6 @@ import java.util.List;
 
 public class Food {
     private int id;
-    @JsonIgnore
-    private int menuID;
     private String name;
     @JsonProperty("imageBase64")
     private String picture;
@@ -93,13 +91,5 @@ public class Food {
 
     public void setKeywords(List<Keyword> keywords) {
         this.keywords = keywords;
-    }
-
-    public int getMenuID() {
-        return menuID;
-    }
-
-    public void setMenuID(int menuID) {
-        this.menuID = menuID;
     }
 }
