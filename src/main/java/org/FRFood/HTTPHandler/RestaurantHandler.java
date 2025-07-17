@@ -20,11 +20,13 @@ import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 
 public class RestaurantHandler implements HttpHandler {
     private final FoodDAO foodDAO;
+    private final OrderDAO orderDAO;
     private final ObjectMapper objectMapper;
     private final RestaurantDAO restaurantDAO;
 
     public RestaurantHandler() {
         foodDAO = new FoodDAOImp();
+        orderDAO = new OrderDAOImp();
         restaurantDAO = new RestaurantDAOImp();
         objectMapper = new ObjectMapper().setPropertyNamingStrategy(PropertyNamingStrategies.SNAKE_CASE);
     }
@@ -351,10 +353,23 @@ public class RestaurantHandler implements HttpHandler {
         }
     }
 
+    // TODO can have query
     private void getOrders(HttpExchange exchange) throws IOException {
+        var userOpt = Authenticate.authenticate(exchange);
+        if (userOpt.isEmpty()) return;
+        if (userOpt.get().getRole().equals(seller)) {
+            HttpError.unauthorized(exchange, "Only sellers can get orders");
+            return;
+        }
+        User user = userOpt.get();
+
         int restaurantId = Integer.parseInt(exchange.getRequestURI().getPath().split("/")[2]);
+
         try {
-            List<Order> orders = new OrderDAOImp().getRestaurantOrders(restaurantId);
+            var  restaurantOpt = Authenticate.restaurantChecker(exchange, user, restaurantId);
+            if (restaurantOpt.isEmpty()) return;
+
+            List<Order> orders = orderDAO.getRestaurantOrders(restaurantId);
             JsonResponse.sendJsonResponse(exchange, 200, objectMapper.writeValueAsString(orders));
         } catch (SQLException e) {
             HttpError.internal(exchange, "Failed to get restaurant orders");
@@ -362,10 +377,30 @@ public class RestaurantHandler implements HttpHandler {
     }
 
     private void setStatus(HttpExchange exchange) throws IOException {
+        var userOpt = Authenticate.authenticate(exchange);
+        if (userOpt.isEmpty()) return;
+        User user = userOpt.get();
+
         int orderId = Integer.parseInt(exchange.getRequestURI().getPath().split("/")[3]);
         String status = objectMapper.readTree(exchange.getRequestBody()).get("status").asText();
+        // TODO need to check
+        if (status.equals("0")) {
+            HttpError.notFound(exchange, "Status not found");
+            return;
+        }
+
         try {
-            new OrderDAOImp().changeStatus(orderId, status);
+            Optional<Order> optionalOrder = orderDAO.getById(orderId);
+            if (optionalOrder.isEmpty()) {
+                HttpError.notFound(exchange, "Order not found");
+                return;
+            }
+            Order order = optionalOrder.get();
+            int restaurantId = order.getRestaurantId();
+            var restaurantOpt = Authenticate.restaurantChecker(exchange, user, restaurantId);
+            if (restaurantOpt.isEmpty()) return;
+
+            orderDAO.changeStatus(orderId, status);
             JsonResponse.sendJsonResponse(exchange, 200, "{\"message\":\"Order status updated\"}");
         } catch (SQLException e) {
             HttpError.internal(exchange, "Failed to update order status");
