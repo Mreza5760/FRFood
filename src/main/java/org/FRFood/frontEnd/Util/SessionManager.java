@@ -1,4 +1,4 @@
-package org.FRFood.frontEnd;
+package org.FRFood.frontEnd.Util;
 
 public class SessionManager {
     private static String authToken;

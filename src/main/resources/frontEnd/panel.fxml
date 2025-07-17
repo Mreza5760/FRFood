@@ -18,15 +18,32 @@
     <Label text="👤 User Panel"
            style="-fx-font-size: 28px; -fx-font-weight: bold; -fx-text-fill: #1e2a38;"/>
 
-<!--    <Label fx:id="walletLabel"-->
-<!--           text="Wallet Balance: $0.00"-->
-<!--           style="-fx-font-size: 20px; -fx-text-fill: #4a5a6a; -fx-font-weight: bold;"/>-->
-
     <VBox spacing="15" alignment="CENTER" maxWidth="250">
-        <Button fx:id="ordersButton" text="Orders"
+
+        <!-- Buyer-only -->
+        <Button fx:id="orderFoodButton" text="Order Food"
+                visible="false" managed="false"
                 prefWidth="250" prefHeight="45"
                 style="-fx-background-color: #0077cc; -fx-text-fill: white; -fx-font-size: 16px; -fx-font-weight: bold; -fx-background-radius: 8;"/>
 
+        <!-- Seller-only -->
+        <Button fx:id="addRestaurantButton" text="Add Restaurant"
+                visible="false" managed="false"
+                prefWidth="250" prefHeight="45"
+                style="-fx-background-color: #0077cc; -fx-text-fill: white; -fx-font-size: 16px; -fx-font-weight: bold; -fx-background-radius: 8;"/>
+
+        <Button fx:id="restaurantButton" text="Restaurants"
+                visible="false" managed="false"
+                prefWidth="250" prefHeight="45"
+                style="-fx-background-color: #ff9900; -fx-text-fill: white; -fx-font-size: 16px; -fx-font-weight: bold; -fx-background-radius: 8;"/>
+
+        <!-- Courier-only -->
+        <Button fx:id="deliveriesButton" text="Deliveries"
+                visible="false" managed="false"
+                prefWidth="250" prefHeight="45"
+                style="-fx-background-color: #6600cc; -fx-text-fill: white; -fx-font-size: 16px; -fx-font-weight: bold; -fx-background-radius: 8;"/>
+
+        <!-- Common -->
         <Button fx:id="walletButton" text="Wallet"
                 prefWidth="250" prefHeight="45"
                 style="-fx-background-color: #00aa88; -fx-text-fill: white; -fx-font-size: 16px; -fx-font-weight: bold; -fx-background-radius: 8;"/>
@@ -38,5 +55,11 @@
         <Button fx:id="logoutButton" text="Logout"
                 prefWidth="250" prefHeight="45"
                 style="-fx-background-color: #cc3300; -fx-text-fill: white; -fx-font-size: 16px; -fx-font-weight: bold; -fx-background-radius: 8;"/>
+        <Label fx:id="welcomeLabel" text="Welcome, User!"
+               style="-fx-font-size: 18px; -fx-font-weight: bold; -fx-text-fill: #2a3a4d;"
+               alignment="CENTER"
+               maxWidth="250"
+               wrapText="true"/>
+
     </VBox>
 </VBox>

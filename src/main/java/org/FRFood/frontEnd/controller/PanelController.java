@@ -1,125 +1,114 @@
 package org.FRFood.frontEnd.controller;
 
-import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import javafx.event.ActionEvent;
+import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.Jws;
 import javafx.fxml.FXML;
-import javafx.fxml.FXMLLoader;
-import javafx.scene.Node;
-import javafx.scene.Parent;
-import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
-import javafx.stage.Stage;
-import org.FRFood.frontEnd.SessionManager;
+import org.FRFood.DAO.UserDAO;
+import org.FRFood.DAO.UserDAOImp;
+import org.FRFood.entity.User;
+import org.FRFood.frontEnd.Util.SceneNavigator;
+import org.FRFood.frontEnd.Util.SessionManager;
+import org.FRFood.util.JwtUtil;
 
-import java.io.IOException;
-import java.net.http.HttpClient;
-import java.net.http.HttpRequest;
-import java.net.http.HttpResponse;
-import java.net.URI;
+import java.sql.SQLException;
 
 public class PanelController {
 
-//    @FXML
-//    private Label walletLabel;
-
     @FXML
-    private Button logoutButton, ordersButton, walletButton, profileButton;
+    public Button addRestaurantButton;
+    @FXML
+    private Label welcomeLabel;
+    @FXML
+    private Button logoutButton;
+    @FXML
+    private Button orderFoodButton;
+    @FXML
+    private Button walletButton;
+    @FXML
+    private Button profileButton;
+    @FXML
+    private Button restaurantButton;
+    @FXML
+    private Button deliveriesButton;
 
     private final ObjectMapper objectMapper = new ObjectMapper();
 
     @FXML
     public void initialize() {
-        fetchWalletBalance();
+        // Role-based button visibility
+        setRoleBasedButtons();
 
+        // Button actions
         logoutButton.setOnAction(e -> handleLogout());
-        ordersButton.setOnAction(e -> handleOrders());
+        orderFoodButton.setOnAction(e -> handleOrders());
+        addRestaurantButton.setOnAction(e -> handleCreateRestaurant());
         walletButton.setOnAction(e -> handleWallet());
         profileButton.setOnAction(e -> handleProfile());
     }
 
-    private void fetchWalletBalance() {
-        // Example API URL, change to your actual backend URL
-//        String url = "http://localhost:8080/user/wallet";
-//
-//        HttpClient client = HttpClient.newHttpClient();
-//        HttpRequest request = HttpRequest.newBuilder()
-//                .uri(URI.create(url))
-//                .GET()
-//                .build();
+    private void setRoleBasedButtons() {
+        String token = SessionManager.getAuthToken();
+        if (token == null) return;
 
-        // Async request so UI thread is not blocked
-//        client.sendAsync(request, HttpResponse.BodyHandlers.ofString())
-//                .thenApply(HttpResponse::body)
-//                .thenAccept(this::updateWalletBalance)
-//                .exceptionally(e -> {
-//                    System.err.println("Failed to fetch wallet: " + e.getMessage());
-//                    return null;
-//                });
-    }
+        Jws<Claims> claimsJws = JwtUtil.validateToken(token);
+        int userId = Integer.parseInt(claimsJws.getBody().getSubject());
 
-//    private void updateWalletBalance(String json) {
-//        try {
-//            JsonNode node = objectMapper.readTree(json);
-//            // Assuming JSON is like { "balance": 123.45 }
-//            double balance = node.get("balance").asDouble();
-//
-//            // Update UI on JavaFX Application Thread
-//            javafx.application.Platform.runLater(() ->
-//                    walletLabel.setText(String.format("Wallet Balance: $%.2f", balance))
-//            );
-//        } catch (Exception e) {
-//            e.printStackTrace();
-//        }
-//    }
-
-    public void goToProfile() {
+        UserDAO userDao = new UserDAOImp();
+        User user = null;
         try {
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("/frontend/profile.fxml"));
-            Parent root = loader.load();
-            Stage stage = (Stage) profileButton.getScene().getWindow(); // see below
-            stage.setScene(new Scene(root));
-            stage.setTitle("profile");
-            stage.show();
-        } catch (IOException e) {
-            e.printStackTrace();
+            user = userDao.getById(userId).orElse(null);
+        } catch (SQLException e) {
+            System.out.println("SQLException: " + e.getMessage());
+        }
+        if (user == null) return;
+
+        welcomeLabel.setText("Welcome, " + user.getFullName() + "!");
+
+        // Show only relevant button based on role
+        System.out.println("Welcome: " + welcomeLabel.getText());
+        switch (user.getRole()) {
+            case buyer -> {
+                orderFoodButton.setVisible(true);
+                orderFoodButton.setManaged(true);
+            }
+            case seller -> {
+                restaurantButton.setVisible(true);
+                restaurantButton.setManaged(true);
+                addRestaurantButton.setVisible(true);
+                addRestaurantButton.setManaged(true);
+            }
+            case courier -> {
+                deliveriesButton.setVisible(true);
+                deliveriesButton.setManaged(true);
+            }
         }
     }
-    public void goToHome() {
-        try {
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("/frontend/home.fxml"));
-            Parent root = loader.load();
-            Stage stage = (Stage) profileButton.getScene().getWindow(); // see below
-            stage.setScene(new Scene(root));
-            stage.setTitle("Home");
-            stage.show();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+
+    private void handleCreateRestaurant() {
+        SceneNavigator.switchTo("/frontend/createRestaurant.fxml", addRestaurantButton);
     }
 
     private void handleLogout() {
         SessionManager.logout();
-        goToHome();
-        System.out.println("Logout clicked");
-        // Add your logout logic here
+        SceneNavigator.switchTo("/frontend/home.fxml", logoutButton);
+        System.out.println("Logout successful");
     }
 
     private void handleOrders() {
-        System.out.println("Orders clicked");
-        // Navigate to orders page or fetch orders
+        System.out.println("Navigating to Orders...");
+        // SceneNavigator.switchTo("/frontend/orders.fxml", orderButton);
     }
 
     private void handleWallet() {
-        System.out.println("Wallet clicked");
-        // Possibly refresh wallet info or open wallet detail
-        fetchWalletBalance();
+        System.out.println("Wallet clicked (fetch logic can go here)");
+        // Future: Fetch wallet API call
     }
 
     private void handleProfile() {
-        goToProfile();
-        System.out.println("Profile clicked");
-        // Navigate to profile page
+        SceneNavigator.switchTo("/frontend/profile.fxml", profileButton);
+        System.out.println("Navigated to Profile");
     }
 }

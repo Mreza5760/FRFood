@@ -7,7 +7,7 @@ import javafx.scene.*;
 import javafx.stage.Stage;
 import javafx.scene.control.Button;
 import javafx.scene.Node;
-import org.FRFood.frontEnd.SessionManager;
+import org.FRFood.frontEnd.Util.SessionManager;
 
 import java.io.IOException;
 import java.util.Objects;

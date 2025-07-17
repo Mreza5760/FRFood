@@ -2,15 +2,13 @@ package org.FRFood.frontEnd.controller;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
-import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.stage.Stage;
-import org.FRFood.frontEnd.SessionManager;
+import org.FRFood.frontEnd.Util.SessionManager;
 
 import java.io.*;
 import java.net.HttpURLConnection;

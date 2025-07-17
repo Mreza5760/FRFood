@@ -149,6 +149,7 @@ public class UserDAOImp implements UserDAO {
                     user.setAddress(rs.getString("address"));
                     user.setPicture(rs.getString("profile_image"));
                     bankAccount = bankAccountDAO.getById(rs.getInt("bank_id")).get();
+                    user.setConfirmed(rs.getBoolean("confirmed"));
                     user.setBankAccount(bankAccount);
                 } else {
                     return Optional.empty();
@@ -177,5 +178,10 @@ public class UserDAOImp implements UserDAO {
             System.out.println(currentUser.getPicture());
             stmt.executeUpdate();
         }
+    }
+
+    @Override
+    public void setConfirmed(int id) throws SQLException {
+
     }
 }

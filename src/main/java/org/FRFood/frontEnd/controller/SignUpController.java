@@ -10,7 +10,7 @@ import javafx.scene.control.*;
 import javafx.event.ActionEvent;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import javafx.stage.Stage;
-import org.FRFood.frontEnd.SessionManager;
+import org.FRFood.frontEnd.Util.SessionManager;
 
 import java.io.IOException;
 import java.net.HttpURLConnection;
