@@ -2,8 +2,11 @@ package org.FRFood.DAO;
 
 import org.FRFood.entity.Food;
 import org.FRFood.entity.Menu;
+import org.FRFood.entity.User;
 import org.FRFood.util.DBConnector;
 import org.FRFood.entity.Restaurant;
+import org.FRFood.util.HttpError;
+import org.FRFood.util.JsonResponse;
 
 import java.sql.*;
 import java.util.List;
@@ -250,5 +253,31 @@ public class RestaurantDAOImp implements RestaurantDAO {
             }
         }
         return Optional.of(menu);
+    }
+
+    @Override
+    public Optional<Restaurant> getByOwnerId(int ownerId) throws SQLException {
+        Restaurant restaurant = null;
+        String query = "SELECT * FROM Restaurants WHERE owner_id = ?";
+        try (Connection conn = DBConnector.gConnection();
+             PreparedStatement stmt = conn.prepareStatement(query)) {
+
+            stmt.setInt(1, ownerId);
+            ResultSet rs = stmt.executeQuery();
+
+            if (rs.next()) {
+                restaurant = new Restaurant(new User(),
+                        rs.getString("name"),
+                        rs.getString("address"),
+                        rs.getString("phone"),
+                        rs.getString("logo"),
+                        rs.getInt("tax_fee"),
+                        rs.getInt("additional_fee"));
+                restaurant.setId(rs.getInt("id"));
+            } else {
+                throw new SQLException("Restaurant not found.");
+            }
+        }
+        return Optional.of(restaurant);
     }
 }

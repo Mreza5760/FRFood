@@ -28,4 +28,6 @@ public interface RestaurantDAO {
     void deleteMenuByTitle(String title, int restaurantId) throws SQLException;
 
     Optional<Menu> getMenuByTitle(String title, int restaurantId) throws SQLException;
+
+    Optional<Restaurant> getByOwnerId(int ownerId) throws SQLException;
 }

@@ -3,6 +3,7 @@ package org.FRFood.HTTPHandler;
 import org.FRFood.DAO.*;
 import org.FRFood.util.*;
 import org.FRFood.entity.*;
+
 import static org.FRFood.util.Role.*;
 import static org.FRFood.util.Validation.validatePhoneNumber;
 
@@ -12,6 +13,7 @@ import java.io.IOException;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.sql.PreparedStatement;
+
 import com.sun.net.httpserver.HttpHandler;
 import com.sun.net.httpserver.HttpExchange;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -105,28 +107,16 @@ public class RestaurantHandler implements HttpHandler {
         }
 
         // TODO Should add to the restaurantDao, i dont check this shit
-        String query = "SELECT * FROM Restaurants WHERE owner_id = ?";
-        try (Connection conn = DBConnector.gConnection();
-             PreparedStatement stmt = conn.prepareStatement(query)) {
-
-            stmt.setInt(1, user.getId());
-            ResultSet rs = stmt.executeQuery();
-
-            if (rs.next()) {
-                Restaurant restaurant = new Restaurant(user,
-                        rs.getString("name"),
-                        rs.getString("address"),
-                        rs.getString("phone"),
-                        rs.getString("logo"),
-                        rs.getInt("tax_fee"),
-                        rs.getInt("additional_fee"));
-                restaurant.setId(rs.getInt("id"));
+        try {
+            if (restaurantDAO.getByOwnerId(user.getId()).isPresent()){
+                Restaurant restaurant = restaurantDAO.getByOwnerId(user.getId()).get();
                 JsonResponse.sendJsonResponse(exchange, 200, objectMapper.writeValueAsString(restaurant));
-            } else {
-                HttpError.notFound(exchange, "No restaurant found for user");
+            }else{
+                return;
+                //error
             }
         } catch (SQLException e) {
-            HttpError.internal(exchange, "Failed to retrieve restaurant");
+            HttpError.internal(exchange, "Failed to get restaurant by owner");
         }
     }
 

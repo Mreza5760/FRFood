@@ -19,7 +19,7 @@ public interface UserDAO {
 
     Optional<User> getByPhone(String phoneNumber) throws SQLException;
 
-    int insert(User user) throws SQLException, DataAlreadyExistsException;
+    int insert(User user) throws SQLException;
 
     boolean insertFavorite(int id, Restaurant restaurant) throws SQLException;
 
