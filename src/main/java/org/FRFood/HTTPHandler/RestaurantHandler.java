@@ -67,20 +67,6 @@ public class RestaurantHandler implements HttpHandler {
         }
     }
 
-    private Optional<Restaurant> restaurantChecker(HttpExchange exchange, User user, int restaurantId) throws SQLException, IOException {
-        Optional<Restaurant> optionalRestaurant = restaurantDAO.getById(restaurantId);
-        if (optionalRestaurant.isEmpty()) {
-            HttpError.notFound(exchange, "Restaurant not found");
-            return Optional.empty();
-        }
-        Restaurant restaurant = optionalRestaurant.get();
-        if (restaurant.getOwner().getId() != user.getId()) {
-            HttpError.unauthorized(exchange, "You do not own this restaurant");
-            return Optional.empty();
-        }
-        return optionalRestaurant;
-    }
-
     private void handleRestaurants(HttpExchange exchange) throws IOException {
         var userOpt = Authenticate.authenticate(exchange);
         if (userOpt.isEmpty()) return;
@@ -121,15 +107,12 @@ public class RestaurantHandler implements HttpHandler {
             return;
         }
 
-        // TODO Should add to the restaurantDao, i dont check this shit
         try {
-            if (restaurantDAO.getByOwnerId(user.getId()).isPresent()){
+            if (restaurantDAO.getByOwnerId(user.getId()).isPresent()) {
                 Restaurant restaurant = restaurantDAO.getByOwnerId(user.getId()).get();
                 JsonResponse.sendJsonResponse(exchange, 200, objectMapper.writeValueAsString(restaurant));
-            }else{
-                return;
-                //error
-            }
+            } else
+                HttpError.badRequest(exchange, "Own no restaurant");
         } catch (SQLException e) {
             HttpError.internal(exchange, "Failed to get restaurant by owner");
         }
@@ -149,7 +132,7 @@ public class RestaurantHandler implements HttpHandler {
         int restaurantId = Integer.parseInt(parts[2]);
 
         try {
-            var restaurantOpt = restaurantChecker(exchange, user, restaurantId);
+            var restaurantOpt = Authenticate.restaurantChecker(exchange, user, restaurantId);
             if (restaurantOpt.isEmpty()) return;
             Restaurant restaurant = restaurantOpt.get();
 
@@ -183,7 +166,7 @@ public class RestaurantHandler implements HttpHandler {
         }
 
         try {
-            var restaurantOpt = restaurantChecker(exchange, user, restaurantId);
+            var restaurantOpt = Authenticate.restaurantChecker(exchange, user, restaurantId);
             if (restaurantOpt.isEmpty()) return;
             Restaurant restaurant = restaurantOpt.get();
 
@@ -211,7 +194,7 @@ public class RestaurantHandler implements HttpHandler {
         food.setId(foodId);
 
         try {
-            var restaurantOpt = restaurantChecker(exchange, user, restaurantId);
+            var restaurantOpt = Authenticate.restaurantChecker(exchange, user, restaurantId);
             if (restaurantOpt.isEmpty()) return;
             Restaurant restaurant = restaurantOpt.get();
 
@@ -235,7 +218,7 @@ public class RestaurantHandler implements HttpHandler {
         int restaurantId = Integer.parseInt(exchange.getRequestURI().getPath().split("/")[2]);
 
         try {
-            var restaurantOpt = restaurantChecker(exchange, user, restaurantId);
+            var restaurantOpt = Authenticate.restaurantChecker(exchange, user, restaurantId);
             if (restaurantOpt.isEmpty()) return;
             Restaurant restaurant = restaurantOpt.get();
 
