@@ -257,6 +257,7 @@ public class BuyerHandler implements HttpHandler {
         }
     }
 
+    // TODO has query
     void handleOrdersHistory(HttpExchange exchange) throws IOException {
         var userOpt = Authenticate.authenticate(exchange);
         if (userOpt.isEmpty()) return;
