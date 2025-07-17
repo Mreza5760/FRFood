@@ -8,6 +8,7 @@ import static org.FRFood.util.Role.*;
 import static org.FRFood.util.Validation.validatePhoneNumber;
 
 import java.util.List;
+import java.util.Optional;
 import java.sql.ResultSet;
 import java.io.IOException;
 import java.sql.Connection;
@@ -64,6 +65,20 @@ public class RestaurantHandler implements HttpHandler {
         } catch (Exception e) {
             HttpError.internal(exchange, "Unexpected server error: " + e.getMessage());
         }
+    }
+
+    private Optional<Restaurant> restaurantChecker(HttpExchange exchange, User user, int restaurantId) throws SQLException, IOException {
+        Optional<Restaurant> optionalRestaurant = restaurantDAO.getById(restaurantId);
+        if (optionalRestaurant.isEmpty()) {
+            HttpError.notFound(exchange, "Restaurant not found");
+            return Optional.empty();
+        }
+        Restaurant restaurant = optionalRestaurant.get();
+        if (restaurant.getOwner().getId() != user.getId()) {
+            HttpError.unauthorized(exchange, "You do not own this restaurant");
+            return Optional.empty();
+        }
+        return optionalRestaurant;
     }
 
     private void handleRestaurants(HttpExchange exchange) throws IOException {
@@ -134,13 +149,9 @@ public class RestaurantHandler implements HttpHandler {
         int restaurantId = Integer.parseInt(parts[2]);
 
         try {
-            Restaurant restaurant = restaurantDAO.getById(restaurantId)
-                    .orElseThrow(() -> new RuntimeException("Restaurant not found"));
-
-            if (restaurant.getOwner().getId() != user.getId()) {
-                HttpError.unauthorized(exchange, "You do not own this restaurant");
-                return;
-            }
+            var restaurantOpt = restaurantChecker(exchange, user, restaurantId);
+            if (restaurantOpt.isEmpty()) return;
+            Restaurant restaurant = restaurantOpt.get();
 
             Restaurant updated = objectMapper.readValue(exchange.getRequestBody(), Restaurant.class);
             updated.setId(restaurantId);
@@ -172,12 +183,10 @@ public class RestaurantHandler implements HttpHandler {
         }
 
         try {
-            Restaurant restaurant = restaurantDAO.getById(restaurantId)
-                    .orElseThrow(() -> new RuntimeException("Restaurant not found"));
-            if (restaurant.getOwner().getId() != user.getId()) {
-                HttpError.unauthorized(exchange, "You do not own this restaurant");
-                return;
-            }
+            var restaurantOpt = restaurantChecker(exchange, user, restaurantId);
+            if (restaurantOpt.isEmpty()) return;
+            Restaurant restaurant = restaurantOpt.get();
+
             food.setId(foodDAO.insert(food));
             JsonResponse.sendJsonResponse(exchange, 201, objectMapper.writeValueAsString(food));
         } catch (SQLException e) {
@@ -202,12 +211,10 @@ public class RestaurantHandler implements HttpHandler {
         food.setId(foodId);
 
         try {
-            Restaurant restaurant = restaurantDAO.getById(restaurantId)
-                    .orElseThrow(() -> new RuntimeException("Restaurant not found"));
-            if (restaurant.getOwner().getId() != user.getId()) {
-                HttpError.unauthorized(exchange, "You do not own this restaurant");
-                return;
-            }
+            var restaurantOpt = restaurantChecker(exchange, user, restaurantId);
+            if (restaurantOpt.isEmpty()) return;
+            Restaurant restaurant = restaurantOpt.get();
+
             foodDAO.update(food);
             JsonResponse.sendJsonResponse(exchange, 200, objectMapper.writeValueAsString(food));
         } catch (SQLException e) {
@@ -228,12 +235,9 @@ public class RestaurantHandler implements HttpHandler {
         int restaurantId = Integer.parseInt(exchange.getRequestURI().getPath().split("/")[2]);
 
         try {
-            Restaurant restaurant = restaurantDAO.getById(restaurantId)
-                    .orElseThrow(() -> new RuntimeException("Restaurant not found"));
-            if (restaurant.getOwner().getId() != user.getId()) {
-                HttpError.unauthorized(exchange, "You do not own this restaurant");
-                return;
-            }
+            var restaurantOpt = restaurantChecker(exchange, user, restaurantId);
+            if (restaurantOpt.isEmpty()) return;
+            Restaurant restaurant = restaurantOpt.get();
 
             foodDAO.delete(foodId);
             JsonResponse.sendJsonResponse(exchange, 200, "{\"message\":\"Food item removed successfully\"}");
@@ -260,13 +264,9 @@ public class RestaurantHandler implements HttpHandler {
         }
 
         try {
-            Restaurant restaurant = restaurantDAO.getById(restaurantId)
-                    .orElseThrow(() -> new RuntimeException("Restaurant not found"));
-            if (restaurant.getOwner().getId() != user.getId()) {
-                HttpError.unauthorized(exchange, "You do not own this restaurant");
-                return;
-            }
-            menu.setRestaurant(restaurant);
+            var restaurantOpt = restaurantChecker(exchange, user, restaurantId);
+            if (restaurantOpt.isEmpty()) return;
+
             menu.setId(restaurantDAO.insertMenu(menu));
             JsonResponse.sendJsonResponse(exchange, 201, objectMapper.writeValueAsString(menu));
         } catch (SQLException e) {
@@ -288,12 +288,14 @@ public class RestaurantHandler implements HttpHandler {
         String menuTitle = parts[4];
 
         try {
-            Restaurant restaurant = restaurantDAO.getById(restaurantId)
-                    .orElseThrow(() -> new RuntimeException("Restaurant not found"));
-            if (restaurant.getOwner().getId() != user.getId()) {
-                HttpError.unauthorized(exchange, "You do not own this restaurant");
+            var  restaurantOpt = restaurantChecker(exchange, user, restaurantId);
+            if (restaurantOpt.isEmpty()) return;
+
+            if (restaurantDAO.getMenuByTitle(menuTitle, restaurantId).isEmpty()) {
+                HttpError.notFound(exchange, "Menu title not found");
                 return;
             }
+
             restaurantDAO.deleteMenuByTitle(menuTitle, restaurantId);
             JsonResponse.sendJsonResponse(exchange, 200, "{\"message\":\"Menu deleted successfully\"}");
         } catch (SQLException e) {
