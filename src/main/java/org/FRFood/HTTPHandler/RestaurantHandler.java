@@ -78,8 +78,7 @@ public class RestaurantHandler implements HttpHandler {
                 return;
             }
 
-            // TODO Tax fee should be more than zero
-            if (restaurant.getName() == null || restaurant.getAddress() == null || restaurant.getPhone() == null || restaurant.getTaxFee() == 0 || restaurant.getAdditionalFee() == 0) {
+            if (restaurant.getName() == null || restaurant.getAddress() == null || restaurant.getPhone() == null || restaurant.getTaxFee() == null || restaurant.getAdditionalFee() == null) {
                 HttpError.badRequest(exchange, "Missing required fields");
                 return;
             }
@@ -158,8 +157,7 @@ public class RestaurantHandler implements HttpHandler {
         Food food = objectMapper.readValue(exchange.getRequestBody(), Food.class);
         food.setRestaurantId(restaurantId);
 
-        // TODO default val
-        if (food.getName() == null || food.getDescription() == null || food.getPrice() == 0 || food.getSupply() == 0 || food.getKeywords() == null) {
+        if (food.getName() == null || food.getDescription() == null || food.getPrice() == null || food.getSupply() == null || food.getKeywords() == null) {
             HttpError.badRequest(exchange, "Missing required fields");
             return;
         }
@@ -382,12 +380,13 @@ public class RestaurantHandler implements HttpHandler {
         User user = userOpt.get();
 
         int orderId = Integer.parseInt(exchange.getRequestURI().getPath().split("/")[3]);
-        String status = objectMapper.readTree(exchange.getRequestBody()).get("status").asText();
-        // TODO need to check
-        if (status.equals("0")) {
-            HttpError.notFound(exchange, "Status not found");
+        JsonNode jsonNode = objectMapper.readTree(exchange.getRequestBody());
+        if (!jsonNode.hasNonNull("status")) {
+            HttpError.badRequest(exchange, "Missing required field: status");
             return;
         }
+
+        String status = jsonNode.get("status").asText();
 
         try {
             Optional<Order> optionalOrder = orderDAO.getById(orderId);
