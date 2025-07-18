@@ -103,7 +103,7 @@ public class AdminHandler implements HttpHandler {
                 return;
             }
 
-            userDAO.setConfirmed(userToUpdate.getId());
+            userDAO.makeConfirmed(userToUpdate.getId());
             JsonResponse.sendJsonResponse(exchange, 200, "{message: success}");
         } catch (SQLException e) {
             HttpError.internal(exchange, "Internal server error while updating profile");

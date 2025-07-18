@@ -28,5 +28,5 @@ public interface UserDAO {
 
     List<User> getAllUser() throws SQLException;
 
-    void setConfirmed(int id) throws SQLException;
+    void makeConfirmed(int id) throws SQLException;
 }
