@@ -5,7 +5,7 @@ import org.FRFood.util.Role;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 public class User {
-    private int id;
+    private Integer id;
     @JsonProperty("full_name")
     private String fullName;
     @JsonProperty("phone")
@@ -21,7 +21,7 @@ public class User {
     @JsonIgnore
     private boolean confirmed;
     @JsonIgnore
-    private int wallet;
+    private Integer wallet;
 
     public User(){};
 
@@ -44,7 +44,7 @@ public class User {
         return fullName;
     }
 
-    public int getId() {
+    public Integer getId() {
         return id;
     }
 
@@ -80,7 +80,7 @@ public class User {
         this.bank = bankAccount;
     }
 
-    public void setId(int id) {
+    public void setId(Integer id) {
         this.id = id;
     }
 
@@ -120,11 +120,11 @@ public class User {
         return confirmed;
     }
 
-    public int getWallet() {
+    public Integer getWallet() {
         return wallet;
     }
 
-    public void setWallet(int wallet) {
+    public void setWallet(Integer wallet) {
         this.wallet = wallet;
     }
 }

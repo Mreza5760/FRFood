@@ -4,12 +4,12 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 
 public class Menu {
     @JsonIgnore
-    private int id;
+    private Integer id;
     @JsonIgnore
     private Restaurant restaurant;
     private String title;
 
-    Menu(int id, User owner,Restaurant restaurant, String title) {
+    Menu(Integer id, User owner,Restaurant restaurant, String title) {
         this.id = id;
         this.restaurant = restaurant;
         this.title = title;
@@ -17,7 +17,7 @@ public class Menu {
 
     public Menu() {}
 
-    public int getId() {
+    public Integer getId() {
         return id;
     }
 
@@ -29,7 +29,7 @@ public class Menu {
         return title;
     }
 
-    public void setId(int id) {
+    public void setId(Integer id) {
         this.id = id;
     }
 

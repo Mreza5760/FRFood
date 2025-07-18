@@ -3,7 +3,7 @@ package org.FRFood.entity;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 public class BankAccount {
-    private int id;
+    private Integer id;
     @JsonProperty("bank_name")
     private String name;
     @JsonProperty("account_number")
@@ -16,7 +16,7 @@ public class BankAccount {
 
     public BankAccount() {}
 
-    public int getId() {
+    public Integer getId() {
         return id;
     }
 
@@ -32,7 +32,7 @@ public class BankAccount {
         this.accountNumber = accountNumber;
     }
 
-    public void setId(int id) {
+    public void setId(Integer id) {
         this.id = id;
     }
 

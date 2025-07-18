@@ -6,19 +6,19 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import java.util.List;
 
 public class Food {
-    private int id;
+    private Integer id;
     private String name;
     @JsonProperty("imageBase64")
     private String picture;
     private String description;
     @JsonProperty("vendor_id")
-    private int restaurantId;
-    private int price;
-    private int supply;
+    private Integer restaurantId;
+    private Integer price;
+    private Integer supply;
     private List<Keyword> keywords;
 
 
-    public Food(String name, int vendorId, String description, List<Keyword> keywords, int price,String picture){
+    public Food(String name, Integer vendorId, String description, List<Keyword> keywords, Integer price,String picture){
         this.setRestaurantId(vendorId);
         this.setName(name);
         this.setDescription(description);
@@ -37,7 +37,7 @@ public class Food {
         return description;
     }
 
-    public int getId() {
+    public Integer getId() {
         return id;
     }
 
@@ -53,7 +53,7 @@ public class Food {
         return keywords;
     }
 
-    public void setId(int id) {
+    public void setId(Integer id) {
         this.id = id;
     }
 
@@ -65,27 +65,27 @@ public class Food {
         this.description = description;
     }
 
-    public int getRestaurantId() {
+    public Integer getRestaurantId() {
         return restaurantId;
     }
 
-    public void setRestaurantId(int vendorId) {
+    public void setRestaurantId(Integer vendorId) {
         this.restaurantId = vendorId;
     }
 
-    public int getPrice() {
+    public Integer getPrice() {
         return price;
     }
 
-    public void setPrice(int price) {
+    public void setPrice(Integer price) {
         this.price = price;
     }
 
-    public int getSupply() {
+    public Integer getSupply() {
         return supply;
     }
 
-    public void setSupply(int supply) {
+    public void setSupply(Integer supply) {
         this.supply = supply;
     }
 

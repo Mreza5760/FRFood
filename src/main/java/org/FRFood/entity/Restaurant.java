@@ -4,7 +4,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 public class Restaurant {
-    private int id;
+    private Integer id;
     @JsonIgnore
     private User owner;
     private String name;
@@ -13,13 +13,13 @@ public class Restaurant {
     @JsonProperty("logoBase64")
     private String logo;
     @JsonProperty("tax_fee")
-    private int taxFee;
+    private Integer taxFee;
     @JsonProperty("additional_fee")
-    private int additionalFee;
+    private Integer additionalFee;
 
     public Restaurant() {}
 
-    public Restaurant(User owner, String name, String address, String phone, String logo, int taxFee, int additionalFee) {
+    public Restaurant(User owner, String name, String address, String phone, String logo, Integer taxFee, Integer additionalFee) {
         this.owner = owner;
         this.name = name;
         this.address = address;
@@ -29,7 +29,7 @@ public class Restaurant {
         this.additionalFee = additionalFee;
     }
 
-    public int getId() {
+    public Integer getId() {
         return id;
     }
 
@@ -37,11 +37,11 @@ public class Restaurant {
         return name;
     }
 
-    public int getAdditionalFee() {
+    public Integer getAdditionalFee() {
         return additionalFee;
     }
 
-    public int getTaxFee() {
+    public Integer getTaxFee() {
         return taxFee;
     }
 
@@ -65,11 +65,11 @@ public class Restaurant {
         this.name = name;
     }
 
-    public void setId(int id) {
+    public void setId(Integer id) {
         this.id = id;
     }
 
-    public void setAdditionalFee(int additionalFee) {
+    public void setAdditionalFee(Integer additionalFee) {
         this.additionalFee = additionalFee;
     }
 
@@ -89,7 +89,7 @@ public class Restaurant {
         this.phone = phone;
     }
 
-    public void setTaxFee(int taxFee) {
+    public void setTaxFee(Integer taxFee) {
         this.taxFee = taxFee;
     }
 }
