@@ -32,6 +32,7 @@ public class KeywordDAOImp implements KeywordDAO {
     public Optional<Keyword> getKeywordByName(String name) throws SQLException {
         String temp = "SELECT id, name FROM Keywords WHERE name = ?";
         Keyword keyword = null;
+
         try (Connection connection = DBConnector.gConnection();
              PreparedStatement statement = connection.prepareStatement(temp)) {
             statement.setString(1, name);
@@ -68,8 +69,6 @@ public class KeywordDAOImp implements KeywordDAO {
             } else {
                 throw new SQLException("Creating Keyword failed, no rows affected.");
             }
-        } catch (SQLException e) {
-            throw e;
         }
         return generatedId;
     }
@@ -78,6 +77,7 @@ public class KeywordDAOImp implements KeywordDAO {
     public List<Keyword> getKeywordsByFoodId(int foodId) throws SQLException {
         String temp = "SELECT * FROM FoodItem_Keywords WHERE food_item_id = ?";
         List<Keyword> keywords = new ArrayList<>();
+
         try(
                 Connection connection = DBConnector.gConnection();
                 PreparedStatement statement = connection.prepareStatement(temp)
@@ -86,10 +86,9 @@ public class KeywordDAOImp implements KeywordDAO {
             try (ResultSet result = statement.executeQuery()) {
                 while (result.next()) {
                     Keyword keyword = new Keyword();
-                    if(getKeywordById(result.getInt("id")).isEmpty()){
-                        //error
-                        return null;
-                    }else{
+                    if (getKeywordById(result.getInt("id")).isEmpty()) {
+                        throw new SQLException("No Keyword found with id " + result.getInt("id"));
+                    } else {
                         keyword = getKeywordById(result.getInt("id")).get();
                     }
                     keywords.add(keyword);
