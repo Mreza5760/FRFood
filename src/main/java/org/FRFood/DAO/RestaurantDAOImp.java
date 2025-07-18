@@ -163,7 +163,21 @@ public class RestaurantDAOImp implements RestaurantDAO {
 
     @Override
     public List<Food> getMenuFood(int restaurantId, int menuId) throws SQLException {
-        return List.of();
+        List<Food> foods = new ArrayList<>();
+        String sql = "SELECT * FROM fooditem_menus WHERE menu_id = ?";
+        try(
+                Connection connection = DBConnector.gConnection();
+                PreparedStatement preparedStatement = connection.prepareStatement(sql);
+                ){
+            preparedStatement.setInt(1, menuId);
+            try(ResultSet rs = preparedStatement.executeQuery()) {
+                while (rs.next()) {
+                    FoodDAO foodDAO = new FoodDAOImp();
+                    foods.add(foodDAO.getById(rs.getInt("food_item_id")).orElse(null));
+                }
+            }
+        }
+        return foods;
     }
 
     @Override
