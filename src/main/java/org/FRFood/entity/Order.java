@@ -1,12 +1,10 @@
 package org.FRFood.entity;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import org.FRFood.util.Status;
 import org.FRFood.DTO.OrderItemDTO;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-import java.util.ArrayList;
 import java.util.List;
 
 @JsonPropertyOrder({
@@ -36,8 +34,7 @@ public class Order {
     private Integer restaurantId;
     @JsonProperty("coupon_id")
     private Integer couponId;
-    @JsonIgnore
-    private List<OrderItemDTO> items;
+    private List<OrderItem> items;
     @JsonProperty("raw_price")
     private Integer rawPrice;
     @JsonProperty("tax_fee")
@@ -69,9 +66,6 @@ public class Order {
 
     public String getDeliveryAddress() { return deliveryAddress; }
     public void setDeliveryAddress(String deliveryAddress) { this.deliveryAddress = deliveryAddress; }
-
-    public List<OrderItemDTO> getItems() { return items; }
-    public void setItems(List<OrderItemDTO> items) { this.items = items; }
 
     public Integer getCustomerId() {
         return customerId;
@@ -153,12 +147,11 @@ public class Order {
         this.updatedAt = updatedAt;
     }
 
-    @JsonProperty("item_ids")
-    public List<Integer> getItemIds() {
-        List<Integer> itemIds = new ArrayList<>();
-        for(OrderItemDTO item : items){
-            itemIds.add(item.getItemId());
-        }
-        return itemIds;
+    public List<OrderItem> getItems() {
+        return items;
+    }
+
+    public void setItems(List<OrderItem> items) {
+        this.items = items;
     }
 }

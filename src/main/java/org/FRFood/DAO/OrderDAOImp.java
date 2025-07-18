@@ -11,7 +11,7 @@ import java.util.Optional;
 
 public class OrderDAOImp implements OrderDAO {
     @Override
-    public int insert(OrderInputDTO order) throws SQLException {
+    public int insert(Order order) throws SQLException {
         int orderId = -1;
         String sql = "INSERT INTO orders (customer_id, restaurant_id, courier_id, coupon_id, delivery_address, raw_price, tax_fee, courier_fee, pay_price, status) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
         try (
