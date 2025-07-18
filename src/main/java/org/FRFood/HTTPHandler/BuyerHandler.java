@@ -193,7 +193,6 @@ public class BuyerHandler implements HttpHandler {
         }
     }
 
-    // TODO
     private void handleSubmitOrder(HttpExchange exchange) throws IOException {
         var userOpt = Authenticate.authenticate(exchange);
         if (userOpt.isEmpty()) return;
@@ -217,6 +216,8 @@ public class BuyerHandler implements HttpHandler {
                 HttpError.notFound(exchange, "Restaurant not found");
                 return;
             }
+            Restaurant restaurant = optionalRestaurant.get();
+            int rawPrice = 0;
             for (OrderItem orderItem : order.getItems()) {
                 Optional<Food> optionalFood = foodDAO.getById(orderItem.getItemId());
                 if (optionalFood.isEmpty()) {
@@ -228,8 +229,13 @@ public class BuyerHandler implements HttpHandler {
                     HttpError.unauthorized(exchange, "This food is not in the restaurant");
                     return;
                 }
+                rawPrice += food.getPrice();
             }
 
+            order.setRawPrice(rawPrice);
+            order.setAdditionalFee(restaurant.getAdditionalFee());
+            order.setTaxFee((restaurant.getTaxFee()/100)*rawPrice);
+            order.setPayPrice(rawPrice + restaurant.getAdditionalFee() +  ((restaurant.getTaxFee()/100)*rawPrice));
             order.setCustomerId(user.getId());
             order.setId(orderDAO.insert(order));
             order = orderDAO.getById(order.getId()).orElse(null);

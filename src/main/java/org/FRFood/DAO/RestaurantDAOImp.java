@@ -162,6 +162,11 @@ public class RestaurantDAOImp implements RestaurantDAO {
     }
 
     @Override
+    public List<Food> getMenuFood(int restaurantId, int menuId) throws SQLException {
+        return List.of();
+    }
+
+    @Override
     public void Update(Restaurant restaurant) throws SQLException {
         String sql = "UPDATE restaurants SET name=? ,address=?, phone=? , logo=? , tax_fee=? , additional_fee=? WHERE id = ?";
         try (

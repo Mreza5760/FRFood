@@ -16,6 +16,7 @@ import java.util.List;
 import java.util.Optional;
 
 import static org.FRFood.util.Authenticate.authenticate;
+import static org.FRFood.util.TransactionMethod.wallet;
 
 public class OrderHandler implements HttpHandler {
     private final UserDAO userDAO;
@@ -84,7 +85,6 @@ public class OrderHandler implements HttpHandler {
         }
 
         try {
-            // TODO need to check
             Transaction transaction = new Transaction();
             transaction.setAmount(amount);
             transaction.setUserID(user.getId());
@@ -103,13 +103,21 @@ public class OrderHandler implements HttpHandler {
         Transaction transaction = objectMapper.readValue(exchange.getRequestBody(), Transaction.class);
 
         try {
-            // TODO need to check
             Optional<Order> orderOptional = orderDAO.getById(transaction.getOrderID());
             if (orderOptional.isEmpty()) {
                 HttpError.notFound(exchange, "Status not found");
                 return;
             }
             Order order = orderOptional.get();
+            if (transaction.getMethod().equals(wallet)) {
+                if (user.getWallet() < transaction.getAmount()) {
+                    HttpError.unauthorized(exchange, "Not enough money");
+                    return;
+                } else {
+                    user.setWallet(user.getWallet() - transaction.getAmount());
+                }
+            }
+
             transaction.setUserID(user.getId());
             transaction.setAmount(order.getPayPrice());
             transaction.setId(transactionDAO.insert(transaction));

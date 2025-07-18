@@ -5,6 +5,7 @@ import org.FRFood.util.*;
 import org.FRFood.entity.*;
 
 import static org.FRFood.util.Role.*;
+import static org.FRFood.util.Validation.validatePhone;
 import static org.FRFood.util.Validation.validatePhoneNumber;
 
 import java.util.List;
@@ -45,6 +46,8 @@ public class RestaurantHandler implements HttpHandler {
                 case "GET" -> {
                     if (path.equals("/restaurants/mine")) myRestaurants(exchange);
                     else if (path.matches("^/\\d+/orders$")) getOrders(exchange);
+                    else if (path.matches("^/\\d+/items/[^/]+$")) getMenuItems(exchange);
+                    else if (path.matches("^/\\d+/menu/[^/]+$")) getItemsOutOfMenu(exchange);
                 }
                 case "PUT" -> {
                     if (path.matches("^/restaurants/\\d+$")) handleUpdateRestaurants(exchange);
@@ -84,7 +87,7 @@ public class RestaurantHandler implements HttpHandler {
                 return;
             }
 
-            if (!validatePhoneNumber(restaurant.getPhone())) {
+            if (!validatePhone(restaurant.getPhone())) {
                 HttpError.unsupported(exchange, "Invalid phone number");
                 return;
             }
@@ -132,12 +135,12 @@ public class RestaurantHandler implements HttpHandler {
         try {
             var restaurantOpt = Authenticate.restaurantChecker(exchange, user, restaurantId);
             if (restaurantOpt.isEmpty()) return;
-            Restaurant restaurant = restaurantOpt.get();
 
             Restaurant updated = objectMapper.readValue(exchange.getRequestBody(), Restaurant.class);
             updated.setId(restaurantId);
-            if (!Validation.validatePhoneNumber(updated.getPhone())) {
+            if (!Validation.validatePhone(updated.getPhone())) {
                 HttpError.badRequest(exchange, "Invalid phone number");
+                return;
             }
             restaurantDAO.Update(updated);
             JsonResponse.sendJsonResponse(exchange, 200, objectMapper.writeValueAsString(updated));
@@ -424,6 +427,56 @@ public class RestaurantHandler implements HttpHandler {
 
             orderDAO.changeStatus(orderId, status);
             JsonResponse.sendJsonResponse(exchange, 200, "{\"message\":\"Order status updated\"}");
+        } catch (SQLException e) {
+            HttpError.internal(exchange, "Failed to update order status");
+        }
+    }
+
+    private void getMenuItems(HttpExchange exchange) throws IOException {
+        var userOpt = Authenticate.authenticate(exchange);
+        if (userOpt.isEmpty()) return;
+        User user = userOpt.get();
+        String title = exchange.getRequestURI().getPath().split("/")[4];
+        int restaurantId = Integer.parseInt(exchange.getRequestURI().getPath().split("/")[2]);
+        try {
+            Optional<Restaurant> optionalRestaurant = Authenticate.restaurantChecker(exchange, user, restaurantId);
+            if (optionalRestaurant.isEmpty()) return;
+            Optional<Menu> optionalMenu = restaurantDAO.getMenuByTitle(title, restaurantId);
+            if (optionalMenu.isEmpty()) {
+                HttpError.notFound(exchange, "Menu title not found");
+                return;
+            }
+            Menu menu = optionalMenu.get();
+
+            List<Food> menuFoods = restaurantDAO.getMenuFood(restaurantId, menu.getId());
+            String json =  objectMapper.writeValueAsString(menuFoods);
+            JsonResponse.sendJsonResponse(exchange, 200, json);
+        } catch (SQLException e) {
+            HttpError.internal(exchange, "Failed to update order status");
+        }
+    }
+
+    private void getItemsOutOfMenu(HttpExchange exchange) throws IOException {
+        var userOpt = Authenticate.authenticate(exchange);
+        if (userOpt.isEmpty()) return;
+        User user = userOpt.get();
+        String title = exchange.getRequestURI().getPath().split("/")[4];
+        int restaurantId = Integer.parseInt(exchange.getRequestURI().getPath().split("/")[2]);
+        try {
+            Optional<Restaurant> optionalRestaurant = Authenticate.restaurantChecker(exchange, user, restaurantId);
+            if (optionalRestaurant.isEmpty()) return;
+            Optional<Menu> optionalMenu = restaurantDAO.getMenuByTitle(title, restaurantId);
+            if (optionalMenu.isEmpty()) {
+                HttpError.notFound(exchange, "Menu title not found");
+                return;
+            }
+            Menu menu = optionalMenu.get();
+
+            List<Food> allFoods = restaurantDAO.getFoods(restaurantId);
+            List<Food> menuFoods = restaurantDAO.getMenuFood(restaurantId, menu.getId());
+            allFoods.removeIf(menuFoods::contains);
+            String json =  objectMapper.writeValueAsString(allFoods);
+            JsonResponse.sendJsonResponse(exchange, 200, json);
         } catch (SQLException e) {
             HttpError.internal(exchange, "Failed to update order status");
         }

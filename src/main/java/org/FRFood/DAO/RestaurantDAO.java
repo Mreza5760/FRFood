@@ -13,6 +13,8 @@ public interface RestaurantDAO {
 
     List<Food> getFoods(int id) throws SQLException;
 
+    List<Food> getMenuFood(int restaurantId, int menuId) throws SQLException;
+
     List<Menu> getMenus(int id) throws SQLException;
 
     Optional<Restaurant> getById(int id) throws SQLException;
