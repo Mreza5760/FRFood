@@ -47,12 +47,13 @@ public class RestaurantHandler implements HttpHandler {
                     else if (path.matches("^/\\d+/orders$")) getOrders(exchange);
                 }
                 case "PUT" -> {
-                    if (path.matches("^/\\d+$")) handleUpdateRestaurants(exchange);
+                    if (path.matches("^/restaurants/\\d+$")) handleUpdateRestaurants(exchange);
                     else if (path.matches("^/\\d+/item/\\d+$")) editItem(exchange);
                     else if (path.matches("^/\\d+/menu/[^/]+$")) addItemToMenu(exchange);
                 }
                 case "DELETE" -> {
-                    if (path.matches("^/\\d+/item/\\d+$")) deleteItem(exchange);
+                    if (path.matches("^/restaurants/\\d+$")) deleteRestaurant(exchange);
+                    else if (path.matches("^/\\d+/item/\\d+$")) deleteItem(exchange);
                     else if (path.matches("^/\\d+/menu/[^/]+$")) deleteMenu(exchange);
                     else if (path.matches("^/\\d+/menu/[^/]+/\\d+$")) deleteItemFromMenu(exchange);
                 }
@@ -135,10 +136,32 @@ public class RestaurantHandler implements HttpHandler {
 
             Restaurant updated = objectMapper.readValue(exchange.getRequestBody(), Restaurant.class);
             updated.setId(restaurantId);
+            if (!Validation.validatePhoneNumber(updated.getPhone())) {
+                HttpError.badRequest(exchange, "Invalid phone number");
+            }
             restaurantDAO.Update(updated);
             JsonResponse.sendJsonResponse(exchange, 200, objectMapper.writeValueAsString(updated));
         } catch (Exception e) {
-            HttpError.internal(exchange, "Failed to update restaurant");
+            HttpError.internal(exchange, "Failed to update restaurant" + e.getMessage());
+        }
+    }
+
+    private void deleteRestaurant(HttpExchange exchange) throws IOException {
+        var userOpt = Authenticate.authenticate(exchange);
+        if (userOpt.isEmpty()) return;
+        User user = userOpt.get();
+        String[] parts = exchange.getRequestURI().getPath().split("/");
+        int restaurantId = Integer.parseInt(parts[2]);
+
+        if (!user.getRole().equals(seller)) {
+            HttpError.unauthorized(exchange, "Only sellers can delete restaurants");
+            return;
+        }
+        try {
+            restaurantDAO.DeleteById(restaurantId);
+            JsonResponse.sendJsonResponse(exchange, 200, "success");
+        } catch (Exception e) {
+            HttpError.internal(exchange, "Failed to delete restaurant");
         }
     }
 
@@ -267,7 +290,7 @@ public class RestaurantHandler implements HttpHandler {
         String menuTitle = parts[4];
 
         try {
-            var  restaurantOpt = Authenticate.restaurantChecker(exchange, user, restaurantId);
+            var restaurantOpt = Authenticate.restaurantChecker(exchange, user, restaurantId);
             if (restaurantOpt.isEmpty()) return;
 
             if (restaurantDAO.getMenuByTitle(menuTitle, restaurantId).isEmpty()) {
@@ -363,7 +386,7 @@ public class RestaurantHandler implements HttpHandler {
         int restaurantId = Integer.parseInt(exchange.getRequestURI().getPath().split("/")[2]);
 
         try {
-            var  restaurantOpt = Authenticate.restaurantChecker(exchange, user, restaurantId);
+            var restaurantOpt = Authenticate.restaurantChecker(exchange, user, restaurantId);
             if (restaurantOpt.isEmpty()) return;
 
             List<Order> orders = orderDAO.getRestaurantOrders(restaurantId);

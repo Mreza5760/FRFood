@@ -4,13 +4,18 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
+import javafx.scene.Node;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.*;
+import javafx.stage.Stage;
 import org.FRFood.entity.Restaurant;
 import org.FRFood.frontEnd.Util.SceneNavigator;
 import org.FRFood.frontEnd.Util.SessionManager;
@@ -20,7 +25,9 @@ import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
+import java.time.ZoneId;
 import java.util.Base64;
+import java.util.EventObject;
 import java.util.List;
 
 public class MyRestaurantsController {
@@ -108,7 +115,8 @@ public class MyRestaurantsController {
 
         info.getChildren().addAll(nameLabel, addressLabel, phoneLabel, feeLabel);
 
-
+        Region spacer = new Region();
+        HBox.setHgrow(spacer, Priority.ALWAYS);
         // Update Button
         Button updateBtn = new Button("Update");
         updateBtn.setPrefWidth(100);
@@ -123,12 +131,24 @@ public class MyRestaurantsController {
                 """);
         updateBtn.setOnAction(e -> handleUpdate(r));
 
-        Region spacer = new Region();
-        HBox.setHgrow(spacer, Priority.ALWAYS);
+// Delete Button
+        Button deleteBtn = new Button("Delete");
+        deleteBtn.setPrefWidth(100);
+        deleteBtn.setPrefHeight(36);
+        deleteBtn.setStyle("""
+                    -fx-background-color: #ff4444;
+                    -fx-text-fill: white;
+                    -fx-font-size: 14px;
+                    -fx-font-weight: bold;
+                    -fx-background-radius: 10;
+                    -fx-cursor: hand;
+                """);
+        deleteBtn.setOnAction(e -> handleDelete(r));
 
-        // Wrap update button
-        VBox rightBox = new VBox(updateBtn);
+// Add both buttons to VBox
+        HBox rightBox = new HBox(10, updateBtn, deleteBtn);
         rightBox.setAlignment(Pos.CENTER_RIGHT);
+
 
         card.setOnMouseClicked(e -> handleClick(r)); // full card click
 
@@ -142,12 +162,62 @@ public class MyRestaurantsController {
     }
 
     private void handleUpdate(Restaurant r) {
-        System.out.println("Update restaurant: " + r.getName());
-        // Open update screen here
+        FXMLLoader loader = new FXMLLoader(getClass().getResource("/frontend/updateRestaurant.fxml"));
+        try {
+            Parent root = loader.load();
+
+            UpdateRestaurantController controller = loader.getController();
+
+            controller.setRestaurantData(
+                    r.getId(),
+                    r.getName(),
+                    r.getAddress(),
+                    r.getPhone(),
+                    r.getTaxFee(),
+                    r.getAdditionalFee(),
+                    r.getLogo()
+            );
+
+            Stage stage = (Stage) restaurantList.getScene().getWindow();
+            double currentWidth = stage.getWidth();
+            double currentHeight = stage.getHeight();
+            stage.setScene(new Scene(root));
+            stage.setWidth(currentWidth);
+            stage.setHeight(currentHeight);
+            stage.show();
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+        }
+
     }
 
     @FXML
     private void goBack() {
         SceneNavigator.switchTo("/frontend/panel.fxml", restaurantList);
+    }
+
+    private void handleDelete(Restaurant r) {
+        String url = "http://localhost:8080/restaurants/" + r.getId();
+
+        HttpRequest request = HttpRequest.newBuilder()
+                .uri(URI.create(url))
+                .header("Authorization", "Bearer " + SessionManager.getAuthToken())
+                .DELETE()
+                .build();
+
+        HttpClient.newHttpClient().sendAsync(request, HttpResponse.BodyHandlers.ofString())
+                .thenAccept(response -> {
+                    if (response.statusCode() == 200 || response.statusCode() == 204) {
+                        System.out.println("Deleted restaurant: " + r.getName());
+                        // Optionally refresh the list on UI thread
+                        Platform.runLater(this::fetchRestaurants);
+                    } else {
+                        System.err.println("Failed to delete restaurant: HTTP " + response.statusCode());
+                    }
+                })
+                .exceptionally(e -> {
+                    e.printStackTrace();
+                    return null;
+                });
     }
 }

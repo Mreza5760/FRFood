@@ -78,6 +78,9 @@ public class RestaurantDAOImp implements RestaurantDAO {
                     restaurant.setLogo(rs.getString("logo"));
                     restaurant.setTaxFee(rs.getInt("tax_fee"));
                     restaurant.setAdditionalFee(rs.getInt("additional_fee"));
+                    int ownerId = rs.getInt("owner_id");
+                    UserDAO userDAO = new UserDAOImp();
+                    restaurant.setOwner(userDAO.getById(ownerId).orElse(null));
                     return Optional.of(restaurant);
                 }
             }
@@ -160,21 +163,18 @@ public class RestaurantDAOImp implements RestaurantDAO {
 
     @Override
     public void Update(Restaurant restaurant) throws SQLException {
-        String sql = "INSERT INTO restaurants (id,owner_id , name , address , phone , logo , tax_fee , additional_fee) VALUES (?,?,?,?,?,?,?,?)";
+        String sql = "UPDATE restaurants SET name=? ,address=?, phone=? , logo=? , tax_fee=? , additional_fee=? WHERE id = ?";
         try (
                 Connection connection = DBConnector.gConnection();
                 PreparedStatement preparedStatement = connection.prepareStatement(sql);
         ) {
-            preparedStatement.setInt(1, restaurant.getId());
-            preparedStatement.setInt(2, restaurant.getOwner().getId());
-            preparedStatement.setString(3, restaurant.getName());
-            preparedStatement.setString(4, restaurant.getAddress());
-            preparedStatement.setString(5, restaurant.getPhone());
-            preparedStatement.setString(6, restaurant.getLogo());
-            preparedStatement.setInt(7, restaurant.getTaxFee());
-            preparedStatement.setInt(8, restaurant.getAdditionalFee());
-
-            DeleteById(restaurant.getId());
+            preparedStatement.setInt(7, restaurant.getId());
+            preparedStatement.setString(1, restaurant.getName());
+            preparedStatement.setString(2, restaurant.getAddress());
+            preparedStatement.setString(3, restaurant.getPhone());
+            preparedStatement.setString(4, restaurant.getLogo());
+            preparedStatement.setInt(5, restaurant.getTaxFee());
+            preparedStatement.setInt(6, restaurant.getAdditionalFee());
             int rows = preparedStatement.executeUpdate();
             if (rows == 0) {
                 throw new SQLException("Insert failed, no rows affected.");
