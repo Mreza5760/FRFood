@@ -15,7 +15,7 @@ public class App extends Application {
         Logger logger = Logger.getLogger("javafx.scene.CssStyleHelper");
         logger.setLevel(Level.SEVERE);
         FXMLLoader loader = new FXMLLoader(getClass().getResource("/frontEnd/home.fxml"));
-        Scene scene = new Scene(loader.load(), 400, 500);
+        Scene scene = new Scene(loader.load(), 900, 820);
 
         primaryStage.setTitle("Sign Up");
         primaryStage.setScene(scene);

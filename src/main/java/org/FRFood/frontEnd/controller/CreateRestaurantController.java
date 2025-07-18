@@ -9,6 +9,7 @@ import java.nio.file.Files;
 import java.util.Base64;
 import javafx.application.Platform;
 import org.FRFood.entity.Restaurant;
+import org.FRFood.frontEnd.Util.SceneNavigator;
 import org.FRFood.frontEnd.Util.SessionManager;
 
 import java.net.HttpURLConnection;
@@ -104,5 +105,9 @@ public class CreateRestaurantController {
         } catch (NumberFormatException e) {
             return 0;
         }
+    }
+    @FXML
+    private void goBack() {
+        SceneNavigator.switchTo("/resources/panel",nameField); // or "Panel" if you want
     }
 }

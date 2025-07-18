@@ -29,7 +29,7 @@
 
     <Button text="Change Picture" onAction="#handleChangePicture"
             prefWidth="140" prefHeight="36"
-            style="-fx-background-color: #0077cc; -fx-text-fill: white; -fx-font-weight: bold; -fx-background-radius: 8;"
+            style="-fx-background-color: #0077cc; -fx-text-fill: white; -fx-font-weight: bold; -fx-background-radius: 8; fx-cursor: hand;"
     />
 
     <GridPane hgap="15" vgap="15" maxWidth="500">
@@ -66,10 +66,10 @@
     <HBox spacing="25" alignment="CENTER" maxWidth="500" >
         <Button text="Cancel" onAction="#handleCancel"
                 prefWidth="120" prefHeight="40"
-                style="-fx-background-color: #999999; -fx-text-fill: white; -fx-font-weight: bold; -fx-background-radius: 8;"/>
+                style="-fx-background-color: #999999; -fx-text-fill: white; -fx-font-weight: bold; -fx-background-radius: 8; fx-cursor: hand;"/>
         <Button text="Save Changes" onAction="#handleSaveChanges"
                 prefWidth="140" prefHeight="40"
-                style="-fx-background-color: #00aa88; -fx-text-fill: white; -fx-font-weight: bold; -fx-background-radius: 8;"/>
+                style="-fx-background-color: #00aa88; -fx-text-fill: white; -fx-font-weight: bold; -fx-background-radius: 8; fx-cursor: hand;"/>
     </HBox>
 
 </VBox>

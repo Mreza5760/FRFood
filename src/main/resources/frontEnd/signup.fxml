@@ -43,7 +43,7 @@
                style="-fx-text-fill: red; -fx-font-size: 13px;"/>
 
         <Button text="Sign Up"
-                style="-fx-background-color: #0077cc; -fx-text-fill: white; -fx-font-size: 15px; -fx-font-weight: bold; -fx-background-radius: 10; -fx-padding: 10 30;"
+                style="-fx-background-color: #0077cc; -fx-text-fill: white; -fx-font-size: 15px; -fx-font-weight: bold; -fx-background-radius: 10; -fx-padding: 10 30; fx-cursor: hand;"
                 onAction="#handleRegister"/>
 
         <Hyperlink text="Already have an account? Log in"
