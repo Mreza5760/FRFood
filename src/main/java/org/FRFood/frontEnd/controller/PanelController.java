@@ -45,8 +45,13 @@ public class PanelController {
         logoutButton.setOnAction(e -> handleLogout());
         orderFoodButton.setOnAction(e -> handleOrders());
         addRestaurantButton.setOnAction(e -> handleCreateRestaurant());
+        restaurantButton.setOnAction(e -> handleRestaurants());
         walletButton.setOnAction(e -> handleWallet());
         profileButton.setOnAction(e -> handleProfile());
+    }
+
+    private void handleRestaurants() {
+        SceneNavigator.switchTo("/frontend/MyRestaurants.fxml",restaurantButton);
     }
 
     private void setRoleBasedButtons() {

@@ -14,6 +14,10 @@
     <padding>
         <Insets top="50" right="60" bottom="50" left="60"/>
     </padding>
+    <Button fx:id="backButton" text="⬅ Back"
+            onAction="#goBack"
+            style="-fx-background-color: #cc4444; -fx-text-fill: white; -fx-font-size: 14px; -fx-font-weight: bold; -fx-background-radius: 8;"
+            prefWidth="100" prefHeight="36"/>
 
     <Label text="🏪 Create a New Restaurant"
            style="-fx-font-size: 30px; -fx-font-weight: bold; -fx-text-fill: #1e2a38;"/>

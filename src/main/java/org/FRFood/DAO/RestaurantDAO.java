@@ -29,5 +29,5 @@ public interface RestaurantDAO {
 
     Optional<Menu> getMenuByTitle(String title, int restaurantId) throws SQLException;
 
-    Optional<Restaurant> getByOwnerId(int ownerId) throws SQLException;
+    List<Restaurant> getByOwnerId(int ownerId) throws SQLException;
 }

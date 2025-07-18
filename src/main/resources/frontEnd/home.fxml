@@ -25,16 +25,16 @@
         <Button fx:id="loginButton" text="Log In"
                 onAction="#goToLogin"
                 prefWidth="120" prefHeight="40"
-                style="-fx-background-color: #0077cc; -fx-text-fill: white; -fx-font-size: 14px; -fx-font-weight: bold; -fx-background-radius: 8;"/>
+                style="-fx-background-color: #0077cc; -fx-text-fill: white; -fx-font-size: 14px; -fx-font-weight: bold; -fx-background-radius: 8; fx-cursor: hand;"/>
 
         <Button fx:id="signupButton" text="Sign Up"
                 onAction="#goToSignup"
                 prefWidth="120" prefHeight="40"
-                style="-fx-background-color: #00aa88; -fx-text-fill: white; -fx-font-size: 14px; -fx-font-weight: bold; -fx-background-radius: 8;"/>
+                style="-fx-background-color: #00aa88; -fx-text-fill: white; -fx-font-size: 14px; -fx-font-weight: bold; -fx-background-radius: 8; fx-cursor: hand;"/>
 
         <Button fx:id="panelButton" text="Go to Panel"
                 onAction="#goToPanel"
                 prefWidth="140" prefHeight="40"
-                style="-fx-background-color: #444444; -fx-text-fill: white; -fx-font-size: 14px; -fx-font-weight: bold; -fx-background-radius: 8;"/>
+                style="-fx-background-color: #444444; -fx-text-fill: white; -fx-font-size: 14px; -fx-font-weight: bold; -fx-background-radius: 8; fx-cursor: hand;"/>
     </HBox>
 </VBox>

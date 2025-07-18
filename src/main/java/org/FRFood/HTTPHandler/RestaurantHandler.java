@@ -107,9 +107,8 @@ public class RestaurantHandler implements HttpHandler {
         }
 
         try {
-            if (restaurantDAO.getByOwnerId(user.getId()).isPresent()) {
-                Restaurant restaurant = restaurantDAO.getByOwnerId(user.getId()).get();
-                JsonResponse.sendJsonResponse(exchange, 200, objectMapper.writeValueAsString(restaurant));
+            if (!restaurantDAO.getByOwnerId(user.getId()).isEmpty()) {
+                JsonResponse.sendJsonResponse(exchange, 200, objectMapper.writeValueAsString(restaurantDAO.getByOwnerId(user.getId())));
             } else
                 HttpError.badRequest(exchange, "Own no restaurant");
         } catch (SQLException e) {

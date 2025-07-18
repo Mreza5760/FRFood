@@ -8,7 +8,11 @@ import org.FRFood.entity.Restaurant;
 import org.FRFood.util.HttpError;
 import org.FRFood.util.JsonResponse;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.sql.*;
+import java.util.Base64;
 import java.util.List;
 import java.util.Optional;
 import java.util.ArrayList;
@@ -25,7 +29,13 @@ public class RestaurantDAOImp implements RestaurantDAO {
             preparedStatement.setString(2, restaurant.getName());
             preparedStatement.setString(3, restaurant.getAddress());
             preparedStatement.setString(4, restaurant.getPhone());
-            preparedStatement.setString(5, restaurant.getLogo());
+            if (restaurant.getLogo() != null && !restaurant.getLogo().isEmpty()) {
+                preparedStatement.setString(5, restaurant.getLogo());
+            } else {
+                byte[] fileContent = Files.readAllBytes(Paths.get("src/main/resources/imageUrls/img.png"));
+                String base64String = Base64.getEncoder().encodeToString(fileContent);
+                preparedStatement.setString(5, base64String);
+            }
             preparedStatement.setInt(6, restaurant.getTaxFee());
             preparedStatement.setInt(7, restaurant.getAdditionalFee());
 
@@ -43,6 +53,9 @@ public class RestaurantDAOImp implements RestaurantDAO {
             }
         } catch (SQLException e) {
             System.out.println(e.getMessage());
+        } catch (IOException e) {
+            System.out.println(e.getMessage());
+            throw new RuntimeException(e);
         }
         return -1;
     }
@@ -223,7 +236,7 @@ public class RestaurantDAOImp implements RestaurantDAO {
         try (
                 Connection connection = DBConnector.gConnection();
                 PreparedStatement preparedStatement = connection.prepareStatement(sql);
-        ){
+        ) {
             preparedStatement.setInt(1, restaurantId);
             preparedStatement.setString(2, title);
             int rows = preparedStatement.executeUpdate();
@@ -237,10 +250,10 @@ public class RestaurantDAOImp implements RestaurantDAO {
     public Optional<Menu> getMenuByTitle(String title, int restaurantId) throws SQLException {
         String sql = "SELECT * FROM menus WHERE restaurant_id = ? AND title = ?";
         Menu menu = new Menu();
-        try(
+        try (
                 Connection connection = DBConnector.gConnection();
                 PreparedStatement preparedStatement = connection.prepareStatement(sql);
-                ){
+        ) {
             preparedStatement.setInt(1, restaurantId);
             preparedStatement.setString(2, title);
             ResultSet rs = preparedStatement.executeQuery();
@@ -254,8 +267,8 @@ public class RestaurantDAOImp implements RestaurantDAO {
     }
 
     @Override
-    public Optional<Restaurant> getByOwnerId(int ownerId) throws SQLException {
-        Restaurant restaurant = null;
+    public List<Restaurant> getByOwnerId(int ownerId) throws SQLException {
+        List<Restaurant> restaurants = new ArrayList<>();
         String query = "SELECT * FROM Restaurants WHERE owner_id = ?";
         try (Connection conn = DBConnector.gConnection();
              PreparedStatement stmt = conn.prepareStatement(query)) {
@@ -263,8 +276,10 @@ public class RestaurantDAOImp implements RestaurantDAO {
             stmt.setInt(1, ownerId);
             ResultSet rs = stmt.executeQuery();
 
-            if (rs.next()) {
-                restaurant = new Restaurant(new User(),
+            boolean found = false;
+
+            while (rs.next()) {
+                Restaurant restaurant = new Restaurant(new User(),
                         rs.getString("name"),
                         rs.getString("address"),
                         rs.getString("phone"),
@@ -272,10 +287,13 @@ public class RestaurantDAOImp implements RestaurantDAO {
                         rs.getInt("tax_fee"),
                         rs.getInt("additional_fee"));
                 restaurant.setId(rs.getInt("id"));
-            } else {
+                restaurants.add(restaurant);
+                found = true;
+            }
+            if (!found) {
                 throw new SQLException("Restaurant not found.");
             }
         }
-        return Optional.of(restaurant);
+        return restaurants;
     }
 }
