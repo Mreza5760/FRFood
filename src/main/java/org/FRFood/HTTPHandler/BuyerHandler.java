@@ -3,7 +3,7 @@ package org.FRFood.HTTPHandler;
 import org.FRFood.DAO.*;
 import org.FRFood.util.*;
 import org.FRFood.entity.*;
-import org.FRFood.DTO.OrderInputDTO;
+
 import static org.FRFood.util.Role.*;
 import org.FRFood.util.BuyerReq.ItemsReq;
 import com.sun.net.httpserver.HttpHandler;
@@ -12,7 +12,6 @@ import com.sun.net.httpserver.HttpExchange;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import static org.FRFood.util.Authenticate.authenticate;
 
-import java.net.http.HttpRequest;
 import java.util.List;
 import java.util.Optional;
 import java.io.IOException;
@@ -206,7 +205,7 @@ public class BuyerHandler implements HttpHandler {
 
         OrderInputDTO orderDTO = objectMapper.readValue(exchange.getRequestBody(), OrderInputDTO.class);
 
-        if (orderDTO.getDeliveryAddress() == null || orderDTO.getRestaurantId() == 0 || orderDTO.getItems() == null) {
+        if (orderDTO.getDeliveryAddress() == null || orderDTO.getRestaurantId() == null || orderDTO.getItems() == null) {
             HttpError.badRequest(exchange, "Missing required fields");
             return;
         }

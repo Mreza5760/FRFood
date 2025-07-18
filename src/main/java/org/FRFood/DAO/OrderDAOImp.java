@@ -1,6 +1,5 @@
 package org.FRFood.DAO;
 
-import org.FRFood.DTO.OrderInputDTO;
 import org.FRFood.entity.Order;
 import org.FRFood.util.DBConnector;
 import org.FRFood.util.Status;
