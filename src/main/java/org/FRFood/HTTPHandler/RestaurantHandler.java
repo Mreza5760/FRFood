@@ -152,12 +152,13 @@ public class RestaurantHandler implements HttpHandler {
         User user = userOpt.get();
         String[] parts = exchange.getRequestURI().getPath().split("/");
         int restaurantId = Integer.parseInt(parts[2]);
-
         if (!user.getRole().equals(seller)) {
             HttpError.unauthorized(exchange, "Only sellers can delete restaurants");
             return;
         }
+
         try {
+            Authenticate.restaurantChecker(exchange, user, restaurantId);
             restaurantDAO.DeleteById(restaurantId);
             JsonResponse.sendJsonResponse(exchange, 200, "success");
         } catch (Exception e) {
