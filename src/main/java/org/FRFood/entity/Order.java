@@ -2,7 +2,6 @@ package org.FRFood.entity;
 
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import org.FRFood.util.Status;
-import org.FRFood.DTO.OrderItemDTO;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import java.util.List;

@@ -17,7 +17,7 @@ public class App extends Application {
         FXMLLoader loader = new FXMLLoader(getClass().getResource("/frontEnd/home.fxml"));
         Scene scene = new Scene(loader.load(), 900, 820);
 
-        primaryStage.setTitle("Sign Up");
+        primaryStage.setTitle("Home");
         primaryStage.setScene(scene);
         primaryStage.show();
 

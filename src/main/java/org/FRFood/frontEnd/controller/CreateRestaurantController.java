@@ -17,6 +17,7 @@ import java.net.URL;
 
 public class CreateRestaurantController {
 
+    public Button backButton;
     @FXML private TextField nameField;
     @FXML private TextField addressField;
     @FXML private TextField phoneField;
@@ -108,6 +109,6 @@ public class CreateRestaurantController {
     }
     @FXML
     private void goBack() {
-        SceneNavigator.switchTo("/resources/panel",nameField); // or "Panel" if you want
+        SceneNavigator.switchTo("/frontEnd/panel.fxml",nameField);
     }
 }
