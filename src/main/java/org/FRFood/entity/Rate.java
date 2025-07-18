@@ -5,31 +5,31 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import java.util.List;
 
 public class Rate {
-    private int id;
+    private Integer id;
     @JsonProperty("user_id")
-    private int userId;
-    private int rating;
+    private Integer userId;
+    private Integer rating;
     @JsonProperty("order_id")
-    private int orderId;
+    private Integer orderId;
     private String comment;
     @JsonProperty("created_id")
     private String createdAt;
     @JsonProperty("imageBase64")
     private List<String> images;
 
-    public int getId() {
+    public Integer getId() {
         return id;
     }
 
-    public void setId(int id) {
+    public void setId(Integer id) {
         this.id = id;
     }
 
-    public int getUserId() {
+    public Integer getUserId() {
         return userId;
     }
 
-    public void setUserId(int userId) {
+    public void setUserId(Integer userId) {
         this.userId = userId;
     }
 
@@ -41,19 +41,19 @@ public class Rate {
         this.createdAt = createdAt;
     }
 
-    public int getOrderId() {
+    public Integer getOrderId() {
         return orderId;
     }
 
-    public void setOrderId(int orderId) {
+    public void setOrderId(Integer orderId) {
         this.orderId = orderId;
     }
 
-    public int getRating() {
+    public Integer getRating() {
         return rating;
     }
 
-    public void setRating(int rating) {
+    public void setRating(Integer rating) {
         this.rating = rating;
     }
 

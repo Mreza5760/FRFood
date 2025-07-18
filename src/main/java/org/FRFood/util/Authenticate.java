@@ -61,7 +61,7 @@ public class Authenticate {
             return Optional.empty();
         }
         Restaurant restaurant = optionalRestaurant.get();
-        if (restaurant.getOwner().getId() != user.getId()) {
+        if (!restaurant.getOwner().getId().equals(user.getId())) {
             HttpError.unauthorized(exchange, "You do not own this restaurant");
             return Optional.empty();
         }

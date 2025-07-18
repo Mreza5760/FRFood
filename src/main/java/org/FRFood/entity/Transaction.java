@@ -5,36 +5,36 @@ import org.FRFood.util.TransactionStatus;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 public class Transaction {
-    private int id;
+    private Integer id;
     @JsonProperty("order_id")
-    private int orderID;
+    private Integer orderID;
     @JsonProperty("user_id")
-    private int userID;
+    private Integer userID;
     private TransactionMethod method;
     private TransactionStatus status;
-    private int amount;
+    private Integer amount;
 
-    public int getId() {
+    public Integer getId() {
         return id;
     }
 
-    public void setId(int id) {
+    public void setId(Integer id) {
         this.id = id;
     }
 
-    public int getOrderID() {
+    public Integer getOrderID() {
         return orderID;
     }
 
-    public void setOrderID(int orderID) {
+    public void setOrderID(Integer orderID) {
         this.orderID = orderID;
     }
 
-    public int getUserID() {
+    public Integer getUserID() {
         return userID;
     }
 
-    public void setUserID(int userID) {
+    public void setUserID(Integer userID) {
         this.userID = userID;
     }
 
@@ -54,11 +54,11 @@ public class Transaction {
         this.status = status;
     }
 
-    public int getAmount() {
+    public Integer getAmount() {
         return amount;
     }
 
-    public void setAmount(int amount) {
+    public void setAmount(Integer amount) {
         this.amount = amount;
     }
 }

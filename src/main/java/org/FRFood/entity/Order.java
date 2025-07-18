@@ -1,12 +1,10 @@
 package org.FRFood.entity;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import org.FRFood.util.Status;
 import org.FRFood.DTO.OrderItemDTO;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-import java.util.ArrayList;
 import java.util.List;
 
 @JsonPropertyOrder({
@@ -27,29 +25,28 @@ import java.util.List;
         "updated_at"
 })
 public class Order {
-    private int id;
+    private Integer id;
     @JsonProperty("delivery_address")
     private String deliveryAddress;
     @JsonProperty("customer_id")
-    private int customerId;
+    private Integer customerId;
     @JsonProperty("vendor_id")
-    private int restaurantId;
+    private Integer restaurantId;
     @JsonProperty("coupon_id")
-    private int couponId;
-    @JsonIgnore
-    private List<OrderItemDTO> items;
+    private Integer couponId;
+    private List<OrderItem> items;
     @JsonProperty("raw_price")
-    private int rawPrice;
+    private Integer rawPrice;
     @JsonProperty("tax_fee")
-    private int taxFee;
+    private Integer taxFee;
     @JsonProperty("additional_fee")
-    private int additionalFee;
+    private Integer additionalFee;
     @JsonProperty("courier_fee")
-    private int courierFee;
+    private Integer courierFee;
     @JsonProperty("pay_price")
-    private int payPrice;
+    private Integer payPrice;
     @JsonProperty("courier_id")
-    private int courierId;
+    private Integer courierId;
     private Status status;
     @JsonProperty("created_at")
     private String createdAt;
@@ -58,74 +55,71 @@ public class Order {
 
     public Order(){}
 
-    public int getId() { return id; }
-    public void setId(int id) { this.id = id; }
+    public Integer getId() { return id; }
+    public void setId(Integer id) { this.id = id; }
 
-    public int getRestaurantId() { return restaurantId; }
-    public void setRestaurantId(int restaurantId) { this.restaurantId = restaurantId; }
+    public Integer getRestaurantId() { return restaurantId; }
+    public void setRestaurantId(Integer restaurantId) { this.restaurantId = restaurantId; }
 
-    public int getCouponId() { return couponId; }
-    public void setCouponId(int couponId) { this.couponId = couponId; }
+    public Integer getCouponId() { return couponId; }
+    public void setCouponId(Integer couponId) { this.couponId = couponId; }
 
     public String getDeliveryAddress() { return deliveryAddress; }
     public void setDeliveryAddress(String deliveryAddress) { this.deliveryAddress = deliveryAddress; }
 
-    public List<OrderItemDTO> getItems() { return items; }
-    public void setItems(List<OrderItemDTO> items) { this.items = items; }
-
-    public int getCustomerId() {
+    public Integer getCustomerId() {
         return customerId;
     }
 
-    public void setCustomerId(int customerId) {
+    public void setCustomerId(Integer customerId) {
         this.customerId = customerId;
     }
 
-    public int getRawPrice() {
+    public Integer getRawPrice() {
         return rawPrice;
     }
 
-    public void setRawPrice(int rawPrice) {
+    public void setRawPrice(Integer rawPrice) {
         this.rawPrice = rawPrice;
     }
 
-    public int getTaxFee() {
+    public Integer getTaxFee() {
         return taxFee;
     }
 
-    public void setTaxFee(int taxFee) {
+    public void setTaxFee(Integer taxFee) {
         this.taxFee = taxFee;
     }
 
-    public int getAdditionalFee() {
+    public Integer getAdditionalFee() {
         return additionalFee;
     }
 
-    public void setAdditionalFee(int additionalFee) {
+    public void setAdditionalFee(Integer additionalFee) {
         this.additionalFee = additionalFee;
     }
 
-    public int getCourierFee() {
+    public Integer getCourierFee() {
         return courierFee;
     }
 
-    public void setCourierFee(int courierFee) {
+    public void setCourierFee(Integer courierFee) {
         this.courierFee = courierFee;
     }
 
-    public int getPayPrice() {
+    public Integer getPayPrice() {
         return payPrice;
     }
 
-    public void setPayPrice(int payPrice) {
+    public void setPayPrice(Integer payPrice) {
         this.payPrice = payPrice;
     }
 
-    public int getCourierId() {
+    public Integer getCourierId() {
         return courierId;
     }
 
-    public void setCourierId(int courierId) {
+    public void setCourierId(Integer courierId) {
         this.courierId = courierId;
     }
 
@@ -153,12 +147,11 @@ public class Order {
         this.updatedAt = updatedAt;
     }
 
-    @JsonProperty("item_ids")
-    public List<Integer> getItemIds() {
-        List<Integer> itemIds = new ArrayList<>();
-        for(OrderItemDTO item : items){
-            itemIds.add(item.getItemId());
-        }
-        return itemIds;
+    public List<OrderItem> getItems() {
+        return items;
+    }
+
+    public void setItems(List<OrderItem> items) {
+        this.items = items;
     }
 }

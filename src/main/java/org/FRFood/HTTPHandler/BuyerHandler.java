@@ -3,7 +3,7 @@ package org.FRFood.HTTPHandler;
 import org.FRFood.DAO.*;
 import org.FRFood.util.*;
 import org.FRFood.entity.*;
-import org.FRFood.DTO.OrderInputDTO;
+
 import static org.FRFood.util.Role.*;
 import org.FRFood.util.BuyerReq.ItemsReq;
 import com.sun.net.httpserver.HttpHandler;
@@ -12,7 +12,6 @@ import com.sun.net.httpserver.HttpExchange;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import static org.FRFood.util.Authenticate.authenticate;
 
-import java.net.http.HttpRequest;
 import java.util.List;
 import java.util.Optional;
 import java.io.IOException;
@@ -194,6 +193,7 @@ public class BuyerHandler implements HttpHandler {
         }
     }
 
+    // TODO
     private void handleSubmitOrder(HttpExchange exchange) throws IOException {
         var userOpt = Authenticate.authenticate(exchange);
         if (userOpt.isEmpty()) return;
@@ -204,18 +204,34 @@ public class BuyerHandler implements HttpHandler {
             return;
         }
 
-        OrderInputDTO orderDTO = objectMapper.readValue(exchange.getRequestBody(), OrderInputDTO.class);
+        Order order = objectMapper.readValue(exchange.getRequestBody(), Order.class);
 
-        if (orderDTO.getDeliveryAddress() == null || orderDTO.getRestaurantId() == 0 || orderDTO.getItems() == null) {
+        if (order.getDeliveryAddress() == null || order.getRestaurantId() == null || order.getItems() == null) {
             HttpError.badRequest(exchange, "Missing required fields");
             return;
         }
 
-        Order order = new Order();
-        order.setCustomerId(user.getId());
-
         try {
-            order.setId(orderDAO.insert(orderDTO));
+            Optional<Restaurant> optionalRestaurant = restaurantDAO.getById(order.getRestaurantId());
+            if (optionalRestaurant.isEmpty()) {
+                HttpError.notFound(exchange, "Restaurant not found");
+                return;
+            }
+            for (OrderItem orderItem : order.getItems()) {
+                Optional<Food> optionalFood = foodDAO.getById(orderItem.getItemId());
+                if (optionalFood.isEmpty()) {
+                    HttpError.notFound(exchange, "Food not found");
+                    return;
+                }
+                Food food = optionalFood.get();
+                if (!food.getRestaurantId().equals(order.getRestaurantId())) {
+                    HttpError.unauthorized(exchange, "This food is not in the restaurant");
+                    return;
+                }
+            }
+
+            order.setCustomerId(user.getId());
+            order.setId(orderDAO.insert(order));
             order = orderDAO.getById(order.getId()).orElse(null);
             String jsonOutput = objectMapper.writeValueAsString(order);
             JsonResponse.sendJsonResponse(exchange, 200, jsonOutput);
@@ -245,7 +261,7 @@ public class BuyerHandler implements HttpHandler {
                 return;
             }
             Order order = orderOpt.get();
-            if (order.getCustomerId() != user.getId()) {
+            if (!order.getCustomerId().equals(user.getId())) {
                 HttpError.unauthorized(exchange, "You are not authorized to view this order");
                 return;
             }
@@ -438,7 +454,7 @@ public class BuyerHandler implements HttpHandler {
                 return;
             }
             Rate rate = optionalRate.get();
-            if (rate.getUserId() != authenticatedUserOptional.get().getId()) {
+            if (!rate.getUserId().equals(authenticatedUserOptional.get().getId())) {
                 // صاحب اش نیست
                 return;
             }
@@ -466,7 +482,7 @@ public class BuyerHandler implements HttpHandler {
                 return;
             }
             Rate currRate = optionalRate.get();
-            if (currRate.getUserId() != authenticatedUserOptional.get().getId()) {
+            if (!currRate.getUserId().equals(authenticatedUserOptional.get().getId())) {
                 // صاحب اش نیست
                 return;
             }

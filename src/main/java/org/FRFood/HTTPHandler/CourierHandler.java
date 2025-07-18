@@ -4,6 +4,8 @@ import java.util.List;
 import java.util.Optional;
 import java.io.IOException;
 import java.sql.SQLException;
+
+import com.fasterxml.jackson.databind.JsonNode;
 import com.sun.net.httpserver.HttpHandler;
 import com.sun.net.httpserver.HttpExchange;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -81,12 +83,13 @@ public class CourierHandler implements HttpHandler {
         String path = exchange.getRequestURI().getPath();
         String[] parts = path.split("/");
         int orderId = Integer.parseInt(parts[2]);
-        String status = objectMapper.readTree(exchange.getRequestBody()).get("status").asText();
-        // TODO need to check
-        if (status.equals("0")) {
-            HttpError.notFound(exchange, "Status not found");
+        JsonNode jsonNode = objectMapper.readTree(exchange.getRequestBody());
+        if (!jsonNode.hasNonNull("status")) {
+            HttpError.badRequest(exchange, "Missing required field: status");
             return;
         }
+
+        String status = jsonNode.get("status").asText();
 
         try {
             Optional<Order> optionalOrder = orderDAO.getById(orderId);
@@ -95,7 +98,7 @@ public class CourierHandler implements HttpHandler {
                 return;
             }
             Order order = optionalOrder.get();
-            if (order.getCourierId() != 0 && order.getCourierId() != user.getId()) {
+            if (!order.getCourierId().equals(0) && !order.getCourierId().equals(user.getId())) {
                 HttpError.unauthorized(exchange, "This order has already been assigned");
                 return;
             }
