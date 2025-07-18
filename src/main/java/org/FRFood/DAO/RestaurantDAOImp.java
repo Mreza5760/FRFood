@@ -276,8 +276,6 @@ public class RestaurantDAOImp implements RestaurantDAO {
             stmt.setInt(1, ownerId);
             ResultSet rs = stmt.executeQuery();
 
-            boolean found = false;
-
             while (rs.next()) {
                 Restaurant restaurant = new Restaurant(new User(),
                         rs.getString("name"),
@@ -288,11 +286,8 @@ public class RestaurantDAOImp implements RestaurantDAO {
                         rs.getInt("additional_fee"));
                 restaurant.setId(rs.getInt("id"));
                 restaurants.add(restaurant);
-                found = true;
             }
-            if (!found) {
-                throw new SQLException("Restaurant not found.");
-            }
+
         }
         return restaurants;
     }
