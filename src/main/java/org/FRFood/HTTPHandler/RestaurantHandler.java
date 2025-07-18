@@ -5,6 +5,7 @@ import org.FRFood.util.*;
 import org.FRFood.entity.*;
 
 import static org.FRFood.util.Role.*;
+import static org.FRFood.util.Validation.validatePhone;
 import static org.FRFood.util.Validation.validatePhoneNumber;
 
 import java.util.List;
@@ -86,7 +87,7 @@ public class RestaurantHandler implements HttpHandler {
                 return;
             }
 
-            if (!validatePhoneNumber(restaurant.getPhone())) {
+            if (!validatePhone(restaurant.getPhone())) {
                 HttpError.unsupported(exchange, "Invalid phone number");
                 return;
             }
@@ -134,12 +135,12 @@ public class RestaurantHandler implements HttpHandler {
         try {
             var restaurantOpt = Authenticate.restaurantChecker(exchange, user, restaurantId);
             if (restaurantOpt.isEmpty()) return;
-            Restaurant restaurant = restaurantOpt.get();
 
             Restaurant updated = objectMapper.readValue(exchange.getRequestBody(), Restaurant.class);
             updated.setId(restaurantId);
-            if (!Validation.validatePhoneNumber(updated.getPhone())) {
+            if (!Validation.validatePhone(updated.getPhone())) {
                 HttpError.badRequest(exchange, "Invalid phone number");
+                return;
             }
             restaurantDAO.Update(updated);
             JsonResponse.sendJsonResponse(exchange, 200, objectMapper.writeValueAsString(updated));

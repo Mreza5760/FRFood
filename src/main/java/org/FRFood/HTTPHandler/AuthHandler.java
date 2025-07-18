@@ -164,6 +164,14 @@ public class AuthHandler implements HttpHandler {
                 currentUser.setFullName((String) updates.get("full_name"));
                 changed = true;
             }
+            if (updates.containsKey("phone_number")) {
+                if (!validatePhoneNumber((String) updates.get("phone_number"))) {
+                    HttpError.badRequest(exchange, "Invalid phone number");
+                    return;
+                }
+                currentUser.setPhoneNumber((String) updates.get("phone_number"));
+                changed = true;
+            }
             if (updates.containsKey("email")) {
                 currentUser.setEmail((String) updates.get("email"));
                 changed = true;
