@@ -70,7 +70,6 @@ public class AuthHandler implements HttpHandler {
             return;
         }
 
-        // TODO: Bank is not required
         if ((user.getBank() == null && user.getRole() != Role.buyer) || user.getFullName() == null || user.getPhoneNumber() == null || user.getPassword() == null || user.getRole() == null) {
             HttpError.notFound(exchange, "Missing required fields");
             return;
@@ -104,10 +103,9 @@ public class AuthHandler implements HttpHandler {
 
     private void handleLogin(HttpExchange exchange) throws IOException {
         User loginRequest;
-        try {
-            loginRequest = objectMapper.readValue(exchange.getRequestBody(), User.class);
-        } catch (Exception e) {
-            HttpError.badRequest(exchange, "Invalid input");
+        loginRequest = objectMapper.readValue(exchange.getRequestBody(), User.class);
+        if (loginRequest.getPhoneNumber() == null || loginRequest.getPassword() == null) {
+            HttpError.unauthorized(exchange, "Missing required fields");
             return;
         }
 
@@ -118,7 +116,6 @@ public class AuthHandler implements HttpHandler {
                 return;
             }
             User user = OpUser.get();
-
             if (!user.isConfirmed()) {
                 HttpError.forbidden(exchange, "User not confirmed");
                 return;
