@@ -33,7 +33,7 @@ public class BankAccountDAOImp implements BankAccountDAO {
 
     @Override
     public Optional<BankAccount> getById(int id) throws SQLException {
-        String sql = "SELECT id, bank_name, account_number FROM bank_account WHERE id = ?";
+        String sql = "SELECT bank_name, account_number FROM bank_account WHERE id = ?";
         try (
                 Connection conn = DBConnector.gConnection();
                 PreparedStatement stmt = conn.prepareStatement(sql)
@@ -42,7 +42,7 @@ public class BankAccountDAOImp implements BankAccountDAO {
             try (ResultSet rs = stmt.executeQuery()) {
                 if (rs.next()) {
                     BankAccount account = new BankAccount(rs.getString("bank_name"), rs.getString("account_number"));
-                    account.setId(rs.getInt("id"));
+                    account.setId(id);
                     return Optional.of(account);
                 }
             }
@@ -51,14 +51,15 @@ public class BankAccountDAOImp implements BankAccountDAO {
     }
 
     @Override
-    public boolean deleteById(int id) throws SQLException {
+    public void deleteById(int id) throws SQLException {
         String sql = "DELETE FROM bank_account WHERE id = ?";
         try (
                 Connection conn = DBConnector.gConnection();
                 PreparedStatement stmt = conn.prepareStatement(sql)
         ) {
             stmt.setInt(1, id);
-            return stmt.executeUpdate() > 0;
+            if (stmt.executeUpdate() == 0)
+                throw new SQLException("No row effected");
         }
     }
 
