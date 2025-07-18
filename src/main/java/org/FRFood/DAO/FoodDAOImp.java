@@ -166,15 +166,15 @@ public class FoodDAOImp implements FoodDAO {
         }
     }
 
-    // TODO need to rewrit (Delete TODO after that)
     @Override
     public void deleteMenuItem(int menuId, int foodId) throws SQLException {
-        String sql = "UPDATE FoodItems SET menu_id = null WHERE id = ?";
+        String sql = "DELETE FROM fooditem_menus WHERE food_item_id = ? AND menu_id = ?";
         try(
                 Connection connection = DBConnector.gConnection();
                 PreparedStatement preparedStatement = connection.prepareStatement(sql);
         ){
             preparedStatement.setInt(1, foodId);
+            preparedStatement.setInt(2, menuId);
             int rows = preparedStatement.executeUpdate();
             if (rows == 0) {
                 throw new SQLException("Update failed, no rows affected.");
