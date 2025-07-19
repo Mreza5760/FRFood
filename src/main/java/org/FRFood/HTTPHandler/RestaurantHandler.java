@@ -417,8 +417,12 @@ public class RestaurantHandler implements HttpHandler {
             HttpError.badRequest(exchange, "Missing required field: status");
             return;
         }
-
-        String status = jsonNode.get("status").asText();
+        String input = jsonNode.get("status").asText();
+        Status status = Status.valueOf(input);
+        if (status != Status.cancelled && status != Status.findingCourier) {
+            HttpError.badRequest(exchange, "Order status is not valid");
+            return;
+        }
 
         try {
             Optional<Order> optionalOrder = orderDAO.getById(orderId);
@@ -430,6 +434,24 @@ public class RestaurantHandler implements HttpHandler {
             int restaurantId = order.getRestaurantId();
             var restaurantOpt = Authenticate.restaurantChecker(exchange, user, restaurantId);
             if (restaurantOpt.isEmpty()) return;
+            Restaurant restaurant = restaurantOpt.get();
+
+            if (!order.getStatus().equals(Status.waiting)) {
+                HttpError.badRequest(exchange, "Order status is not waiting");
+                return;
+            }
+
+            if (status == Status.cancelled) {
+                Optional<User> optionalCustomer = new UserDAOImp().getById(order.getCustomerId());
+                if (optionalCustomer.isEmpty()) return;
+                User customer = optionalCustomer.get();
+                new UserDAOImp().setWallet(customer.getId(), customer.getWallet() + order.getPayPrice());
+            } else {
+                Optional<User> optionalOwner = new UserDAOImp().getById(restaurant.getOwner().getId());
+                if (optionalOwner.isEmpty()) return;
+                User owner = optionalOwner.get();
+                new UserDAOImp().setWallet(owner.getId(), owner.getWallet() + order.getPayPrice() - order.getCourierFee());
+            }
 
             orderDAO.changeStatus(orderId, status);
             JsonResponse.sendJsonResponse(exchange, 200, "{\"message\":\"Order status updated\"}");

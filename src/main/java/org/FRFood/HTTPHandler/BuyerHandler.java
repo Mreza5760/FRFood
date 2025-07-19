@@ -233,6 +233,7 @@ public class BuyerHandler implements HttpHandler {
             Random rand = new Random();
             int randomPrice = rand.nextInt(91) + 10;
 
+            order.setStatus(Status.unpaid);
             order.setRawPrice(rawPrice);
             order.setAdditionalFee(restaurant.getAdditionalFee());
             order.setTaxFee(restaurant.getTaxFee());
