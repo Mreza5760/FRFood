@@ -41,13 +41,14 @@ public class RestaurantHandler implements HttpHandler {
                 case "POST" -> {
                     if (path.equals("/restaurants")) handleRestaurants(exchange);
                     else if (path.matches("^/\\d+/item$")) addItem(exchange);
-                    else if (path.matches("^/\\d+/menu$")) addMenu(exchange);
+                    else if (path.matches("^/restaurants/\\d+/menu$")) addMenu(exchange);
                 }
                 case "GET" -> {
                     if (path.equals("/restaurants/mine")) myRestaurants(exchange);
                     else if (path.matches("^/\\d+/orders$")) getOrders(exchange);
+                    else if (path.matches("^/restaurants/\\d+/menus$")) getMenus(exchange);
                     else if (path.matches("^/\\d+/items/[^/]+$")) getMenuItems(exchange);
-                    else if (path.matches("^/\\d+/menu/[^/]+$")) getItemsOutOfMenu(exchange);
+                    else if (path.matches("^/restaurants/\\d+/menu/[^/]+$")) getItemsOutOfMenu(exchange);
                 }
                 case "PUT" -> {
                     if (path.matches("^/restaurants/\\d+$")) handleUpdateRestaurants(exchange);
@@ -272,7 +273,7 @@ public class RestaurantHandler implements HttpHandler {
         try {
             var restaurantOpt = Authenticate.restaurantChecker(exchange, user, restaurantId);
             if (restaurantOpt.isEmpty()) return;
-
+            menu.setRestaurant(restaurantOpt.get());
             menu.setId(restaurantDAO.insertMenu(menu));
             JsonResponse.sendJsonResponse(exchange, 201, objectMapper.writeValueAsString(menu));
         } catch (SQLException e) {
@@ -479,6 +480,19 @@ public class RestaurantHandler implements HttpHandler {
             JsonResponse.sendJsonResponse(exchange, 200, json);
         } catch (SQLException e) {
             HttpError.internal(exchange, "Failed to update order status");
+        }
+    }
+
+    private void getMenus(HttpExchange exchange) throws IOException {
+        String[] parts = exchange.getRequestURI().getPath().split("/");
+        int restaurantId = Integer.parseInt(parts[2]);
+
+        try {
+            List<Menu> menus= restaurantDAO.getMenus(restaurantId);
+            String json =   objectMapper.writeValueAsString(menus);
+            JsonResponse.sendJsonResponse(exchange, 200, json);
+        } catch (SQLException e) {
+            HttpError.internal(exchange, "Failed to delete menu");
         }
     }
 }

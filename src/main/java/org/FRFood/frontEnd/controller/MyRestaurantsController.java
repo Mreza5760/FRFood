@@ -117,6 +117,21 @@ public class MyRestaurantsController {
 
         Region spacer = new Region();
         HBox.setHgrow(spacer, Priority.ALWAYS);
+
+        // order button
+        Button orderBtn = new Button("Orders");
+        orderBtn.setPrefWidth(100);
+        orderBtn.setPrefHeight(36);
+        orderBtn.setStyle("""
+                    -fx-background-color: #6600cc;
+                    -fx-text-fill: white;
+                    -fx-font-size: 14px;
+                    -fx-font-weight: bold;
+                    -fx-background-radius: 10;
+                    -fx-cursor: hand;
+                """);
+        orderBtn.setOnAction(e -> handleOrder(r));
+
         // Update Button
         Button updateBtn = new Button("Update");
         updateBtn.setPrefWidth(100);
@@ -146,7 +161,7 @@ public class MyRestaurantsController {
         deleteBtn.setOnAction(e -> handleDelete(r));
 
 // Add both buttons to VBox
-        HBox rightBox = new HBox(10, updateBtn, deleteBtn);
+        HBox rightBox = new HBox(10,orderBtn, updateBtn, deleteBtn);
         rightBox.setAlignment(Pos.CENTER_RIGHT);
 
 
@@ -156,9 +171,25 @@ public class MyRestaurantsController {
         return card;
     }
 
+    private void handleOrder(Restaurant r) {
+    }
+
     private void handleClick(Restaurant r) {
-        System.out.println("Clicked on restaurant: " + r.getName());
-        // You can navigate or do something else here
+        RestaurantController.setValues(r.getId(),r.getName());
+        FXMLLoader loader = new FXMLLoader(getClass().getResource("/frontend/Restaurant.fxml"));
+        try {
+            Parent root = loader.load();
+
+            Stage stage = (Stage) restaurantList.getScene().getWindow();
+            double currentWidth = stage.getWidth();
+            double currentHeight = stage.getHeight();
+            stage.setScene(new Scene(root));
+            stage.setWidth(currentWidth);
+            stage.setHeight(currentHeight);
+            stage.show();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     private void handleUpdate(Restaurant r) {

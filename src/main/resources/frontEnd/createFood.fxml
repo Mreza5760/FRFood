@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.geometry.Insets?>
+<?import javafx.geometry.Pos?>
+
+<VBox xmlns="http://javafx.com/javafx"
+      xmlns:fx="http://javafx.com/fxml"
+      fx:controller="org.FRFood.frontEnd.controller.CreteFoodController"
+      alignment="CENTER" spacing="30"
+      style="-fx-background-color: linear-gradient(to bottom, #eef3f9, #dbe5f1);">
+
+    <padding>
+        <Insets top="50" right="60" bottom="50" left="60"/>
+    </padding>
+    <Button fx:id="backButton" text="⬅ Back"
+            onAction="#goBack"
+            style="-fx-background-color: #cc4444; -fx-text-fill: white; -fx-font-size: 14px; -fx-font-weight: bold; -fx-background-radius: 8;"
+            prefWidth="100" prefHeight="36"/>
+
+    <Label text="🍔 Create a New Food"
+           style="-fx-font-size: 30px; -fx-font-weight: bold; -fx-text-fill: #1e2a38;"/>
+
+    <VBox spacing="18" alignment="CENTER" maxWidth="350" style="-fx-background-color: white; -fx-padding: 30; -fx-background-radius: 12; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.1), 10, 0, 0, 4);">
+
+        <TextField fx:id="nameField" promptText="Food name"
+                   style="-fx-font-size: 14px; -fx-padding: 10; -fx-background-radius: 6;"/>
+
+        <TextField fx:id="priceField" promptText="price"
+                   style="-fx-font-size: 14px; -fx-padding: 10; -fx-background-radius: 6;"/>
+
+        <TextField fx:id="supplyField" promptText="supply"
+                   style="-fx-font-size: 14px; -fx-padding: 10; -fx-background-radius: 6;"/>
+
+        <ListView fx:id="keywordsListView"
+                  prefHeight="200"
+                  prefWidth="300"
+                  style="-fx-font-size: 14px;"/>
+
+        <TextField fx:id="descriptionField" promptText="description"
+                   style="-fx-font-size: 14px; -fx-padding: 10; -fx-background-radius: 6;"/>
+
+        <Button fx:id="uploadLogoButton" text="📁 Upload Photo"
+                style="-fx-background-color: #0077cc; -fx-text-fill: white; -fx-font-size: 14px; -fx-font-weight: bold; -fx-background-radius: 8;"
+                prefWidth="200" prefHeight="40"/>
+
+        <Label fx:id="logoStatusLabel" text="No image selected"
+               style="-fx-text-fill: #4a5a6a; -fx-font-size: 13px;" wrapText="true"/>
+
+        <Button fx:id="submitButton" text="✅ Create Food"
+                style="-fx-background-color: #00aa88; -fx-text-fill: white; -fx-font-size: 15px; -fx-font-weight: bold; -fx-background-radius: 10;"
+                prefWidth="240" prefHeight="45"/>
+
+        <Label fx:id="responseLabel" text=""
+               style="-fx-text-fill: #cc3300; -fx-font-size: 13px; -fx-font-weight: bold;" wrapText="true" maxWidth="280"/>
+    </VBox>
+</VBox>
