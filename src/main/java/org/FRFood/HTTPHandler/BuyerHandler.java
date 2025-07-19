@@ -13,6 +13,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import static org.FRFood.util.Authenticate.authenticate;
 
 import java.util.List;
+import java.util.Random;
 import java.util.Optional;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -229,10 +230,14 @@ public class BuyerHandler implements HttpHandler {
                 rawPrice += food.getPrice();
             }
 
+            Random rand = new Random();
+            int randomPrice = rand.nextInt(91) + 10;
+
             order.setRawPrice(rawPrice);
             order.setAdditionalFee(restaurant.getAdditionalFee());
-            order.setTaxFee((restaurant.getTaxFee()/100)*rawPrice);
-            order.setPayPrice(rawPrice + restaurant.getAdditionalFee() +  ((restaurant.getTaxFee()/100)*rawPrice));
+            order.setTaxFee(restaurant.getTaxFee());
+            order.setCourierFee(randomPrice);
+            order.setPayPrice(rawPrice + restaurant.getAdditionalFee() + restaurant.getTaxFee() + randomPrice);
             order.setCustomerId(user.getId());
             order.setId(orderDAO.insert(order));
             order = orderDAO.getById(order.getId()).orElse(null);
