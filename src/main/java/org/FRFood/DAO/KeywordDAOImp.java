@@ -97,4 +97,22 @@ public class KeywordDAOImp implements KeywordDAO {
         }
         return keywords;
     }
+
+    @Override
+    public List<Keyword> getAllKeywords() throws SQLException {
+        String  temp = "SELECT * FROM Keywords";
+        List<Keyword> keywords = new ArrayList<>();
+        try (Connection connection = DBConnector.gConnection();
+        PreparedStatement statement = connection.prepareStatement(temp)) {
+            try (ResultSet result = statement.executeQuery()) {
+                while (result.next()) {
+                    Keyword keyword = new Keyword();
+                    keyword.setId(result.getInt("id"));
+                    keyword.setName(result.getString("name"));
+                    keywords.add(keyword);
+                }
+            }
+        }
+        return keywords;
+    }
 }
