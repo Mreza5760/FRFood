@@ -14,4 +14,6 @@ public interface KeywordDAO {
     Optional<Keyword> getKeywordByName(String Name) throws SQLException;
 
     List<Keyword> getKeywordsByFoodId(int foodId) throws SQLException;
+
+    List<Keyword> getAllKeywords() throws SQLException;
 }
