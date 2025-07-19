@@ -23,4 +23,6 @@ public interface FoodDAO {
     void deleteMenuItem(int menuId, int foodId) throws SQLException;
 
     List<Keyword> getKeywords(int foodId) throws SQLException;
+
+    List<Food> searchFood(String search) throws SQLException;
 }

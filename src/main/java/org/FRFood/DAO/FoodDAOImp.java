@@ -205,4 +205,9 @@ public class FoodDAOImp implements FoodDAO {
             return keywords;
         }
     }
+
+    @Override
+    public List<Food> searchFood(String search) throws SQLException {
+        return List.of();
+    }
 }
