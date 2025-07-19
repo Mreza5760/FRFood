@@ -10,12 +10,15 @@ import com.sun.net.httpserver.HttpHandler;
 import com.sun.net.httpserver.HttpExchange;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import org.FRFood.DAO.UserDAOImp;
 import org.FRFood.entity.User;
 import org.FRFood.DAO.OrderDAO;
 import org.FRFood.entity.Order;
 import org.FRFood.util.HttpError;
 import org.FRFood.DAO.OrderDAOImp;
 import org.FRFood.util.JsonResponse;
+import org.FRFood.util.Status;
+
 import static org.FRFood.util.Role.courier;
 import static org.FRFood.util.Authenticate.authenticate;
 
@@ -88,8 +91,12 @@ public class CourierHandler implements HttpHandler {
             HttpError.badRequest(exchange, "Missing required field: status");
             return;
         }
-
-        String status = jsonNode.get("status").asText();
+        String input = jsonNode.get("status").asText();
+        Status status = Status.valueOf(input);
+        if (status != Status.onTheWay && status != Status.completed) {
+            HttpError.badRequest(exchange, "Invalid status");
+            return;
+        }
 
         try {
             Optional<Order> optionalOrder = orderDAO.getById(orderId);
@@ -101,6 +108,10 @@ public class CourierHandler implements HttpHandler {
             if (!order.getCourierId().equals(0) && !order.getCourierId().equals(user.getId())) {
                 HttpError.unauthorized(exchange, "This order has already been assigned");
                 return;
+            }
+
+            if (status == Status.completed) {
+                new UserDAOImp().setWallet(user.getId(), user.getWallet() + order.getCourierFee());
             }
 
             orderDAO.changeStatus(orderId, status);
