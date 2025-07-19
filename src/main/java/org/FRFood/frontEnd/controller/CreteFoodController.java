@@ -28,6 +28,7 @@ public class CreteFoodController {
     public Button submitButton;
     public Button uploadLogoButton;
     public ListView keywordsListView;
+    @FXML private Label logoStatusLabel;
 
     private String logoBase64 = "";
 
