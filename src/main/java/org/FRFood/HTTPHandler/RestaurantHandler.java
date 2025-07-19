@@ -49,6 +49,7 @@ public class RestaurantHandler implements HttpHandler {
                     else if (path.matches("^/restaurants/\\d+/menus$")) getMenus(exchange);
                     else if (path.matches("^/\\d+/items/[^/]+$")) getMenuItems(exchange);
                     else if (path.matches("^/restaurants/\\d+/menu/[^/]+$")) getItemsOutOfMenu(exchange);
+                    else if (path.equals("/keywords")) getAllKeywords(exchange);
                 }
                 case "PUT" -> {
                     if (path.matches("^/restaurants/\\d+$")) handleUpdateRestaurants(exchange);
@@ -382,11 +383,11 @@ public class RestaurantHandler implements HttpHandler {
     private void getOrders(HttpExchange exchange) throws IOException {
         var userOpt = Authenticate.authenticate(exchange);
         if (userOpt.isEmpty()) return;
-        if (userOpt.get().getRole().equals(seller)) {
+        User user = userOpt.get();
+        if (!user.getRole().equals(seller)) {
             HttpError.unauthorized(exchange, "Only sellers can get orders");
             return;
         }
-        User user = userOpt.get();
 
         int restaurantId = Integer.parseInt(exchange.getRequestURI().getPath().split("/")[2]);
 
@@ -405,6 +406,10 @@ public class RestaurantHandler implements HttpHandler {
         var userOpt = Authenticate.authenticate(exchange);
         if (userOpt.isEmpty()) return;
         User user = userOpt.get();
+        if (!user.getRole().equals(seller)) {
+            HttpError.unauthorized(exchange, "Only sellers can set status");
+            return;
+        }
 
         int orderId = Integer.parseInt(exchange.getRequestURI().getPath().split("/")[3]);
         JsonNode jsonNode = objectMapper.readTree(exchange.getRequestBody());
@@ -437,6 +442,11 @@ public class RestaurantHandler implements HttpHandler {
         var userOpt = Authenticate.authenticate(exchange);
         if (userOpt.isEmpty()) return;
         User user = userOpt.get();
+        if (!user.getRole().equals(seller)) {
+            HttpError.unauthorized(exchange, "Only sellers can get menu items");
+            return;
+        }
+
         String title = exchange.getRequestURI().getPath().split("/")[4];
         int restaurantId = Integer.parseInt(exchange.getRequestURI().getPath().split("/")[2]);
         try {
@@ -461,6 +471,10 @@ public class RestaurantHandler implements HttpHandler {
         var userOpt = Authenticate.authenticate(exchange);
         if (userOpt.isEmpty()) return;
         User user = userOpt.get();
+        if (!user.getRole().equals(seller)) {
+            HttpError.unauthorized(exchange, "Only sellers can get items");
+            return;
+        }
         String title = exchange.getRequestURI().getPath().split("/")[4];
         int restaurantId = Integer.parseInt(exchange.getRequestURI().getPath().split("/")[2]);
         try {
@@ -479,20 +493,49 @@ public class RestaurantHandler implements HttpHandler {
             String json =  objectMapper.writeValueAsString(allFoods);
             JsonResponse.sendJsonResponse(exchange, 200, json);
         } catch (SQLException e) {
-            HttpError.internal(exchange, "Failed to update order status");
+            HttpError.internal(exchange, "Internal error");
         }
     }
 
     private void getMenus(HttpExchange exchange) throws IOException {
+        var userOpt = Authenticate.authenticate(exchange);
+        if (userOpt.isEmpty()) return;
+        User user = userOpt.get();
+        if (!user.getRole().equals(seller)) {
+            HttpError.unauthorized(exchange, "Only sellers can get menus");
+            return;
+        }
+
         String[] parts = exchange.getRequestURI().getPath().split("/");
         int restaurantId = Integer.parseInt(parts[2]);
 
         try {
+            Optional<Restaurant> optionalRestaurant = Authenticate.restaurantChecker(exchange, user, restaurantId);
+            if (optionalRestaurant.isEmpty()) return;
+
             List<Menu> menus= restaurantDAO.getMenus(restaurantId);
-            String json =   objectMapper.writeValueAsString(menus);
+            String json = objectMapper.writeValueAsString(menus);
             JsonResponse.sendJsonResponse(exchange, 200, json);
         } catch (SQLException e) {
-            HttpError.internal(exchange, "Failed to delete menu");
+            HttpError.internal(exchange, "Internal error");
+        }
+    }
+
+    private void getRestaurants(HttpExchange exchange) throws IOException {
+        var userOpt = Authenticate.authenticate(exchange);
+        if (userOpt.isEmpty()) return;
+        User user = userOpt.get();
+        if (!user.getRole().equals(seller)) {
+            HttpError.unauthorized(exchange, "Only sellers can get keywords");
+            return;
+        }
+
+        try {
+            List<Keyword> keywords = new KeywordDAOImp().getAllKeywords();
+            String json =  objectMapper.writeValueAsString(keywords);
+            JsonResponse.sendJsonResponse(exchange, 200, json);
+        } catch (SQLException e) {
+            HttpError.internal(exchange, "Internal error");
         }
     }
 }
