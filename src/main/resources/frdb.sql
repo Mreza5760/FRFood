@@ -80,7 +80,7 @@ CREATE TABLE IF NOT EXISTS FoodItem_keywords
     FOREIGN KEY (keyword_id) REFERENCES `Keywords` (id) ON DELETE CASCADE
 );
 
-CREATE TABLE IF NOT EXISTS fooditem_menus(
+CREATE TABLE IF NOT EXISTS FoodItem_menus(
     food_item_id INTEGER NOT NULL,
     menu_id INTEGER NOT NULL,
     PRIMARY KEY (food_item_id, menu_id),
