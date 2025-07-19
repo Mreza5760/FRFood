@@ -2,6 +2,7 @@ package org.FRFood.DAO;
 
 import org.FRFood.entity.Food;
 import org.FRFood.entity.Keyword;
+import org.FRFood.entity.Restaurant;
 import org.FRFood.util.DBConnector;
 
 import java.sql.*;
@@ -208,6 +209,23 @@ public class FoodDAOImp implements FoodDAO {
 
     @Override
     public List<Food> searchFood(String search) throws SQLException {
-        return List.of();
+        String sql = "SELECT * FROM fooditems WHERE name LIKE ?";
+        try (
+                Connection connection = DBConnector.gConnection();
+                PreparedStatement preparedStatement = connection.prepareStatement(sql);
+        ) {
+            preparedStatement.setString(1, "%" + search + "%");
+            try (ResultSet rs = preparedStatement.executeQuery()) {
+                List<Food> foods = new ArrayList<>();
+                while (rs.next()) {
+                    int id =  rs.getInt("id");
+                    Optional<Food> food = getById(id);
+                    if (food.isEmpty())
+                        throw new SQLException();
+                    foods.add(food.get());
+                }
+                return foods;
+            }
+        }
     }
 }
