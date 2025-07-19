@@ -61,7 +61,6 @@ CREATE TABLE IF NOT EXISTS FoodItems
 (
     id            INTEGER AUTO_INCREMENT PRIMARY KEY,
     restaurant_id INTEGER      NOT NULL,
-    menu_id       INTEGER,
     name          VARCHAR(255) NOT NULL,
     image         LONGTEXT     NULL,
     description   TEXT         NOT NULL,
@@ -69,8 +68,7 @@ CREATE TABLE IF NOT EXISTS FoodItems
     supply        INTEGER      NOT NULL,
     created_at    TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at    TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    FOREIGN KEY (restaurant_id) REFERENCES Restaurants (id) ON DELETE CASCADE,
-    FOREIGN KEY (menu_id) REFERENCES Menus (id) ON DELETE CASCADE
+    FOREIGN KEY (restaurant_id) REFERENCES Restaurants (id) ON DELETE CASCADE
 );
 
 CREATE TABLE IF NOT EXISTS FoodItem_keywords
@@ -80,6 +78,14 @@ CREATE TABLE IF NOT EXISTS FoodItem_keywords
     PRIMARY KEY (food_item_id, keyword_id),
     FOREIGN KEY (food_item_id) REFERENCES FoodItems (id) ON DELETE CASCADE,
     FOREIGN KEY (keyword_id) REFERENCES `Keywords` (id) ON DELETE CASCADE
+);
+
+CREATE TABLE IF NOT EXISTS fooditem_menus(
+    food_item_id INTEGER NOT NULL,
+    menu_id INTEGER NOT NULL,
+    PRIMARY KEY (food_item_id, menu_id),
+    FOREIGN KEY (food_item_id) REFERENCES FoodItems (id) ON DELETE CASCADE,
+    FOREIGN KEY (menu_id) REFERENCES menus (id) ON DELETE CASCADE
 );
 
 CREATE TABLE IF NOT EXISTS Coupons

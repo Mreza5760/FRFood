@@ -49,7 +49,7 @@ public class RestaurantHandler implements HttpHandler {
                     else if (path.matches("^/restaurants/\\d+/menus$")) getMenus(exchange);
                     else if (path.matches("^/\\d+/items/[^/]+$")) getMenuItems(exchange);
                     else if (path.matches("^/restaurants/\\d+/menu/[^/]+$")) getItemsOutOfMenu(exchange);
-                    else if (path.equals("/keywords")) getAllKeywords(exchange);
+                    else if (path.equals("/keywords")) getKeywords(exchange);
                 }
                 case "PUT" -> {
                     if (path.matches("^/restaurants/\\d+$")) handleUpdateRestaurants(exchange);
@@ -521,7 +521,7 @@ public class RestaurantHandler implements HttpHandler {
         }
     }
 
-    private void getRestaurants(HttpExchange exchange) throws IOException {
+    private void getKeywords(HttpExchange exchange) throws IOException {
         var userOpt = Authenticate.authenticate(exchange);
         if (userOpt.isEmpty()) return;
         User user = userOpt.get();
