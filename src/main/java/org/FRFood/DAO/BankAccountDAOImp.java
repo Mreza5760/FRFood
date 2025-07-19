@@ -73,7 +73,10 @@ public class BankAccountDAOImp implements BankAccountDAO {
             stmt.setString(1, bankAccount.getName());
             stmt.setString(2, bankAccount.getAccountNumber());
             stmt.setInt(3, bankAccount.getId());
-            stmt.executeUpdate();
+            int rows =stmt.executeUpdate();
+            if(rows == 0){
+                throw new SQLException("Update failed, no rows affected.");
+            }
         }
     }
 }

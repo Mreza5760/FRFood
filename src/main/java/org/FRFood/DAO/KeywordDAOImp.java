@@ -16,7 +16,7 @@ public class KeywordDAOImp implements KeywordDAO {
 
         try (Connection connection = DBConnector.gConnection();
              PreparedStatement statement = connection.prepareStatement(temp)) {
-            statement.setString(1, Integer.toString(id));
+            statement.setInt(1, id);
             try (ResultSet result = statement.executeQuery()) {
                 if (result.next()) {
                     keyword = new Keyword();
