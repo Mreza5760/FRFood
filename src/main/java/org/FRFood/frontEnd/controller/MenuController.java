@@ -192,7 +192,7 @@ public class MenuController {
         HttpClient.newHttpClient().sendAsync(request, HttpResponse.BodyHandlers.ofString())
                 .thenAccept(response -> {
                     if (response.statusCode() == 200 || response.statusCode() == 204) {
-                        System.out.println("Deleted restaurant: " + r.getName());
+                        System.out.println("Deleted restaurant: " + food.getName());
                         // Optionally refresh the list on UI thread
                         Platform.runLater(this::fetchFoods);
                     } else {
