@@ -52,7 +52,7 @@ public class RestaurantHandler implements HttpHandler {
                     else if (path.matches("^/restaurants/\\d+/menus$")) getMenus(exchange);
                     else if (path.matches("^/\\d+/items/[^/]+$")) getMenuItems(exchange);
                     else if (path.matches("^/restaurants/\\d+/menu/[^/]+$")) getItemsOutOfMenu(exchange);
-                    else if (path.matches("^/restaurants/keywords$")) getKeywords(exchange);
+//                    else if (path.matches("^/restaurants/keywords$")) getKeywords(exchange);
                 }
                 case "PUT" -> {
                     if (path.matches("^/restaurants/\\d+$")) handleUpdateRestaurants(exchange);
@@ -574,21 +574,21 @@ public class RestaurantHandler implements HttpHandler {
         }
     }
 
-    private void getKeywords(HttpExchange exchange) throws IOException {
-        var userOpt = Authenticate.authenticate(exchange);
-        if (userOpt.isEmpty()) return;
-        User user = userOpt.get();
-        if (!user.getRole().equals(seller)) {
-            HttpError.unauthorized(exchange, "Only sellers can get keywords");
-            return;
-        }
-
-        try {
-            List<Keyword> keywords = new KeywordDAOImp().getAllKeywords();
-            String json = objectMapper.writeValueAsString(keywords);
-            JsonResponse.sendJsonResponse(exchange, 200, json);
-        } catch (SQLException e) {
-            HttpError.internal(exchange, "Internal error");
-        }
-    }
+//    private void getKeywords(HttpExchange exchange) throws IOException {
+//        var userOpt = Authenticate.authenticate(exchange);
+//        if (userOpt.isEmpty()) return;
+//        User user = userOpt.get();
+//        if (!user.getRole().equals(seller)) {
+//            HttpError.unauthorized(exchange, "Only sellers can get keywords");
+//            return;
+//        }
+//
+//        try {
+//            List<Keyword> keywords = new KeywordDAOImp().getAllKeywords();
+//            String json = objectMapper.writeValueAsString(keywords);
+//            JsonResponse.sendJsonResponse(exchange, 200, json);
+//        } catch (SQLException e) {
+//            HttpError.internal(exchange, "Internal error");
+//        }
+//    }
 }
