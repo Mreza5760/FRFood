@@ -419,7 +419,7 @@ public class RestaurantHandler implements HttpHandler {
         }
         String input = jsonNode.get("status").asText();
         Status status = Status.valueOf(input);
-        if (status != Status.cancelled && status != Status.findingCourier) {
+        if (status != Status.cancelled && status != Status.findingCourier && status != Status.preparing) {
             HttpError.badRequest(exchange, "Order status is not valid");
             return;
         }
@@ -436,8 +436,8 @@ public class RestaurantHandler implements HttpHandler {
             if (restaurantOpt.isEmpty()) return;
             Restaurant restaurant = restaurantOpt.get();
 
-            if (!order.getStatus().equals(Status.waiting)) {
-                HttpError.badRequest(exchange, "Order status is not waiting");
+            if (!order.getStatus().equals(Status.waiting) && (order.getStatus().equals(Status.preparing)) && status != Status.findingCourier) {
+                HttpError.badRequest(exchange, "Order status is not valid");
                 return;
             }
 
@@ -446,7 +446,7 @@ public class RestaurantHandler implements HttpHandler {
                 if (optionalCustomer.isEmpty()) return;
                 User customer = optionalCustomer.get();
                 new UserDAOImp().setWallet(customer.getId(), customer.getWallet() + order.getPayPrice());
-            } else {
+            } else if (status == Status.preparing) {
                 Optional<User> optionalOwner = new UserDAOImp().getById(restaurant.getOwner().getId());
                 if (optionalOwner.isEmpty()) return;
                 User owner = optionalOwner.get();
