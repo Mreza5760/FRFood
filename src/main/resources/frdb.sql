@@ -95,7 +95,7 @@ CREATE TABLE IF NOT EXISTS Coupons
     `type`      ENUM ('fixed',
         'percent'
         )                      NOT NULL,
-    `value`     DECIMAL(10, 2) NOT NULL,
+    `value`     INTEGER        NOT NULL,
     min_price   INTEGER        NOT NULL,
     user_count  INTEGER        NOT NULL,
     start_date  DATE           NOT NULL,
