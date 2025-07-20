@@ -119,6 +119,7 @@ CREATE TABLE IF NOT EXISTS Orders
     status           ENUM (
         'unpaid',
         'waiting',
+        'preparing',
         'cancelled',
         'findingCourier',
         'onTheWay',
