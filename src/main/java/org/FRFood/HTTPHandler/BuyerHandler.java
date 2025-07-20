@@ -62,6 +62,7 @@ public class BuyerHandler implements HttpHandler {
                     else if (path.matches("^/ratings/items/\\d+$")) handeGetFoodRates(exchange);
                     else if (path.matches("^/orders/\\d+$")) handleGetOrder(exchange);
                     else if (path.matches("^/ratings/\\d+$")) handleGetRate(exchange);
+                    else if (path.equals("/coupons")) checkCoupon(exchange);
                     else HttpError.notFound(exchange, "Not Found");
                 }
                 case "PUT" -> {
@@ -501,5 +502,10 @@ public class BuyerHandler implements HttpHandler {
             //            e.printStackTrace();
             JsonResponse.sendJsonResponse(exchange, 500, "{\"error\":\"Internal server error\"}");
         }
+    }
+
+    // TODO
+    private void checkCoupon(HttpExchange exchange) throws IOException {
+
     }
 }
