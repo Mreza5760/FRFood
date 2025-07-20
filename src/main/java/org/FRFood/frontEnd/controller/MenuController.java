@@ -8,6 +8,7 @@ import javafx.fxml.FXML;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
+import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.image.Image;
@@ -18,13 +19,16 @@ import javafx.scene.layout.Region;
 import javafx.scene.layout.VBox;
 import org.FRFood.entity.Food;
 import org.FRFood.entity.Menu;
+import org.FRFood.frontEnd.Util.SceneNavigator;
 import org.FRFood.frontEnd.Util.SessionManager;
 
 import java.io.ByteArrayInputStream;
 import java.net.URI;
+import java.net.URLEncoder;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
+import java.nio.charset.StandardCharsets;
 import java.util.Base64;
 import java.util.List;
 
@@ -39,7 +43,7 @@ public class MenuController {
     private static int menuId;
     private static String menuTitle;
     private static int restaurantId;
-    private void setData(int menuId, String menuTitle, int restaurantId) {
+    public static void setData(int menuId, String menuTitle, int restaurantId) {
         MenuController.menuId = menuId;
         MenuController.menuTitle = menuTitle;
         MenuController.restaurantId = restaurantId;
@@ -47,6 +51,7 @@ public class MenuController {
 
     @FXML
     public void goBack(ActionEvent actionEvent) {
+        SceneNavigator.switchTo("/frontend/Restaurant.fxml",menu_name_label);
     }
 
     @FXML
@@ -60,8 +65,10 @@ public class MenuController {
     }
 
     private void fetchFoods() {
+        String safeUrl = "http://localhost:8080/restaurants/" + restaurantId + "/menu/" +URLEncoder.encode(menuTitle, StandardCharsets.UTF_8);
+        URI uri = URI.create(safeUrl);
         HttpRequest request = HttpRequest.newBuilder()
-                .uri(URI.create("http://localhost:8080/restaurants/"+restaurantId+"/menu/"+menuTitle))
+                .uri(uri)
                 .header("Authorization", "Bearer " + SessionManager.getAuthToken())
                 .GET()
                 .build();
@@ -121,7 +128,7 @@ public class MenuController {
         Label nameLabel = new Label("📛 " + food.getName());
         nameLabel.setStyle("-fx-font-size: 16px; -fx-text-fill: #1e2a38; -fx-font-weight: bold;");
 
-        Label supplyLabel = new Label("📍 " + food.getSupply());
+        Label supplyLabel = new Label("📍 Supply: " + food.getSupply());
         supplyLabel.setStyle("-fx-font-size: 14px; -fx-text-fill: #3a3a3a;");
 
         Label feeLabel = new Label("💰 Price: " + food.getPrice()+"$");
@@ -181,10 +188,11 @@ public class MenuController {
     }
 
     private void handleDelete(Food food) {
-        String url = "http://localhost:8080/restaurants/" + restaurantId+"/menu/" + menuTitle + "/" + food.getId();
-
+        String safeUrl = "http://localhost:8080/restaurants/" + restaurantId + "/menu/" +URLEncoder.encode(menuTitle, StandardCharsets.UTF_8)+food.getId();
+        URI uri = URI.create(safeUrl);
+//        String url = "http://localhost:8080/restaurants/" + restaurantId+"/menu/" + menuTitle + "/" + food.getId();
         HttpRequest request = HttpRequest.newBuilder()
-                .uri(URI.create(url))
+                .uri(uri)
                 .header("Authorization", "Bearer " + SessionManager.getAuthToken())
                 .DELETE()
                 .build();

@@ -22,6 +22,8 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.Region;
 import javafx.scene.layout.VBox;
+import org.FRFood.DAO.RestaurantDAO;
+import org.FRFood.DAO.RestaurantDAOImp;
 import org.FRFood.DAO.UserDAO;
 import org.FRFood.DAO.UserDAOImp;
 import org.FRFood.entity.Menu;
@@ -35,9 +37,11 @@ import org.FRFood.util.Role;
 
 import java.io.ByteArrayInputStream;
 import java.net.URI;
+import java.net.URLEncoder;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
+import java.nio.charset.StandardCharsets;
 import java.util.*;
 
 public class RestaurantController {
@@ -93,6 +97,12 @@ public class RestaurantController {
             Platform.runLater(() -> {
                 menuList.getChildren().clear();
                 for (Menu menu : menus) {
+                    RestaurantDAO restaurantDAO = new RestaurantDAOImp();
+                    try {
+                        menu = restaurantDAO.getMenuByTitle(menu.getTitle(), restaurantId).orElse(null);
+                    }catch (Exception e) {
+                        e.getStackTrace();
+                    }
                     menuList.getChildren().add(createMenuCard(menu));
                 }
             });
@@ -133,23 +143,49 @@ public class RestaurantController {
         deleteBtn.setOnAction(e -> handleDelete(menu));
 
 // Add both buttons to VBox
-        HBox rightBox = new HBox(10,deleteBtn);
+        HBox rightBox = new HBox(10, deleteBtn);
         rightBox.setAlignment(Pos.CENTER_RIGHT);
 
 
         card.setOnMouseClicked(e -> handleClick(menu)); // full card click
 
-        card.getChildren().addAll( info, spacer, rightBox);
+        card.getChildren().addAll(info, spacer, rightBox);
         return card;
     }
 
     private void handleClick(Menu menu) {
+        MenuController.setData(menu.getId(),menu.getTitle(),restaurantId);
+        SceneNavigator.switchTo("/frontend/menu.fxml",restaurant_name_label);
     }
 
     private void handleDelete(Menu menu) {
-    }
+        String safeUrl = "http://localhost:8080/restaurants/" + restaurantId + "/menu/" + URLEncoder.encode(menu.getTitle(), StandardCharsets.UTF_8);
+        URI uri = URI.create(safeUrl);
+        HttpRequest request = HttpRequest.newBuilder()
+                .uri(uri)
+                .header("Authorization", "Bearer " + SessionManager.getAuthToken())
+                .DELETE()
+                .build();
 
-    private void addItemHandle(Menu menu) {
+        HttpClient.newHttpClient().sendAsync(request, HttpResponse.BodyHandlers.ofString())
+                .thenAccept(response -> {
+                    Platform.runLater(() -> {
+                        fetchMenus();
+                        if (response.statusCode() == 200) {
+                            Alert alert = new Alert(Alert.AlertType.INFORMATION);
+                            alert.setTitle("Added the menu");
+                            alert.setHeaderText(null);
+                            alert.setContentText("You have successfully removed the menu!");
+                            alert.showAndWait();
+                        } else {
+                            System.err.println("Failed to fetch restaurants: HTTP " + response.statusCode());
+                        }
+                    });
+                })
+                .exceptionally(e -> {
+                    e.printStackTrace();
+                    return null;
+                });
     }
 
     public void goBack(ActionEvent actionEvent) {
@@ -162,6 +198,8 @@ public class RestaurantController {
     }
 
     public void addFood(ActionEvent actionEvent) {
+        CreteFoodController.setRestaurantId(restaurantId);
+        SceneNavigator.switchTo("/frontend/createFood.fxml", restaurant_name_label);
     }
 
     public void submitMenu(ActionEvent actionEvent) {
@@ -171,7 +209,7 @@ public class RestaurantController {
             Map<String, String> jsonMap = new HashMap<>();
             jsonMap.put("title", menuTitleField.getText());
             jsonBody = mapper.writeValueAsString(jsonMap);
-        }catch (Exception e) {
+        } catch (Exception e) {
             e.printStackTrace();
         }
         HttpRequest request = HttpRequest.newBuilder()

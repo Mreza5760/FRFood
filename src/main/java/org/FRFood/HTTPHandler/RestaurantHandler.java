@@ -8,6 +8,9 @@ import static org.FRFood.util.Role.*;
 import static org.FRFood.util.Validation.validatePhone;
 import static org.FRFood.util.Validation.validatePhoneNumber;
 
+import java.net.URLDecoder;
+import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
 import java.util.List;
 import java.io.IOException;
 import java.sql.SQLException;
@@ -40,7 +43,7 @@ public class RestaurantHandler implements HttpHandler {
             switch (method) {
                 case "POST" -> {
                     if (path.equals("/restaurants")) handleRestaurants(exchange);
-                    else if (path.matches("^/\\d+/item$")) addItem(exchange);
+                    else if (path.matches("^/restaurants/\\d+/item$")) addItem(exchange);
                     else if (path.matches("^/restaurants/\\d+/menu$")) addMenu(exchange);
                 }
                 case "GET" -> {
@@ -49,7 +52,7 @@ public class RestaurantHandler implements HttpHandler {
                     else if (path.matches("^/restaurants/\\d+/menus$")) getMenus(exchange);
                     else if (path.matches("^/\\d+/items/[^/]+$")) getMenuItems(exchange);
                     else if (path.matches("^/restaurants/\\d+/menu/[^/]+$")) getItemsOutOfMenu(exchange);
-                    else if (path.equals("/keywords")) getKeywords(exchange);
+                    else if (path.matches("^/restaurants/keywords$")) getKeywords(exchange);
                 }
                 case "PUT" -> {
                     if (path.matches("^/restaurants/\\d+$")) handleUpdateRestaurants(exchange);
@@ -59,8 +62,8 @@ public class RestaurantHandler implements HttpHandler {
                 case "DELETE" -> {
                     if (path.matches("^/restaurants/\\d+$")) deleteRestaurant(exchange);
                     else if (path.matches("^/\\d+/item/\\d+$")) deleteItem(exchange);
-                    else if (path.matches("^/\\d+/menu/[^/]+$")) deleteMenu(exchange);
-                    else if (path.matches("^/\\d+/menu/[^/]+/\\d+$")) deleteItemFromMenu(exchange);
+                    else if (path.matches("^/restaurants/\\d+/menu/[^/]+$")) deleteMenu(exchange);
+                    else if (path.matches("^restaurants/\\d+/menu/[^/]+/\\d+$")) deleteItemFromMenu(exchange);
                 }
                 case "PATCH" -> {
                     if (path.matches("^/orders/\\d+$")) setStatus(exchange);
@@ -192,6 +195,16 @@ public class RestaurantHandler implements HttpHandler {
         Food food = objectMapper.readValue(exchange.getRequestBody(), Food.class);
         food.setRestaurantId(restaurantId);
 
+        KeywordDAO keywordDAO = new KeywordDAOImp();
+        List<Keyword> thekeywods = new ArrayList<>();
+        for (Keyword keyword : food.getKeywords()) {
+            try {
+                thekeywods.add(keywordDAO.getKeywordByName(keyword.getName()).orElse(null));
+            } catch (SQLException e) {
+                HttpError.badRequest(exchange, "error !!");
+            }
+        }
+        food.setKeywords(thekeywods);
         if (food.getName() == null || food.getDescription() == null || food.getPrice() == null || food.getSupply() == null || food.getKeywords() == null) {
             HttpError.badRequest(exchange, "Missing required fields");
             return;
@@ -201,8 +214,9 @@ public class RestaurantHandler implements HttpHandler {
             var restaurantOpt = Authenticate.restaurantChecker(exchange, user, restaurantId);
             if (restaurantOpt.isEmpty()) return;
             Restaurant restaurant = restaurantOpt.get();
-
+            System.out.println("debug");
             food.setId(foodDAO.insert(food));
+            System.out.println("debug");
             JsonResponse.sendJsonResponse(exchange, 201, objectMapper.writeValueAsString(food));
         } catch (SQLException e) {
             HttpError.internal(exchange, "Failed to add food item");
@@ -310,7 +324,7 @@ public class RestaurantHandler implements HttpHandler {
 
         String[] parts = exchange.getRequestURI().getPath().split("/");
         int restaurantId = Integer.parseInt(parts[2]);
-        String menuTitle = parts[4];
+        String menuTitle = URLDecoder.decode(parts[4], StandardCharsets.UTF_8);
 
         try {
             var restaurantOpt = Authenticate.restaurantChecker(exchange, user, restaurantId);
@@ -499,7 +513,7 @@ public class RestaurantHandler implements HttpHandler {
             Menu menu = optionalMenu.get();
 
             List<Food> menuFoods = restaurantDAO.getMenuFood(restaurantId, menu.getId());
-            String json =  objectMapper.writeValueAsString(menuFoods);
+            String json = objectMapper.writeValueAsString(menuFoods);
             JsonResponse.sendJsonResponse(exchange, 200, json);
         } catch (SQLException e) {
             HttpError.internal(exchange, "Failed to update order status");
@@ -514,7 +528,7 @@ public class RestaurantHandler implements HttpHandler {
             HttpError.unauthorized(exchange, "Only sellers can get items");
             return;
         }
-        String title = exchange.getRequestURI().getPath().split("/")[4];
+        String title = URLDecoder.decode(exchange.getRequestURI().getPath().split("/")[4], StandardCharsets.UTF_8);
         int restaurantId = Integer.parseInt(exchange.getRequestURI().getPath().split("/")[2]);
         try {
             Optional<Restaurant> optionalRestaurant = Authenticate.restaurantChecker(exchange, user, restaurantId);
@@ -529,7 +543,7 @@ public class RestaurantHandler implements HttpHandler {
             List<Food> allFoods = restaurantDAO.getFoods(restaurantId);
             List<Food> menuFoods = restaurantDAO.getMenuFood(restaurantId, menu.getId());
             allFoods.removeIf(menuFoods::contains);
-            String json =  objectMapper.writeValueAsString(allFoods);
+            String json = objectMapper.writeValueAsString(allFoods);
             JsonResponse.sendJsonResponse(exchange, 200, json);
         } catch (SQLException e) {
             HttpError.internal(exchange, "Internal error");
@@ -552,7 +566,7 @@ public class RestaurantHandler implements HttpHandler {
             Optional<Restaurant> optionalRestaurant = Authenticate.restaurantChecker(exchange, user, restaurantId);
             if (optionalRestaurant.isEmpty()) return;
 
-            List<Menu> menus= restaurantDAO.getMenus(restaurantId);
+            List<Menu> menus = restaurantDAO.getMenus(restaurantId);
             String json = objectMapper.writeValueAsString(menus);
             JsonResponse.sendJsonResponse(exchange, 200, json);
         } catch (SQLException e) {
@@ -571,7 +585,7 @@ public class RestaurantHandler implements HttpHandler {
 
         try {
             List<Keyword> keywords = new KeywordDAOImp().getAllKeywords();
-            String json =  objectMapper.writeValueAsString(keywords);
+            String json = objectMapper.writeValueAsString(keywords);
             JsonResponse.sendJsonResponse(exchange, 200, json);
         } catch (SQLException e) {
             HttpError.internal(exchange, "Internal error");

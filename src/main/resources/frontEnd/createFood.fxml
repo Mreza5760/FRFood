@@ -27,16 +27,21 @@
         <TextField fx:id="nameField" promptText="Food name"
                    style="-fx-font-size: 14px; -fx-padding: 10; -fx-background-radius: 6;"/>
 
-        <TextField fx:id="priceField" promptText="price"
-                   style="-fx-font-size: 14px; -fx-padding: 10; -fx-background-radius: 6;"/>
+        <HBox spacing="15" alignment="CENTER">
+            <TextField fx:id="priceField" promptText="price"
+                       style="-fx-font-size: 14px; -fx-padding: 10; -fx-background-radius: 6;"
+                       prefWidth="140"/>
 
-        <TextField fx:id="supplyField" promptText="supply"
-                   style="-fx-font-size: 14px; -fx-padding: 10; -fx-background-radius: 6;"/>
+            <TextField fx:id="supplyField" promptText="supply"
+                       style="-fx-font-size: 14px; -fx-padding: 10; -fx-background-radius: 6;"
+                       prefWidth="140"/>
+        </HBox>
 
         <ListView fx:id="keywordsListView"
-                  prefHeight="200"
+                  prefHeight="150"
+                  maxHeight="150"
                   prefWidth="300"
-                  style="-fx-font-size: 14px;"/>
+                  style="-fx-font-size: 14px; -fx-background-radius: 6; -fx-padding: 5;"/>
 
         <TextField fx:id="descriptionField" promptText="description"
                    style="-fx-font-size: 14px; -fx-padding: 10; -fx-background-radius: 6;"/>
