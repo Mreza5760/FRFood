@@ -71,7 +71,7 @@ public class RestaurantHandler implements HttpHandler {
                 default -> JsonResponse.sendJsonResponse(exchange, 404, "Not Found");
             }
         } catch (Exception e) {
-            HttpError.internal(exchange, "Unexpected server error: " + e.getMessage());
+            HttpError.internal(exchange, "Wrong url: " + e.getMessage());
         }
     }
 
@@ -380,7 +380,6 @@ public class RestaurantHandler implements HttpHandler {
         String menuTitle =URLDecoder.decode(parts[4], StandardCharsets.UTF_8);
         int foodId = Integer.parseInt(parts[5]);
         int restaurantId = Integer.parseInt(parts[2]);
-
         try {
             var restaurantOpt = Authenticate.restaurantChecker(exchange, user, restaurantId);
             if (restaurantOpt.isEmpty()) return;
@@ -390,7 +389,6 @@ public class RestaurantHandler implements HttpHandler {
                 return;
             }
             Menu menu = optionalMenu.get();
-
             foodDAO.deleteMenuItem(menu.getId(), foodId);
             JsonResponse.sendJsonResponse(exchange, 200, "{\"message\":\"Item removed from menu\"}");
         } catch (SQLException e) {

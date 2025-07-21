@@ -14,7 +14,7 @@ import java.util.*;
 public class FoodDAOImp implements FoodDAO {
 
     @Override
-    public Optional<Food> getById(int id) {
+    public Optional<Food> getById(int id) throws SQLException {
         String sql = "SELECT * FROM FoodItems WHERE id = ?";
         try (
                 Connection connection = DBConnector.gConnection();
@@ -37,9 +37,6 @@ public class FoodDAOImp implements FoodDAO {
                     return Optional.of(food);
                 }
             }
-        } catch (SQLException e) {
-            System.out.println(e.getMessage());
-            return Optional.empty();
         }
         return Optional.empty();
     }
@@ -113,8 +110,7 @@ public class FoodDAOImp implements FoodDAO {
 
     @Override
     public void update(Food food) throws SQLException {
-        delete(food.getId());
-        String sql = "INSERT INTO FoodItems (id , restaurant_id , name , image , description , price , supply) VALUES (?,?,?,?,?,?,?)";
+        String sql = "UPDATE FoodItems SET id =? , restaurant_id=? , name=? , image=? , description=? , price=? , supply=?";
         try (
                 Connection connection = DBConnector.gConnection();
                 PreparedStatement preparedStatement = connection.prepareStatement(sql);
