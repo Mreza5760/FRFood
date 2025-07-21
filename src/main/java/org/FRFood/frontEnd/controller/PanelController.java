@@ -103,8 +103,8 @@ public class PanelController {
     }
 
     private void handleOrders() {
-        System.out.println("Navigating to Orders...");
-        // SceneNavigator.switchTo("/frontend/orders.fxml", orderButton);
+        SceneNavigator.switchTo("/frontEnd/buyerOrderPage.fxml", orderFoodButton);
+        System.out.println("Navigated to Buyer Order Page");
     }
 
     private void handleWallet() {

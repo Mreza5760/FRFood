@@ -4,6 +4,7 @@ import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
+import javafx.stage.WindowEvent;
 
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -14,19 +15,14 @@ public class App extends Application {
     public void start(Stage primaryStage) throws Exception {
         Logger logger = Logger.getLogger("javafx.scene.CssStyleHelper");
         logger.setLevel(Level.SEVERE);
+
         FXMLLoader loader = new FXMLLoader(getClass().getResource("/frontEnd/home.fxml"));
         Scene scene = new Scene(loader.load(), 900, 700);
 
         primaryStage.setTitle("Frfood");
         primaryStage.setScene(scene);
-        primaryStage.show();
 
-//
-//        FXMLLoader fxmlLoader = new FXMLLoader(App.class.getResource("/frontEnd/login.fxml"));
-//        Scene scene = new Scene(fxmlLoader.load());
-//        primaryStage.setTitle("Login | FRFood");
-//        primaryStage.setScene(scene);
-//        primaryStage.show();
+        primaryStage.show();
     }
 
     public static void main(String[] args) {
