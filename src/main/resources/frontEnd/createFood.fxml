@@ -37,11 +37,8 @@
                        prefWidth="140"/>
         </HBox>
 
-        <ListView fx:id="keywordsListView"
-                  prefHeight="150"
-                  maxHeight="150"
-                  prefWidth="300"
-                  style="-fx-font-size: 14px; -fx-background-radius: 6; -fx-padding: 5;"/>
+        <TextField fx:id="keywordsTextField" promptText="description"
+                   style="-fx-font-size: 14px; -fx-padding: 10; -fx-background-radius: 6;"/>
 
         <TextField fx:id="descriptionField" promptText="description"
                    style="-fx-font-size: 14px; -fx-padding: 10; -fx-background-radius: 6;"/>

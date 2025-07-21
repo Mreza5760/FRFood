@@ -9,24 +9,23 @@ import java.util.Optional;
 import java.util.ArrayList;
 
 public class KeywordDAOImp implements KeywordDAO {
-    @Override
-    public Optional<Keyword> getKeywordById(int id) throws SQLException {
-        String temp = "SELECT id, name FROM Keywords WHERE id = ?";
-        Keyword keyword = null;
-
-        try (Connection connection = DBConnector.gConnection();
-             PreparedStatement statement = connection.prepareStatement(temp)) {
-            statement.setInt(1, id);
-            try (ResultSet result = statement.executeQuery()) {
-                if (result.next()) {
-                    keyword = new Keyword();
-                    keyword.setId(result.getInt("id"));
-                    keyword.setName(result.getString("name"));
-                }
-            }
-        }
-        return Optional.ofNullable(keyword);
-    }
+//    @Override
+//    public Optional<Keyword> getKeywordById(int id) throws SQLException {
+//        String temp = "SELECT id, name FROM Keywords WHERE id = ?";
+//        Keyword keyword = null;
+//
+//        try (Connection connection = DBConnector.gConnection();
+//             PreparedStatement statement = connection.prepareStatement(temp)) {
+//            statement.setInt(1, id);
+//            try (ResultSet result = statement.executeQuery()) {
+//                if (result.next()) {
+//                    keyword = new Keyword();
+//                    keyword.setName(result.getString("name"));
+//                }
+//            }
+//        }
+//        return Optional.ofNullable(keyword);
+//    }
 
     @Override
     public Optional<Keyword> getKeywordByName(String name) throws SQLException {
@@ -40,7 +39,6 @@ public class KeywordDAOImp implements KeywordDAO {
                 if (result.next()) {
                     keyword = new Keyword();
                     keyword.setName(result.getString("name"));
-                    keyword.setId(result.getInt("id"));
                 }
             }
         }
@@ -48,30 +46,30 @@ public class KeywordDAOImp implements KeywordDAO {
         return Optional.ofNullable(keyword);
     }
 
-    @Override
-    public int insertKeyword(Keyword keyword) throws SQLException {
-        int generatedId = -1;
-        String temp = "INSERT INTO Keywords (name) VALUES (?)";
-
-        try (Connection connection = DBConnector.gConnection();
-             PreparedStatement statement = connection.prepareStatement(temp, Statement.RETURN_GENERATED_KEYS)) {
-            statement.setString(1, keyword.getName());
-            int affectedRows = statement.executeUpdate();
-
-            if (affectedRows > 0) {
-                try (ResultSet rs = statement.getGeneratedKeys()) {
-                    if (rs.next()) {
-                        generatedId = rs.getInt(1);
-                    } else {
-                        throw new SQLException("Creating Keyword failed, no Id obtained.");
-                    }
-                }
-            } else {
-                throw new SQLException("Creating Keyword failed, no rows affected.");
-            }
-        }
-        return generatedId;
-    }
+//    @Override
+//    public int insertKeyword(Keyword keyword) throws SQLException {
+//        int generatedId = -1;
+//        String temp = "INSERT INTO Keywords (name) VALUES (?)";
+//
+//        try (Connection connection = DBConnector.gConnection();
+//             PreparedStatement statement = connection.prepareStatement(temp, Statement.RETURN_GENERATED_KEYS)) {
+//            statement.setString(1, keyword.getName());
+//            int affectedRows = statement.executeUpdate();
+//
+//            if (affectedRows > 0) {
+//                try (ResultSet rs = statement.getGeneratedKeys()) {
+//                    if (rs.next()) {
+//                        generatedId = rs.getInt(1);
+//                    } else {
+//                        throw new SQLException("Creating Keyword failed, no Id obtained.");
+//                    }
+//                }
+//            } else {
+//                throw new SQLException("Creating Keyword failed, no rows affected.");
+//            }
+//        }
+//        return generatedId;
+//    }
 
     @Override
     public List<Keyword> getKeywordsByFoodId(int foodId) throws SQLException {
@@ -94,21 +92,21 @@ public class KeywordDAOImp implements KeywordDAO {
         return keywords;
     }
 
-    @Override
-    public List<Keyword> getAllKeywords() throws SQLException {
-        String  temp = "SELECT * FROM Keywords";
-        List<Keyword> keywords = new ArrayList<>();
-        try (Connection connection = DBConnector.gConnection();
-        PreparedStatement statement = connection.prepareStatement(temp)) {
-            try (ResultSet result = statement.executeQuery()) {
-                while (result.next()) {
-                    Keyword keyword = new Keyword();
-                    keyword.setId(result.getInt("id"));
-                    keyword.setName(result.getString("name"));
-                    keywords.add(keyword);
-                }
-            }
-        }
-        return keywords;
-    }
+//    @Override
+//    public List<Keyword> getAllKeywords() throws SQLException {
+//        String  temp = "SELECT * FROM Keywords";
+//        List<Keyword> keywords = new ArrayList<>();
+//        try (Connection connection = DBConnector.gConnection();
+//        PreparedStatement statement = connection.prepareStatement(temp)) {
+//            try (ResultSet result = statement.executeQuery()) {
+//                while (result.next()) {
+//                    Keyword keyword = new Keyword();
+//                    keyword.setId(result.getInt("id"));
+//                    keyword.setName(result.getString("name"));
+//                    keywords.add(keyword);
+//                }
+//            }
+//        }
+//        return keywords;
+//    }
 }

@@ -38,8 +38,8 @@ public class CreteFoodController {
     public TextField descriptionField;
     public Button submitButton;
     public Button uploadLogoButton;
-    @FXML
-    public ListView<Keyword> keywordsListView;
+
+    @FXML public TextField keywordsTextField;
     @FXML private Label logoStatusLabel;
 
     private String logoBase64 = "";
@@ -54,25 +54,8 @@ public class CreteFoodController {
 
     @FXML
     public void initialize() {
-        keywordsListView.setCellFactory(CheckBoxListCell.forListView(
-                keyword -> {
-                    BooleanProperty observable = new SimpleBooleanProperty();
-                    observable.addListener((obs, wasSelected, isNowSelected) -> {
-                        if (isNowSelected) {
-                            keywordsListView.getSelectionModel().select(keyword);
-                        } else {
-                            keywordsListView.getSelectionModel().clearSelection(
-                                    keywordsListView.getItems().indexOf(keyword));
-                        }
-                    });
-                    return observable;
-                }
-        ));
-        keywordsListView.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
         uploadLogoButton.setOnAction(actionEvent -> handleLogoUpload());
         submitButton.setOnAction(actionEvent -> handleSubmit());
-        fetchOptions();
-
     }
 
     private void handleSubmit() {
@@ -80,11 +63,13 @@ public class CreteFoodController {
         String description = descriptionField.getText();
         String priceText = priceField.getText();
         String supplyText = supplyField.getText();
+        String keywords = keywordsTextField.getText();
 
         if (name.isEmpty() || description.isEmpty() || priceText.isEmpty() || supplyText.isEmpty()) {
             showAlert(Alert.AlertType.ERROR, "Validation Error", "All fields must be filled out.");
             return;
         }
+        List<String> keywordsList = List.of(keywords.split(" "));
 
         double price;
         int supply;
@@ -96,11 +81,7 @@ public class CreteFoodController {
             return;
         }
 
-        List<String> selectedKeywords = keywordsListView.getSelectionModel()
-                .getSelectedItems()
-                .stream()
-                .map(Keyword::getName)
-                .toList();
+
 
         ObjectMapper mapper = new ObjectMapper();
         try {
@@ -111,10 +92,9 @@ public class CreteFoodController {
                     description,
                     price,
                     supply,
-                    selectedKeywords
+                    keywordsList
             ));
 
-            System.out.println("here!"+requestBody);
 
             HttpRequest request = HttpRequest.newBuilder()
                     .uri(URI.create("http://localhost:8080/restaurants/"+restaurantId+"/item"))
@@ -152,40 +132,6 @@ public class CreteFoodController {
         alert.setHeaderText(null);
         alert.setContentText(content);
         alert.showAndWait();
-    }
-
-
-
-    private void fetchOptions() {
-        HttpRequest request = HttpRequest.newBuilder()
-                .uri(URI.create("http://localhost:8080/restaurants/keywords"))
-                .header("Authorization", "Bearer " + SessionManager.getAuthToken())
-                .GET()
-                .build();
-
-
-        HttpClient.newHttpClient().sendAsync(request, HttpResponse.BodyHandlers.ofString())
-                .thenAccept(response -> {
-                    if (response.statusCode() == 200) {
-                        try {
-                            ObjectMapper mapper = new ObjectMapper();
-                            List<Keyword> options = mapper.readValue(response.body(), new TypeReference<>() {});
-                            Platform.runLater(() -> {
-                                System.out.println("Response body: " + response.body());
-                                System.out.println("Parsed keywords: " + options);
-                                keywordsListView.getItems().addAll(options);
-                                System.out.println("Added to ListView: " + keywordsListView.getItems());
-                                keywordsListView.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
-                            });
-                        } catch (Exception e) {
-                            e.printStackTrace();
-                        }
-                    }
-                })
-                .exceptionally(e -> {
-                    e.printStackTrace();
-                    return null;
-                });
     }
 
     private void handleLogoUpload() {
