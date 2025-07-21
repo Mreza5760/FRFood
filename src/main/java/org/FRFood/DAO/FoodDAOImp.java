@@ -5,6 +5,9 @@ import org.FRFood.entity.Keyword;
 import org.FRFood.entity.Restaurant;
 import org.FRFood.util.DBConnector;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.sql.*;
 import java.util.*;
 
@@ -65,7 +68,13 @@ public class FoodDAOImp implements FoodDAO {
         ) {
             preparedStatement.setInt(1, food.getRestaurantId());
             preparedStatement.setString(2, food.getName());
-            preparedStatement.setString(3, food.getPicture());
+            if (food.getPicture() != null && !food.getPicture().isEmpty()) {
+                preparedStatement.setString(3, food.getPicture());
+            } else {
+                byte[] fileContent = Files.readAllBytes(Paths.get("src/main/resources/imageUrls/chef-logo-design-illustration-restaurant-logo-vector.png"));
+                String base64String = Base64.getEncoder().encodeToString(fileContent);
+                preparedStatement.setString(3, base64String);
+            }
             preparedStatement.setString(4, food.getDescription());
             preparedStatement.setInt(5, food.getPrice());
             preparedStatement.setInt(6, food.getSupply());
@@ -88,14 +97,16 @@ public class FoodDAOImp implements FoodDAO {
             String sql2 = "INSERT INTO keywords (name,food_id) VALUES (?,?)";
             PreparedStatement preparedStatement2 = connection.prepareStatement(sql2);
             for (Keyword keyword : keywords) {
-                preparedStatement2.setString(2, keyword.getName());
-                preparedStatement2.setInt(1, food.getId());
-                int changed = preparedStatement2.executeUpdate();
-                if (changed == 0) {
-                    throw new SQLException();
+                preparedStatement2.setString(1, keyword.getName());
+                preparedStatement2.setInt(2, food.getId());
+                int theRows = preparedStatement2.executeUpdate();
+                if (theRows == 0) {
+                    throw new SQLException("Insert failed, no rows affected.");
                 }
             }
             preparedStatement2.close();
+        } catch (IOException e) {
+            throw new SQLException("Insert failed.", e);
         }
         return generatedKey;
     }

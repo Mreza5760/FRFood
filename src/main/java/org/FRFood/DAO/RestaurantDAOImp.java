@@ -32,7 +32,7 @@ public class RestaurantDAOImp implements RestaurantDAO {
             if (restaurant.getLogo() != null && !restaurant.getLogo().isEmpty()) {
                 preparedStatement.setString(5, restaurant.getLogo());
             } else {
-                byte[] fileContent = Files.readAllBytes(Paths.get("src/main/resources/imageUrls/img.png"));
+                byte[] fileContent = Files.readAllBytes(Paths.get("src/main/resources/imageUrls/Good-food-logo-design-on-transparent-background-PNG"));
                 String base64String = Base64.getEncoder().encodeToString(fileContent);
                 preparedStatement.setString(5, base64String);
             }
