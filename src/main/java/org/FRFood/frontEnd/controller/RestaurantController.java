@@ -100,7 +100,7 @@ public class RestaurantController {
                     RestaurantDAO restaurantDAO = new RestaurantDAOImp();
                     try {
                         menu = restaurantDAO.getMenuByTitle(menu.getTitle(), restaurantId).orElse(null);
-                    }catch (Exception e) {
+                    } catch (Exception e) {
                         e.getStackTrace();
                     }
                     menuList.getChildren().add(createMenuCard(menu));
@@ -154,8 +154,8 @@ public class RestaurantController {
     }
 
     private void handleClick(Menu menu) {
-        MenuController.setData(menu.getId(),menu.getTitle(),restaurantId);
-        SceneNavigator.switchTo("/frontend/menu.fxml",restaurant_name_label);
+        MenuController.setData(menu.getId(), menu.getTitle(), restaurantId);
+        SceneNavigator.switchTo("/frontend/menu.fxml", restaurant_name_label);
     }
 
     private void handleDelete(Menu menu) {
@@ -237,5 +237,10 @@ public class RestaurantController {
                     e.printStackTrace();
                     return null;
                 });
+    }
+
+    public void viewFoods(ActionEvent actionEvent) {
+        AllRestaurantFoodController.setData(restaurantId, restaurantName);
+        SceneNavigator.switchTo("/frontend/allRestaurantFood.fxml", restaurant_name_label);
     }
 }

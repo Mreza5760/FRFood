@@ -1,6 +1,7 @@
 package org.FRFood.frontEnd.controller;
 
 import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import javafx.application.Platform;
 import javafx.event.ActionEvent;
@@ -8,7 +9,6 @@ import javafx.fxml.FXML;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
-import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.image.Image;
@@ -18,7 +18,6 @@ import javafx.scene.layout.Priority;
 import javafx.scene.layout.Region;
 import javafx.scene.layout.VBox;
 import org.FRFood.entity.Food;
-import org.FRFood.entity.Menu;
 import org.FRFood.frontEnd.Util.SceneNavigator;
 import org.FRFood.frontEnd.Util.SessionManager;
 
@@ -32,26 +31,25 @@ import java.nio.charset.StandardCharsets;
 import java.util.Base64;
 import java.util.List;
 
-public class MenuController {
+public class AllRestaurantFoodController {
     @FXML
-    public Label menu_name_label;
+    public Label restaurant_name_label;
     @FXML
     public VBox foodList;
 
     private final ObjectMapper mapper = new ObjectMapper();
 
-    private static int menuId;
-    private static String menuTitle;
     private static int restaurantId;
-    public static void setData(int menuId, String menuTitle, int restaurantId) {
-        MenuController.menuId = menuId;
-        MenuController.menuTitle = menuTitle;
-        MenuController.restaurantId = restaurantId;
+    private static String restaurantName;
+
+    public static void setData(int input,String restaurant_name) {
+        AllRestaurantFoodController.restaurantId = input;
+        AllRestaurantFoodController.restaurantName = restaurant_name;
     }
 
     @FXML
     public void goBack(ActionEvent actionEvent) {
-        SceneNavigator.switchTo("/frontend/Restaurant.fxml",menu_name_label);
+        SceneNavigator.switchTo("/frontend/Restaurant.fxml",foodList);
     }
 
     @FXML
@@ -60,12 +58,12 @@ public class MenuController {
 
     @FXML
     private void initialize(){
-        menu_name_label.setText(menuTitle);
+        restaurant_name_label.setText(restaurantName);
         fetchFoods();
     }
 
     private void fetchFoods() {
-        String safeUrl = "http://localhost:8080/restaurants/" + restaurantId + "/items/" +URLEncoder.encode(menuTitle, StandardCharsets.UTF_8);
+        String safeUrl = "http://localhost:8080/vendors/" +restaurantId ;
         URI uri = URI.create(safeUrl);
         HttpRequest request = HttpRequest.newBuilder()
                 .uri(uri)
@@ -78,7 +76,7 @@ public class MenuController {
                     if (response.statusCode() == 200) {
                         displayFoods(response.body());
                     } else {
-                        System.err.println("Failed to fetch restaurants: HTTP " + response.statusCode());
+                        System.err.println("Failed to fetch restaurants: HTTP " + response.statusCode() + response.body());
                     }
                 })
                 .exceptionally(e -> {
@@ -89,7 +87,11 @@ public class MenuController {
 
     private void displayFoods(String body) {
         try {
-            List<Food> foods = mapper.readValue(body, new TypeReference<>() {
+            JsonNode rootNode = mapper.readTree(body);
+
+            // Extract node for "the thing"
+            JsonNode theThingNode = rootNode.get("menu_title");
+            List<Food> foods = mapper.convertValue(theThingNode, new TypeReference<List<Food>>()  {
             });
             Platform.runLater(() -> {
                 foodList.getChildren().clear();
@@ -133,7 +135,7 @@ public class MenuController {
 
         Label feeLabel = new Label("💰 Price: " + food.getPrice()+"$");
         feeLabel.setStyle("-fx-font-size: 14px; -fx-text-fill: #3a3a3a;");
-        
+
         Label descriptionLabel = new Label("📝 " + food.getDescription());
         descriptionLabel.setStyle("-fx-font-size: 14px; -fx-text-fill: #3a3a3a;");
 
@@ -154,7 +156,7 @@ public class MenuController {
                     -fx-background-radius: 10;
                     -fx-cursor: hand;
                 """);
-        CommentsBtn.setOnAction(e -> handleComments(food));
+//        CommentsBtn.setOnAction(e -> handleComments(food));
 
 // Delete Button
         Button deleteBtn = new Button("Delete");
@@ -168,49 +170,18 @@ public class MenuController {
                     -fx-background-radius: 10;
                     -fx-cursor: hand;
                 """);
-        deleteBtn.setOnAction(e -> handleDelete(food));
+//        deleteBtn.setOnAction(e -> handleDelete(food));
 
 // Add both buttons to VBox
         HBox rightBox = new HBox(10, CommentsBtn, deleteBtn);
         rightBox.setAlignment(Pos.CENTER_RIGHT);
 
 
-        card.setOnMouseClicked(e -> handleClick(food)); // full card click
+//        card.setOnMouseClicked(e -> handleClick(food)); // full card click
 
         card.getChildren().addAll(logo, info, spacer, rightBox);
         return card;
     }
 
-    private void handleComments(Food food) {
-    }
-
-    private void handleClick(Food food) {
-    }
-
-    private void handleDelete(Food food) {
-        String safeUrl = "http://localhost:8080/restaurants/" + restaurantId + "/menu/" +URLEncoder.encode(menuTitle, StandardCharsets.UTF_8)+food.getId();
-        URI uri = URI.create(safeUrl);
-//        String url = "http://localhost:8080/restaurants/" + restaurantId+"/menu/" + menuTitle + "/" + food.getId();
-        HttpRequest request = HttpRequest.newBuilder()
-                .uri(uri)
-                .header("Authorization", "Bearer " + SessionManager.getAuthToken())
-                .DELETE()
-                .build();
-
-        HttpClient.newHttpClient().sendAsync(request, HttpResponse.BodyHandlers.ofString())
-                .thenAccept(response -> {
-                    if (response.statusCode() == 200 || response.statusCode() == 204) {
-                        System.out.println("Deleted restaurant: " + food.getName());
-                        // Optionally refresh the list on UI thread
-                        Platform.runLater(this::fetchFoods);
-                    } else {
-                        System.err.println("Failed to delete restaurant: HTTP " + response.statusCode());
-                    }
-                })
-                .exceptionally(e -> {
-                    e.printStackTrace();
-                    return null;
-                });
-    }
 
 }

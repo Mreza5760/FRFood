@@ -26,6 +26,12 @@
                 prefWidth="120"
                 style="-fx-background-color: #ff5555; -fx-text-fill: white; -fx-font-weight: bold; -fx-background-radius: 10; -fx-cursor: hand; -fx-pref-height: 40;-fx-font-size: 14px;"/>
 
+        <Region fx:id="spacer4" HBox.hgrow="ALWAYS"/>
+        <Button text="view foods"
+                onAction="#viewFoods"
+                prefWidth="120"
+                style="-fx-background-color: #6600cc; -fx-text-fill: white; -fx-font-weight: bold; -fx-background-radius: 10; -fx-cursor: hand; -fx-pref-height: 40;-fx-font-size: 14px;"/>
+
         <Region fx:id="spacer1" HBox.hgrow="ALWAYS"/>
         <Button text="+ Add Food"
                 onAction="#addFood"

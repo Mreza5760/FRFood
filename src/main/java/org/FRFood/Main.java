@@ -2,6 +2,7 @@ package org.FRFood;
 
 import com.sun.net.httpserver.HttpServer;
 import org.FRFood.HTTPHandler.AuthHandler;
+import org.FRFood.HTTPHandler.BuyerHandler;
 import org.FRFood.HTTPHandler.RestaurantHandler;
 
 import java.net.InetSocketAddress;
@@ -18,6 +19,7 @@ public class Main {
          System.out.println("ok");
          server.createContext("/auth", new AuthHandler());
          server.createContext("/restaurants", new RestaurantHandler());
+         server.createContext("/vendors",new BuyerHandler());
          server.setExecutor(Executors.newFixedThreadPool(4));
          server.start();
          System.out.println("Server started. Listening on port " + port);

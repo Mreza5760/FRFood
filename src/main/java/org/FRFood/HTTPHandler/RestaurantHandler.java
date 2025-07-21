@@ -50,7 +50,7 @@ public class RestaurantHandler implements HttpHandler {
                     if (path.equals("/restaurants/mine")) myRestaurants(exchange);
                     else if (path.matches("^/\\d+/orders$")) getOrders(exchange);
                     else if (path.matches("^/restaurants/\\d+/menus$")) getMenus(exchange);
-                    else if (path.matches("^/\\d+/items/[^/]+$")) getMenuItems(exchange);
+                    else if (path.matches("^/restaurants/\\d+/items/[^/]+$")) getMenuItems(exchange);
                     else if (path.matches("^/restaurants/\\d+/menu/[^/]+$")) getItemsOutOfMenu(exchange);
 //                    else if (path.matches("^/restaurants/keywords$")) getKeywords(exchange);
                 }
@@ -470,7 +470,7 @@ public class RestaurantHandler implements HttpHandler {
             return;
         }
 
-        String title = exchange.getRequestURI().getPath().split("/")[4];
+        String title = URLDecoder.decode(exchange.getRequestURI().getPath().split("/")[4], StandardCharsets.UTF_8);
         int restaurantId = Integer.parseInt(exchange.getRequestURI().getPath().split("/")[2]);
         try {
             Optional<Restaurant> optionalRestaurant = Authenticate.restaurantChecker(exchange, user, restaurantId);
