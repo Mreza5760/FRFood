@@ -10,6 +10,7 @@ import javafx.scene.control.*;
 import javafx.event.ActionEvent;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import javafx.stage.Stage;
+import org.FRFood.frontEnd.Util.SceneNavigator;
 import org.FRFood.frontEnd.Util.SessionManager;
 
 import java.io.IOException;
@@ -88,14 +89,7 @@ public class SignUpController {
     }
     @FXML
     private void goToLogin() {
-        try {
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("/frontend/Login.fxml"));
-            Parent root = loader.load();
-            Stage stage = (Stage) fullNameField.getScene().getWindow();
-            stage.setScene(new Scene(root));
-        } catch (IOException e) {
-            System.out.println(e.getMessage());
-        }
+        SceneNavigator.switchTo("/frontend/Login.fxml",messageLabel);
     }
 
     private String getString() throws JsonProcessingException {
