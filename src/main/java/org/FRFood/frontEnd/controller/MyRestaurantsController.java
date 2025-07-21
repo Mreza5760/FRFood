@@ -7,7 +7,6 @@ import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
-import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
@@ -25,9 +24,7 @@ import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
-import java.time.ZoneId;
 import java.util.Base64;
-import java.util.EventObject;
 import java.util.List;
 
 public class MyRestaurantsController {
@@ -176,7 +173,7 @@ public class MyRestaurantsController {
 
     private void handleClick(Restaurant r) {
         RestaurantController.setValues(r.getId(),r.getName());
-        FXMLLoader loader = new FXMLLoader(getClass().getResource("/frontend/Restaurant.fxml"));
+        FXMLLoader loader = new FXMLLoader(getClass().getResource("/frontEnd/restaurant.fxml"));
         try {
             Parent root = loader.load();
 

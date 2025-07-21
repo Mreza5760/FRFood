@@ -189,7 +189,7 @@ public class RestaurantController {
     }
 
     public void goBack(ActionEvent actionEvent) {
-        SceneNavigator.switchTo("/frontend/MyRestaurants.fxml", restaurant_name_label);
+        SceneNavigator.switchTo("/frontend/myRestaurants.fxml", restaurant_name_label);
     }
 
     public void addMenu(ActionEvent actionEvent) {

@@ -96,7 +96,7 @@ public class UpdateRestaurantController {
                 if (responseCode == 200) {
                     Platform.runLater(() -> {
                         // Go back to restaurant list
-                        SceneNavigator.switchTo("/frontend/MyRestaurants.fxml", (Node) event.getSource());
+                        SceneNavigator.switchTo("/frontend/myRestaurants.fxml", (Node) event.getSource());
                     });
                 }
 
@@ -108,6 +108,6 @@ public class UpdateRestaurantController {
 
     @FXML
     public void handleCancel(ActionEvent event) {
-        SceneNavigator.switchTo("/frontend/MyRestaurants.fxml", (Node) event.getSource());
+        SceneNavigator.switchTo("/frontend/myRestaurants.fxml", (Node) event.getSource());
     }
 }
