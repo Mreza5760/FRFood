@@ -37,7 +37,7 @@
                        prefWidth="140"/>
         </HBox>
 
-        <TextField fx:id="keywordsTextField" promptText="description"
+        <TextField fx:id="keywordsTextField" promptText="keywords separated by ',' "
                    style="-fx-font-size: 14px; -fx-padding: 10; -fx-background-radius: 6;"/>
 
         <TextField fx:id="descriptionField" promptText="description"
