@@ -360,7 +360,7 @@ public class RestaurantHandler implements HttpHandler {
         }
 
         String[] parts = exchange.getRequestURI().getPath().split("/");
-        String menuTitle = parts[4];
+        String menuTitle =URLDecoder.decode(parts[4], StandardCharsets.UTF_8);
         int foodId = Integer.parseInt(parts[5]);
         int restaurantId = Integer.parseInt(parts[2]);
 
@@ -513,7 +513,9 @@ public class RestaurantHandler implements HttpHandler {
 
             List<Food> allFoods = restaurantDAO.getFoods(restaurantId);
             List<Food> menuFoods = restaurantDAO.getMenuFood(restaurantId, menu.getId());
-            allFoods.removeIf(menuFoods::contains);
+            for(Food food : menuFoods){
+                allFoods.remove(food);
+            }
             String json = objectMapper.writeValueAsString(allFoods);
             JsonResponse.sendJsonResponse(exchange, 200, json);
         } catch (SQLException e) {

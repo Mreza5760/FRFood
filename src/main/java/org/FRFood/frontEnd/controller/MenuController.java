@@ -206,7 +206,7 @@ public class MenuController {
                         // Optionally refresh the list on UI thread
                         Platform.runLater(this::fetchFoods);
                     } else {
-                        System.err.println("Failed to delete restaurant: HTTP " + response.statusCode());
+                        System.err.println("Failed to delete food: HTTP " + response.statusCode() + response.body());
                     }
                 })
                 .exceptionally(e -> {

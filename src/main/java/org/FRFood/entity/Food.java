@@ -92,4 +92,14 @@ public class Food {
     public void setKeywords(List<Keyword> keywords) {
         this.keywords = keywords;
     }
+
+    @Override
+    public boolean equals(Object obj) {
+        if(!(obj instanceof Food)){
+            return false;
+        }
+        Food food = (Food) obj;
+        return food.getId().equals(this.id);
+    }
+
 }
