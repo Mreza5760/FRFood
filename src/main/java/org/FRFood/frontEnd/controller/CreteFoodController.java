@@ -69,7 +69,7 @@ public class CreteFoodController {
             showAlert(Alert.AlertType.ERROR, "Validation Error", "All fields must be filled out.");
             return;
         }
-        List<String> keywordsList = List.of(keywords.split(" "));
+        List<String> keywordsList = List.of(keywords.split(","));
 
         double price;
         int supply;
