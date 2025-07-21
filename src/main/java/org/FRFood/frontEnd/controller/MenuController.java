@@ -190,7 +190,7 @@ public class MenuController {
     }
 
     private void handleDelete(Food food) {
-        String safeUrl = "http://localhost:8080/restaurants/" + restaurantId + "/menu/" +URLEncoder.encode(menuTitle, StandardCharsets.UTF_8)+food.getId();
+        String safeUrl = "http://localhost:8080/restaurants/" + restaurantId + "/menu/" +URLEncoder.encode(menuTitle, StandardCharsets.UTF_8)+"/"+food.getId();
         URI uri = URI.create(safeUrl);
 //        String url = "http://localhost:8080/restaurants/" + restaurantId+"/menu/" + menuTitle + "/" + food.getId();
         HttpRequest request = HttpRequest.newBuilder()
@@ -202,7 +202,6 @@ public class MenuController {
         HttpClient.newHttpClient().sendAsync(request, HttpResponse.BodyHandlers.ofString())
                 .thenAccept(response -> {
                     if (response.statusCode() == 200 || response.statusCode() == 204) {
-                        System.out.println("Deleted restaurant: " + food.getName());
                         // Optionally refresh the list on UI thread
                         Platform.runLater(this::fetchFoods);
                     } else {
