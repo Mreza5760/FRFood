@@ -2,34 +2,163 @@ package org.FRFood.DAO;
 
 import org.FRFood.entity.Food;
 import org.FRFood.entity.Rate;
+import org.FRFood.util.DBConnector;
 
+import java.sql.*;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import java.sql.SQLException;
 
 public class RateDAOImp implements RateDAO {
     @Override
     public int insert(Rate rate) throws SQLException {
-        return 0;
+        int id = -1;
+        String sql = "INSERT INTO ratings (order_id , user_id , rating , comment) VALUES (?,?,?,?)";
+        try(
+                Connection connection = DBConnector.gConnection();
+                PreparedStatement preparedStatement = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
+                ){
+            preparedStatement.setInt(1,rate.getOrderId());
+            preparedStatement.setInt(2,rate.getUserId());
+            preparedStatement.setInt(3,rate.getRating());
+            preparedStatement.setString(4,rate.getComment());
+
+            try(ResultSet generatedKeys = preparedStatement.executeQuery()){
+                if(generatedKeys.next()){
+                    rate.setId(generatedKeys.getInt(1));
+                    id = rate.getId();
+                }
+            }
+
+            String sql2 = "INSERT INTO rating_images (rating_id,image_data) VALUES (?,?)";
+            for(String imageData : rate.getImages()){
+                try(
+                        Connection connection2 = DBConnector.gConnection();
+                        PreparedStatement stmt = connection2.prepareStatement(sql2);
+                ){
+                    stmt.setInt(1, id);
+                    stmt.setString(2,imageData);
+                    stmt.executeUpdate();
+                }
+            }
+        }
+        return id;
     }
 
     @Override
     public boolean deleteById(int id) throws SQLException {
-        return false;
+        String sql = "DELETE FROM ratings WHERE id = ?";
+        try(
+                Connection connection = DBConnector.gConnection();
+                PreparedStatement preparedStatement = connection.prepareStatement(sql);
+                ){
+            preparedStatement.setInt(1,id);
+            int rows = preparedStatement.executeUpdate();
+            if(rows == 0){
+                throw new SQLException("no rows changed !");
+            }
+            return true;
+        }
     }
 
     @Override
     public boolean updateById(int id, Rate rate) throws SQLException {
+        String sql = "UPDATE ratings SET  rating = ?, comment = ? WHERE id = ?";
+        try(
+                Connection connection = DBConnector.gConnection();
+                PreparedStatement preparedStatement = connection.prepareStatement(sql);
+                ){
+            preparedStatement.setInt(1, rate.getRating());
+            preparedStatement.setString(2,rate.getComment());
+            int rows = preparedStatement.executeUpdate();
+            if(rows == 0){
+                throw new SQLException("no rows changed !");
+            }
+        }
+
+        String deleteSql = "DELETE FROM rating_images WHERE rating_id = ?";
+        try(
+                Connection connection = DBConnector.gConnection();
+                PreparedStatement stmt = connection.prepareStatement(deleteSql);
+        ){
+            stmt.setInt(1,id);
+            stmt.executeUpdate();
+        }
+
+        String sql2 = "INSERT INTO rating_images (rating_id,image_data) VALUES (?,?)";
+        for(String imageData : rate.getImages()){
+            try(
+                    Connection connection = DBConnector.gConnection();
+                    PreparedStatement stmt = connection.prepareStatement(sql2);
+            ){
+                stmt.setInt(1, id);
+                stmt.setString(2,imageData);
+                int rows = stmt.executeUpdate();
+                if(rows == 0){
+                    throw new SQLException("no rows changed !");
+                }
+            }
+        }
         return false;
     }
 
     @Override
     public Optional<Rate> getById(int id) throws SQLException {
-        return null;
+        Rate rate = null;
+        String sql = "SELECT * FROM ratings WHERE id = ?";
+        try(
+                Connection connection = DBConnector.gConnection();
+                PreparedStatement preparedStatement = connection.prepareStatement(sql);
+                ){
+            preparedStatement.setInt(1,id);
+            List<String> images = new ArrayList<>();
+            String sql2 = "SELECT * FROM rating_images WHERE rating_id = ?";
+            try(
+                    Connection connection2 = DBConnector.gConnection();
+                    PreparedStatement preparedStatement2 = connection2.prepareStatement(sql2);
+            ){
+                preparedStatement2.setInt(1,id);
+                try(ResultSet resultSet = preparedStatement2.executeQuery()){
+                    while(resultSet.next()){
+                        images.add(resultSet.getString("image_data"));
+                    }
+                }
+            }
+            try(ResultSet resultSet = preparedStatement.executeQuery()){
+                if(resultSet.next()){
+                    rate = new Rate();
+                    rate.setId(id);
+                    rate.setImages(images);
+                    rate.setRating(resultSet.getInt("rating"));
+                    rate.setComment(resultSet.getString("comment"));
+                    rate.setOrderId(resultSet.getInt("order_id"));
+                    rate.setUserId(resultSet.getInt("user_id"));
+                    rate.setCreatedAt(resultSet.getString("created_at"));
+                }
+            }
+        }
+        return Optional.ofNullable(rate);
     }
 
     @Override
     public List<Rate> getFoodRates(Food food) throws SQLException {
-        return List.of();
+        List<Rate> rates = new ArrayList<>();
+        List<Integer> rateIds = new ArrayList<>();
+        String sql = "SELECT * FROM ratings WHERE food_id = ?";
+        try(
+                Connection connection = DBConnector.gConnection();
+                PreparedStatement preparedStatement = connection.prepareStatement(sql);
+                ){
+            preparedStatement.setInt(1,food.getId());
+            try(ResultSet resultSet = preparedStatement.executeQuery()){
+                while(resultSet.next()){
+                    rateIds.add(resultSet.getInt("id"));
+                }
+            }
+        }
+        for(int id : rateIds){
+            rates.add(getById(id).orElse(null));
+        }
+        return rates;
     }
 }
