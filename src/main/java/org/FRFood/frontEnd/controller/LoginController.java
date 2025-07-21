@@ -8,6 +8,7 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.stage.Stage;
+import org.FRFood.frontEnd.Util.SceneNavigator;
 import org.FRFood.frontEnd.Util.SessionManager;
 
 import java.io.*;
@@ -91,29 +92,10 @@ public class LoginController {
     }
     @FXML
     private void goToSignUp() {
-        try {
-            System.out.println("Going to sign up...");
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("/frontEnd/signup.fxml"));
-            Parent root = loader.load();
-            Stage stage = (Stage) phoneField.getScene().getWindow();
-            stage.setScene(new Scene(root));
-        } catch (IOException e) {
-            System.out.println(e.getMessage());
-        }
+        SceneNavigator.switchTo("/frontend/signup.fxml",messageLabel);
     }
     public void goToHome() {
-        try {
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("/frontend/Home.fxml"));
-            Parent root = loader.load();
-
-            Stage stage = (Stage) phoneField.getScene().getWindow(); // see below
-            stage.setScene(new Scene(root));
-            stage.setTitle("Home");
-            stage.show();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        SceneNavigator.switchTo("/frontend/Home.fxml",messageLabel);
     }
-
 
 }
