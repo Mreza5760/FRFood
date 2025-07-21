@@ -6,9 +6,12 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.image.Image;
@@ -17,7 +20,9 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.Region;
 import javafx.scene.layout.VBox;
+import javafx.stage.Stage;
 import org.FRFood.entity.Food;
+import org.FRFood.entity.Keyword;
 import org.FRFood.frontEnd.Util.SceneNavigator;
 import org.FRFood.frontEnd.Util.SessionManager;
 
@@ -225,8 +230,30 @@ public class AllRestaurantFoodController {
     }
 
     private void handleEdit(Food food) {
-    }
+        FXMLLoader loader = new FXMLLoader(getClass().getResource("/frontend/updateFood.fxml"));
+        try {
+            Parent root = loader.load();
 
+            UpdateFoodController controller = loader.getController();
+            StringBuilder keywords = new StringBuilder();
+            for(Keyword f : food.getKeywords()) {
+                keywords.append(f.getName()).append(" ");
+            }
+            controller.setFoodData(restaurantId,food.getId(),food.getName(),food.getSupply(),food.getPrice(),keywords.toString(),food.getDescription(),food.getPicture());
+
+
+            Stage stage = (Stage) restaurant_name_label.getScene().getWindow();
+            double currentWidth = stage.getWidth();
+            double currentHeight = stage.getHeight();
+            stage.setScene(new Scene(root));
+            stage.setWidth(currentWidth);
+            stage.setHeight(currentHeight);
+            stage.show();
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+        }
+
+    }
 
 }
 

@@ -56,7 +56,7 @@ public class RestaurantHandler implements HttpHandler {
                 }
                 case "PUT" -> {
                     if (path.matches("^/restaurants/\\d+$")) handleUpdateRestaurants(exchange);
-                    else if (path.matches("^/\\d+/item/\\d+$")) editItem(exchange);
+                    else if (path.matches("^/restaurants/\\d+/item/\\d+$")) editItem(exchange);
                     else if (path.matches("^/restaurants/\\d+/menu/[^/]+$")) addItemToMenu(exchange);
                 }
                 case "DELETE" -> {
@@ -211,6 +211,7 @@ public class RestaurantHandler implements HttpHandler {
     }
 
     private void editItem(HttpExchange exchange) throws IOException {
+        System.out.println("debug");
         var userOpt = Authenticate.authenticate(exchange);
         if (userOpt.isEmpty()) return;
         User user = userOpt.get();
@@ -218,23 +219,23 @@ public class RestaurantHandler implements HttpHandler {
             HttpError.unauthorized(exchange, "Only sellers can edit items");
             return;
         }
-
+        System.out.println("debug");
         String[] parts = exchange.getRequestURI().getPath().split("/");
         int restaurantId = Integer.parseInt(parts[2]);
         int foodId = Integer.parseInt(parts[4]);
         Food food = objectMapper.readValue(exchange.getRequestBody(), Food.class);
         food.setRestaurantId(restaurantId);
         food.setId(foodId);
-
+        System.out.println("debug");
         try {
             var restaurantOpt = Authenticate.restaurantChecker(exchange, user, restaurantId);
             if (restaurantOpt.isEmpty()) return;
             Restaurant restaurant = restaurantOpt.get();
-
+            System.out.println("debug");
             foodDAO.update(food);
             JsonResponse.sendJsonResponse(exchange, 200, objectMapper.writeValueAsString(food));
         } catch (SQLException e) {
-            HttpError.internal(exchange, "Failed to edit food item");
+            HttpError.internal(exchange, "Failed to edit food item" + e.getMessage());
         }
     }
 
