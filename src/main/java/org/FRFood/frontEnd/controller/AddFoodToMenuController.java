@@ -9,6 +9,7 @@ import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.Scene;
+import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.image.Image;
@@ -30,9 +31,11 @@ import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.nio.charset.StandardCharsets;
 import java.util.Base64;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
-public class MenuController {
+public class AddFoodToMenuController {
     @FXML
     public Label menu_name_label;
     @FXML
@@ -43,31 +46,26 @@ public class MenuController {
     private static int menuId;
     private static String menuTitle;
     private static int restaurantId;
-    public static void setData(int menuId, String menuTitle, int restaurantId) {
-        MenuController.menuId = menuId;
-        MenuController.menuTitle = menuTitle;
-        MenuController.restaurantId = restaurantId;
+
+    public static void setData(int menu_id, String menu_Title, int restaurant_Id) {
+        menuId = menu_id;
+        menuTitle = menu_Title;
+        restaurantId = restaurant_Id;
     }
 
     @FXML
     public void goBack(ActionEvent actionEvent) {
-        SceneNavigator.switchTo("/frontend/Restaurant.fxml",menu_name_label);
+        SceneNavigator.switchTo("/frontend/menu.fxml", menu_name_label);
     }
 
     @FXML
-    public void addFood(ActionEvent actionEvent) {
-        AddFoodToMenuController.setData(menuId,menuTitle,restaurantId);
-        SceneNavigator.switchTo("/frontend/addFoodToMenu.fxml",menu_name_label);
-    }
-
-    @FXML
-    private void initialize(){
+    private void initialize() {
         menu_name_label.setText(menuTitle);
         fetchFoods();
     }
 
     private void fetchFoods() {
-        String safeUrl = "http://localhost:8080/restaurants/" + restaurantId + "/items/" +URLEncoder.encode(menuTitle, StandardCharsets.UTF_8);
+        String safeUrl = "http://localhost:8080/restaurants/" + restaurantId + "/menu/" + URLEncoder.encode(menuTitle, StandardCharsets.UTF_8);
         URI uri = URI.create(safeUrl);
         HttpRequest request = HttpRequest.newBuilder()
                 .uri(uri)
@@ -133,47 +131,34 @@ public class MenuController {
         Label supplyLabel = new Label("📍 Supply: " + food.getSupply());
         supplyLabel.setStyle("-fx-font-size: 14px; -fx-text-fill: #3a3a3a;");
 
-        Label feeLabel = new Label("💰 Price: " + food.getPrice()+"$");
+        Label feeLabel = new Label("💰 Price: " + food.getPrice() + "$");
         feeLabel.setStyle("-fx-font-size: 14px; -fx-text-fill: #3a3a3a;");
-        
+
         Label descriptionLabel = new Label("📝 " + food.getDescription());
         descriptionLabel.setStyle("-fx-font-size: 14px; -fx-text-fill: #3a3a3a;");
 
-        info.getChildren().addAll(nameLabel, supplyLabel,  feeLabel,descriptionLabel);
+        info.getChildren().addAll(nameLabel, supplyLabel, feeLabel, descriptionLabel);
 
         Region spacer = new Region();
         HBox.setHgrow(spacer, Priority.ALWAYS);
 
-        // Comments Button
-        Button CommentsBtn = new Button("Comments");
-        CommentsBtn.setPrefWidth(100);
-        CommentsBtn.setPrefHeight(36);
-        CommentsBtn.setStyle("""
-                    -fx-background-color: #007acc;
-                    -fx-text-fill: white;
-                    -fx-font-size: 14px;
-                    -fx-font-weight: bold;
-                    -fx-background-radius: 10;
-                    -fx-cursor: hand;
-                """);
-        CommentsBtn.setOnAction(e -> handleComments(food));
 
 // Delete Button
-        Button deleteBtn = new Button("Delete");
-        deleteBtn.setPrefWidth(100);
-        deleteBtn.setPrefHeight(36);
-        deleteBtn.setStyle("""
-                    -fx-background-color: #ff4444;
+        Button addBtn = new Button("add");
+        addBtn.setPrefWidth(100);
+        addBtn.setPrefHeight(36);
+        addBtn.setStyle("""
+                    -fx-background-color: #00aa88;
                     -fx-text-fill: white;
                     -fx-font-size: 14px;
                     -fx-font-weight: bold;
                     -fx-background-radius: 10;
                     -fx-cursor: hand;
                 """);
-        deleteBtn.setOnAction(e -> handleDelete(food));
+        addBtn.setOnAction(e -> handleaddBtn(food));
 
 // Add both buttons to VBox
-        HBox rightBox = new HBox(10, CommentsBtn, deleteBtn);
+        HBox rightBox = new HBox(10, addBtn);
         rightBox.setAlignment(Pos.CENTER_RIGHT);
 
 
@@ -183,36 +168,53 @@ public class MenuController {
         return card;
     }
 
-    private void handleComments(Food food) {
+    private void handleaddBtn(Food food) {
+        String safeUrl = "http://localhost:8080/restaurants/" + restaurantId + "/menu/" + URLEncoder.encode(menuTitle, StandardCharsets.UTF_8);
+        URI uri = URI.create(safeUrl);
+
+        Map<String, Integer> map = new HashMap<>();
+        map.put("item_id", food.getId());
+        String json = "";
+        try {
+            json = mapper.writeValueAsString(map);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        HttpRequest request = HttpRequest.newBuilder()
+                .uri(uri)
+                .header("Authorization", "Bearer " + SessionManager.getAuthToken())
+                .PUT(HttpRequest.BodyPublishers.ofString(json))
+                .build();
+
+        HttpClient.newHttpClient().sendAsync(request, HttpResponse.BodyHandlers.ofString())
+                .thenAccept(response -> {
+                    if (response.statusCode() == 200 || response.statusCode() == 201) {
+                        Platform.runLater(() -> {
+                            fetchFoods();
+                            showAlert(Alert.AlertType.INFORMATION, "Success", "Food added successfully.");
+                        });
+                    } else {
+                        Platform.runLater(() -> showAlert(Alert.AlertType.ERROR, "Error", "Failed to add food: " + response.body()));
+                    }
+                })
+                .exceptionally(e -> {
+                    e.printStackTrace();
+                    Platform.runLater(() -> showAlert(Alert.AlertType.ERROR, "Error", "An error occurred while sending the request."));
+                    return null;
+                });
+
     }
 
     private void handleClick(Food food) {
     }
 
-    private void handleDelete(Food food) {
-        String safeUrl = "http://localhost:8080/restaurants/" + restaurantId + "/menu/" +URLEncoder.encode(menuTitle, StandardCharsets.UTF_8)+food.getId();
-        URI uri = URI.create(safeUrl);
-//        String url = "http://localhost:8080/restaurants/" + restaurantId+"/menu/" + menuTitle + "/" + food.getId();
-        HttpRequest request = HttpRequest.newBuilder()
-                .uri(uri)
-                .header("Authorization", "Bearer " + SessionManager.getAuthToken())
-                .DELETE()
-                .build();
-
-        HttpClient.newHttpClient().sendAsync(request, HttpResponse.BodyHandlers.ofString())
-                .thenAccept(response -> {
-                    if (response.statusCode() == 200 || response.statusCode() == 204) {
-                        System.out.println("Deleted restaurant: " + food.getName());
-                        // Optionally refresh the list on UI thread
-                        Platform.runLater(this::fetchFoods);
-                    } else {
-                        System.err.println("Failed to delete food: HTTP " + response.statusCode() + response.body());
-                    }
-                })
-                .exceptionally(e -> {
-                    e.printStackTrace();
-                    return null;
-                });
+    private void showAlert(Alert.AlertType type, String title, String content) {
+        Alert alert = new Alert(type);
+        alert.setTitle(title);
+        alert.setHeaderText(null);
+        alert.setContentText(content);
+        alert.showAndWait();
     }
 
 }
