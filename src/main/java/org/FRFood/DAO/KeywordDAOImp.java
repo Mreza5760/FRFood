@@ -75,7 +75,7 @@ public class KeywordDAOImp implements KeywordDAO {
 
     @Override
     public List<Keyword> getKeywordsByFoodId(int foodId) throws SQLException {
-        String temp = "SELECT * FROM FoodItem_Keywords WHERE food_item_id = ?";
+        String temp = "SELECT * FROM keywords WHERE food_id = ?";
         List<Keyword> keywords = new ArrayList<>();
 
         try(
@@ -86,11 +86,7 @@ public class KeywordDAOImp implements KeywordDAO {
             try (ResultSet result = statement.executeQuery()) {
                 while (result.next()) {
                     Keyword keyword = new Keyword();
-                    if (getKeywordById(result.getInt("id")).isEmpty()) {
-                        throw new SQLException("No Keyword found with id " + result.getInt("id"));
-                    } else {
-                        keyword = getKeywordById(result.getInt("id")).get();
-                    }
+                    keyword.setName(result.getString("name"));
                     keywords.add(keyword);
                 }
             }
