@@ -24,10 +24,8 @@ public class SceneNavigator {
             stage.setScene(new Scene(root));
 
 
-            double tempx = 900;
-            double tempy = 700;
-            stage.setWidth(tempx);
-            stage.setHeight(tempy);
+            stage.setWidth(currentWidth);
+            stage.setHeight(currentHeight);
 
             stage.show();
         } catch (IOException e) {
