@@ -15,8 +15,8 @@ public class UserDAOImp implements UserDAO {
     @Override
     public int insert(User user) throws SQLException {
         BankAccountDAO bankAccountDAO = new BankAccountDAOImp();
-        String sql = "INSERT INTO Users (full_name, phone, email, password_hash, role, address, profile_image, bank_id,confirmed) " +
-                "VALUES (?, ?, ?, ?, ?, ?, ?, ?,?)";
+        String sql = "INSERT INTO Users (full_name, phone, email, password_hash, role, address, profile_image, bank_id, confirmed) " +
+                "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
         try (
                 Connection conn = DBConnector.gConnection();
                 PreparedStatement stmt = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)
@@ -232,7 +232,7 @@ public class UserDAOImp implements UserDAO {
                 PreparedStatement stmt = conn.prepareStatement(sql)
         ){
             stmt.setInt(1, id);
-            int rows =stmt.executeUpdate();
+            int rows = stmt.executeUpdate();
             if (rows == 0) {
                 throw new SQLException("no rows affected");
             }

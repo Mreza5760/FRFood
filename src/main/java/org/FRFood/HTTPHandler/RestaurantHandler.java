@@ -167,6 +167,13 @@ public class RestaurantHandler implements HttpHandler {
 
         try {
             Authenticate.restaurantChecker(exchange, user, restaurantId);
+            List<Order> orders = orderDAO.getRestaurantOrders(restaurantId);
+            for (Order order : orders) {
+                if (order.getStatus() != Status.cancelled && order.getStatus() != Status.completed) {
+                    HttpError.badRequest(exchange, "Invalid order status");
+                    return;
+                }
+            }
             restaurantDAO.DeleteById(restaurantId);
             JsonResponse.sendJsonResponse(exchange, 200, "success");
         } catch (Exception e) {
@@ -246,7 +253,17 @@ public class RestaurantHandler implements HttpHandler {
         try {
             var restaurantOpt = Authenticate.restaurantChecker(exchange, user, restaurantId);
             if (restaurantOpt.isEmpty()) return;
-            Restaurant restaurant = restaurantOpt.get();
+
+            List<Order> orders = orderDAO.getRestaurantOrders(restaurantId);
+            for (Order order : orders) {
+                List<OrderItem> orderItems = order.getItems();
+                for (OrderItem orderItem : orderItems) {
+                    if (orderItem.getItemId() == foodId && order.getStatus() != Status.cancelled && order.getStatus() != Status.completed) {
+                        HttpError.badRequest(exchange, "Invalid order status");
+                        return;
+                    }
+                }
+            }
 
             foodDAO.delete(foodId);
             JsonResponse.sendJsonResponse(exchange, 200, "{\"message\":\"Food item removed successfully\"}");
