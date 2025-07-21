@@ -57,13 +57,13 @@ public class RestaurantHandler implements HttpHandler {
                 case "PUT" -> {
                     if (path.matches("^/restaurants/\\d+$")) handleUpdateRestaurants(exchange);
                     else if (path.matches("^/\\d+/item/\\d+$")) editItem(exchange);
-                    else if (path.matches("^/\\d+/menu/[^/]+$")) addItemToMenu(exchange);
+                    else if (path.matches("^/restaurants/\\d+/menu/[^/]+$")) addItemToMenu(exchange);
                 }
                 case "DELETE" -> {
                     if (path.matches("^/restaurants/\\d+$")) deleteRestaurant(exchange);
-                    else if (path.matches("^/\\d+/item/\\d+$")) deleteItem(exchange);
+                    else if (path.matches("^/restaurants/\\d+/item/\\d+$")) deleteItem(exchange);
                     else if (path.matches("^/restaurants/\\d+/menu/[^/]+$")) deleteMenu(exchange);
-                    else if (path.matches("^restaurants/\\d+/menu/[^/]+/\\d+$")) deleteItemFromMenu(exchange);
+                    else if (path.matches("^/restaurants/\\d+/menu/[^/]+/\\d+$")) deleteItemFromMenu(exchange);
                 }
                 case "PATCH" -> {
                     if (path.matches("^/orders/\\d+$")) setStatus(exchange);
@@ -251,7 +251,7 @@ public class RestaurantHandler implements HttpHandler {
             foodDAO.delete(foodId);
             JsonResponse.sendJsonResponse(exchange, 200, "{\"message\":\"Food item removed successfully\"}");
         } catch (SQLException e) {
-            HttpError.internal(exchange, "Failed to delete food item");
+            HttpError.internal(exchange, "Failed to delete food item" + e.getMessage());
         }
     }
 
@@ -325,7 +325,8 @@ public class RestaurantHandler implements HttpHandler {
         int restaurantId = Integer.parseInt(parts[2]);
         JsonNode node = objectMapper.readTree(exchange.getRequestBody());
         int itemId = node.get("item_id").asInt();
-        String title = parts[4];
+
+        String title = URLDecoder.decode(parts[4], StandardCharsets.UTF_8);
 
         if (itemId == 0) {
             HttpError.badRequest(exchange, "Missing required fields");
@@ -335,7 +336,7 @@ public class RestaurantHandler implements HttpHandler {
         try {
             var restaurantOpt = Authenticate.restaurantChecker(exchange, user, restaurantId);
             if (restaurantOpt.isEmpty()) return;
-            Optional<Menu> optionalMenu = restaurantDAO.getMenuByTitle(title, itemId);
+            Optional<Menu> optionalMenu = restaurantDAO.getMenuByTitle(title, restaurantId);
             if (optionalMenu.isEmpty()) {
                 HttpError.notFound(exchange, "Menu title not found");
                 return;

@@ -23,11 +23,9 @@ import org.FRFood.frontEnd.Util.SessionManager;
 
 import java.io.ByteArrayInputStream;
 import java.net.URI;
-import java.net.URLEncoder;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
-import java.nio.charset.StandardCharsets;
 import java.util.Base64;
 import java.util.List;
 
@@ -42,14 +40,14 @@ public class AllRestaurantFoodController {
     private static int restaurantId;
     private static String restaurantName;
 
-    public static void setData(int input,String restaurant_name) {
+    public static void setData(int input, String restaurant_name) {
         AllRestaurantFoodController.restaurantId = input;
         AllRestaurantFoodController.restaurantName = restaurant_name;
     }
 
     @FXML
     public void goBack(ActionEvent actionEvent) {
-        SceneNavigator.switchTo("/frontend/Restaurant.fxml",foodList);
+        SceneNavigator.switchTo("/frontend/Restaurant.fxml", foodList);
     }
 
     @FXML
@@ -57,13 +55,13 @@ public class AllRestaurantFoodController {
     }
 
     @FXML
-    private void initialize(){
+    private void initialize() {
         restaurant_name_label.setText(restaurantName);
         fetchFoods();
     }
 
     private void fetchFoods() {
-        String safeUrl = "http://localhost:8080/vendors/" +restaurantId ;
+        String safeUrl = "http://localhost:8080/vendors/" + restaurantId;
         URI uri = URI.create(safeUrl);
         HttpRequest request = HttpRequest.newBuilder()
                 .uri(uri)
@@ -91,7 +89,7 @@ public class AllRestaurantFoodController {
 
             // Extract node for "the thing"
             JsonNode theThingNode = rootNode.get("menu_title");
-            List<Food> foods = mapper.convertValue(theThingNode, new TypeReference<List<Food>>()  {
+            List<Food> foods = mapper.convertValue(theThingNode, new TypeReference<List<Food>>() {
             });
             Platform.runLater(() -> {
                 foodList.getChildren().clear();
@@ -133,16 +131,31 @@ public class AllRestaurantFoodController {
         Label supplyLabel = new Label("📍 Supply: " + food.getSupply());
         supplyLabel.setStyle("-fx-font-size: 14px; -fx-text-fill: #3a3a3a;");
 
-        Label feeLabel = new Label("💰 Price: " + food.getPrice()+"$");
+        Label feeLabel = new Label("💰 Price: " + food.getPrice() + "$");
         feeLabel.setStyle("-fx-font-size: 14px; -fx-text-fill: #3a3a3a;");
 
         Label descriptionLabel = new Label("📝 " + food.getDescription());
         descriptionLabel.setStyle("-fx-font-size: 14px; -fx-text-fill: #3a3a3a;");
 
-        info.getChildren().addAll(nameLabel, supplyLabel,  feeLabel,descriptionLabel);
+        info.getChildren().addAll(nameLabel, supplyLabel, feeLabel, descriptionLabel);
 
         Region spacer = new Region();
         HBox.setHgrow(spacer, Priority.ALWAYS);
+
+        // editfood Button
+        Button editBtn = new Button("edit food");
+        editBtn.setPrefWidth(100);
+        editBtn.setPrefHeight(36);
+        editBtn.setStyle("""
+                    -fx-background-color: #ff9900;
+                    -fx-text-fill: white;
+                    -fx-font-size: 14px;
+                    -fx-font-weight: bold;
+                    -fx-background-radius: 10;
+                    -fx-cursor: hand;
+                """);
+        editBtn.setOnAction(e -> handleEdit(food));
+
 
         // Comments Button
         Button CommentsBtn = new Button("Comments");
@@ -156,7 +169,7 @@ public class AllRestaurantFoodController {
                     -fx-background-radius: 10;
                     -fx-cursor: hand;
                 """);
-//        CommentsBtn.setOnAction(e -> handleComments(food));
+        CommentsBtn.setOnAction(e -> handleComments(food));
 
 // Delete Button
         Button deleteBtn = new Button("Delete");
@@ -170,10 +183,10 @@ public class AllRestaurantFoodController {
                     -fx-background-radius: 10;
                     -fx-cursor: hand;
                 """);
-//        deleteBtn.setOnAction(e -> handleDelete(food));
+        deleteBtn.setOnAction(e -> handleDelete(food));
 
 // Add both buttons to VBox
-        HBox rightBox = new HBox(10, CommentsBtn, deleteBtn);
+        HBox rightBox = new HBox(10, editBtn, CommentsBtn, deleteBtn);
         rightBox.setAlignment(Pos.CENTER_RIGHT);
 
 
@@ -183,5 +196,37 @@ public class AllRestaurantFoodController {
         return card;
     }
 
+    private void handleDelete(Food food) {
+        String safeUrl = "http://localhost:8080/restaurants/" + restaurantId + "/item/" + food.getId();
+        URI uri = URI.create(safeUrl);
+        HttpRequest request = HttpRequest.newBuilder()
+                .uri(uri)
+                .header("Authorization", "Bearer " + SessionManager.getAuthToken())
+                .DELETE()
+                .build();
+//
+        HttpClient.newHttpClient().sendAsync(request, HttpResponse.BodyHandlers.ofString())
+                .thenAccept(response -> {
+                    if (response.statusCode() == 200 || response.statusCode() == 204) {
+                        System.out.println("Deleted restaurant: " + food.getName());
+                        Platform.runLater(this::fetchFoods);
+                    } else {
+                        System.err.println("Failed to delete restaurant: HTTP " + response.statusCode()+response.body());
+                    }
+                })
+                .exceptionally(e -> {
+                    e.printStackTrace();
+                    return null;
+                });
+    }
+
+
+    private void handleComments(Food food) {
+    }
+
+    private void handleEdit(Food food) {
+    }
+
 
 }
+
