@@ -112,23 +112,8 @@ public class UserDAOImp implements UserDAO {
                 ){
             try(ResultSet rs = stmt.executeQuery()){
                 while(rs.next()){
-                    User user = new User();
-                    user.setId(rs.getInt("id"));
-                    user.setFullName(rs.getString("full_name"));
-                    user.setPhoneNumber(rs.getString("phone"));
-                    user.setEmail(rs.getString("email"));
-                    user.setPassword(rs.getString("password_hash"));
-                    user.setRole(Role.valueOf(rs.getString("role")));
-                    user.setAddress(rs.getString("address"));
-                    user.setPicture(rs.getString("profile_image"));
-                    user.setConfirmed(rs.getBoolean("confirmed"));
-
-                    int bankId = rs.getInt("bank_id");
-                    if (!rs.wasNull()) {
-                        BankAccountDAO bankDAO = new BankAccountDAOImp();
-                        user.setBankAccount(bankDAO.getById(bankId).orElse(null));
-                    }
-
+                    User user;
+                    user = getById(rs.getInt("id")).orElse(null);
                     users.add(user);
                 }
             }
@@ -137,7 +122,7 @@ public class UserDAOImp implements UserDAO {
     }
 
     @Override
-    public Optional<User> getById(int id) {
+    public Optional<User> getById(int id) throws SQLException{
         String sql = "SELECT * FROM Users WHERE id = ?";
         try (
                 Connection conn = DBConnector.gConnection();
@@ -158,16 +143,13 @@ public class UserDAOImp implements UserDAO {
                     user.setConfirmed(rs.getBoolean("confirmed"));
 
                     int bankId = rs.getInt("bank_id");
-                    if (!rs.wasNull()) {
+                    if (bankId != 0) {
                         BankAccountDAO bankDAO = new BankAccountDAOImp();
                         user.setBankAccount(bankDAO.getById(bankId).orElse(null));
                     }
-
                     return Optional.of(user);
                 }
             }
-        } catch (SQLException e) {
-            throw new RuntimeException("Query failed: " + e.getMessage(), e);
         }
         return Optional.empty();
     }
@@ -195,7 +177,7 @@ public class UserDAOImp implements UserDAO {
     }
 
     @Override
-    public boolean deleteById(int id) {
+    public boolean deleteById(int id) throws  SQLException {
         String sql = "DELETE FROM Users WHERE id = ?";
         try (
                 Connection conn = DBConnector.gConnection();
@@ -203,17 +185,13 @@ public class UserDAOImp implements UserDAO {
         ) {
             stmt.setInt(1, id);
             return stmt.executeUpdate() > 0;
-        } catch (SQLException e) {
-            throw new RuntimeException("Delete failed: " + e.getMessage(), e);
         }
     }
 
     @Override
-    public Optional<User> getByPhone(String phoneNumber) {
+    public Optional<User> getByPhone(String phoneNumber) throws SQLException {
         String sql = "SELECT * FROM Users WHERE phone = ?";
-        BankAccountDAO bankAccountDAO = new BankAccountDAOImp();
         User user = null;
-        BankAccount bankAccount = null;
         try (
                 Connection conn = DBConnector.gConnection();
                 PreparedStatement stmt = conn.prepareStatement(sql)
@@ -221,24 +199,9 @@ public class UserDAOImp implements UserDAO {
             stmt.setString(1, phoneNumber);
             try (ResultSet rs = stmt.executeQuery()) {
                 if (rs.next()) {
-                    user = new User();
-                    user.setId(rs.getInt("id"));
-                    user.setFullName(rs.getString("full_name"));
-                    user.setPhoneNumber(rs.getString("phone"));
-                    user.setEmail(rs.getString("email"));
-                    user.setPassword(rs.getString("password_hash"));
-                    user.setRole(Role.valueOf(rs.getString("role")));
-                    user.setAddress(rs.getString("address"));
-                    user.setPicture(rs.getString("profile_image"));
-                    bankAccount = bankAccountDAO.getById(rs.getInt("bank_id")).orElse(null);
-                    user.setConfirmed(rs.getBoolean("confirmed"));
-                    user.setBankAccount(bankAccount);
-                } else {
-                    return Optional.empty();
+                    user = getById(rs.getInt("id")).orElse(null);
                 }
             }
-        } catch (SQLException e) {
-            System.out.println(e.getMessage());
         }
         return Optional.ofNullable(user);
     }
@@ -257,7 +220,6 @@ public class UserDAOImp implements UserDAO {
             stmt.setString(5, currentUser.getPicture());
             stmt.setInt(6, currentUser.getBank().getId());
             stmt.setInt(7, currentUser.getId());
-            System.out.println(currentUser.getPicture());
             stmt.executeUpdate();
         }
     }
