@@ -196,12 +196,10 @@ public class RestaurantHandler implements HttpHandler {
             var restaurantOpt = Authenticate.restaurantChecker(exchange, user, restaurantId);
             if (restaurantOpt.isEmpty()) return;
             Restaurant restaurant = restaurantOpt.get();
-            System.out.println("debug");
             food.setId(foodDAO.insert(food));
-            System.out.println("debug");
             JsonResponse.sendJsonResponse(exchange, 201, objectMapper.writeValueAsString(food));
         } catch (SQLException e) {
-            HttpError.internal(exchange, "Failed to add food item");
+            HttpError.internal(exchange, "Failed to add food item" + e.getMessage());
         }
     }
 
