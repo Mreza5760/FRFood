@@ -3,7 +3,6 @@ package org.FRFood.DAO;
 import org.FRFood.entity.Transaction;
 import org.FRFood.util.DBConnector;
 import org.FRFood.util.TransactionMethod;
-import org.FRFood.util.TransactionStatus;
 
 import java.sql.*;
 import java.util.ArrayList;
@@ -43,18 +42,13 @@ public class TransactionDAOImp implements TransactionDAO {
 
     @Override
     public int insert(Transaction transaction) throws SQLException {
-        String sql = "INSERT INTO Transactions (order_id, user_id, method, status, amount) VALUES (?, ?, ?, ?, ?)";
+        String sql = "INSERT INTO Transactions (order_id, user_id, method, amount) VALUES (?, ?, ?, ?)";
         try (Connection conn = DBConnector.gConnection();
              PreparedStatement stmt = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
-            if (transaction.getOrderID() != null) {
-                stmt.setInt(1, transaction.getOrderID());
-            } else {
-                stmt.setNull(1, Types.INTEGER);
-            }
+            stmt.setInt(1, transaction.getOrderID());
             stmt.setInt(2, transaction.getUserID());
             stmt.setString(3, transaction.getMethod().name());
-            stmt.setString(4, transaction.getStatus().name());
-            stmt.setInt(5, transaction.getAmount());
+            stmt.setInt(4, transaction.getAmount());
 
             int rows = stmt.executeUpdate();
             if (rows == 0) {
@@ -79,7 +73,6 @@ public class TransactionDAOImp implements TransactionDAO {
         transaction.setOrderID(rs.wasNull() ? null : orderId);
         transaction.setUserID(rs.getInt("user_id"));
         transaction.setMethod(TransactionMethod.valueOf(rs.getString("method")));
-        transaction.setStatus(TransactionStatus.valueOf(rs.getString("status")));
         transaction.setAmount(rs.getInt("amount"));
         return transaction;
     }
