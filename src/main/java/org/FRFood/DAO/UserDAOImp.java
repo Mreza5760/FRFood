@@ -142,6 +142,7 @@ public class UserDAOImp implements UserDAO {
                     user.setAddress(rs.getString("address"));
                     user.setPicture(rs.getString("profile_image"));
                     user.setConfirmed(rs.getBoolean("confirmed"));
+                    user.setWallet(rs.getInt("wallet"));
 
                     int bankId = rs.getInt("bank_id");
                     if (bankId != 0) {

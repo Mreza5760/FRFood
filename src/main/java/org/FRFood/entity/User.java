@@ -20,7 +20,6 @@ public class User {
     private BankAccount bank;
     @JsonIgnore
     private boolean confirmed;
-    @JsonIgnore
     private Integer wallet;
 
     public User(){};
