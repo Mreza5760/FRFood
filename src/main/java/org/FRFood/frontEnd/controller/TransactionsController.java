@@ -40,7 +40,6 @@ public class TransactionsController {
         idColumn.setCellValueFactory(new PropertyValueFactory<>("id"));
         orderIdColumn.setCellValueFactory(new PropertyValueFactory<>("orderID"));
         methodColumn.setCellValueFactory(new PropertyValueFactory<>("method"));
-        statusColumn.setCellValueFactory(new PropertyValueFactory<>("status"));
         amountColumn.setCellValueFactory(new PropertyValueFactory<>("amount"));
         createdAtColumn.setCellValueFactory(new PropertyValueFactory<>("createdAt"));
 

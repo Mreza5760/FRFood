@@ -9,6 +9,7 @@ import org.FRFood.entity.Transaction;
 import org.FRFood.entity.User;
 import org.FRFood.util.HttpError;
 import org.FRFood.util.JsonResponse;
+import org.FRFood.util.TransactionMethod;
 
 import java.io.IOException;
 import java.sql.SQLException;
@@ -85,10 +86,13 @@ public class OrderHandler implements HttpHandler {
         }
 
         try {
-//            Transaction transaction = new Transaction();
-//            transaction.setAmount(amount);
-//            transaction.setUserID(user.getId());
-//            transaction.setId(transactionDAO.insert(transaction));
+            Transaction transaction = new Transaction();
+            transaction.setOrderID(0);
+            transaction.setUserID(user.getId());
+            transaction.setMethod(TransactionMethod.online);
+            transaction.setAmount(amount);
+
+            transaction.setId(transactionDAO.insert(transaction));
             userDAO.setWallet(user.getId(), user.getWallet()+amount);
             JsonResponse.sendJsonResponse(exchange, 200, "{message: wallet updated}");
         } catch (SQLException e) {

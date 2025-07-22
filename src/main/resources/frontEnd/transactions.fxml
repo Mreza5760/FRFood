@@ -25,7 +25,6 @@
                 <TableColumn fx:id="idColumn" text="ID" prefWidth="60"/>
                 <TableColumn fx:id="orderIdColumn" text="Order ID" prefWidth="100"/>
                 <TableColumn fx:id="methodColumn" text="Method" prefWidth="120"/>
-                <TableColumn fx:id="statusColumn" text="Status" prefWidth="120"/>
                 <TableColumn fx:id="amountColumn" text="Amount" prefWidth="120"/>
                 <TableColumn fx:id="createdAtColumn" text="Created At" prefWidth="200"/>
             </columns>
