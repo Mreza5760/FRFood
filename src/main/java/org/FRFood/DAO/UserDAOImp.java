@@ -32,12 +32,12 @@ public class UserDAOImp implements UserDAO {
 
             if (user.getBank() != null) {
                 int bankId = bankAccountDAO.insert(user.getBank());
-                stmt.setInt(8, bankId);
+                stmt.setInt(9, bankId);
             } else {
-                stmt.setNull(8, Types.INTEGER);
+                stmt.setNull(9, Types.INTEGER);
             }
 
-            stmt.setBoolean(9, user.getRole() == Role.buyer);
+            stmt.setBoolean(10, user.getRole() == Role.buyer);
 
 
             int rows = stmt.executeUpdate();
