@@ -23,6 +23,7 @@ public class SessionManager {
 
     public static void logout() {
         authToken = null;
+        orderList.clear();
     }
 
     public static Map<Integer, Order> getOrderList() {
