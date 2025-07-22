@@ -132,7 +132,8 @@ public class WalletController {
     }
 
     private void handleHistory() {
-        System.out.println("Transaction history clicked (not implemented yet).");
+        SceneNavigator.switchTo("/frontend/transactions.fxml",historyButton);
+        System.out.println("Navigate to history");
     }
 
     private void updateBalanceLabel() {
