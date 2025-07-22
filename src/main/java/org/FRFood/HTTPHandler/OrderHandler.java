@@ -78,18 +78,18 @@ public class OrderHandler implements HttpHandler {
         Optional<User> authenticatedUserOptional = authenticate(exchange);
         if (authenticatedUserOptional.isEmpty()) return;
         User user = authenticatedUserOptional.get();
-
         int amount = objectMapper.readTree(exchange.getRequestBody()).get("amount").asInt();
         if (amount == 0) {
             HttpError.notFound(exchange, "Amount is zero");
             return;
         }
-
         try {
             Transaction transaction = new Transaction();
             transaction.setOrderID(0);
             transaction.setUserID(user.getId());
-            transaction.setMethod(TransactionMethod.online);
+            transaction.setMethod(
+                    TransactionMethod.online
+            );
             transaction.setAmount(amount);
 
             transaction.setId(transactionDAO.insert(transaction));

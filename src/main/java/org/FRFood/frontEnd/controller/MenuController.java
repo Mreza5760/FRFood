@@ -10,7 +10,6 @@ import javafx.fxml.FXML;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
-import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.image.Image;
@@ -22,7 +21,8 @@ import javafx.scene.layout.VBox;
 import org.FRFood.DAO.UserDAO;
 import org.FRFood.DAO.UserDAOImp;
 import org.FRFood.entity.Food;
-import org.FRFood.entity.Menu;
+import org.FRFood.entity.Order;
+import org.FRFood.entity.OrderItem;
 import org.FRFood.entity.User;
 import org.FRFood.frontEnd.Util.SceneNavigator;
 import org.FRFood.frontEnd.Util.SessionManager;
@@ -39,6 +39,7 @@ import java.nio.charset.StandardCharsets;
 import java.sql.SQLException;
 import java.util.Base64;
 import java.util.List;
+import java.util.Map;
 
 public class MenuController {
     @FXML
@@ -49,6 +50,7 @@ public class MenuController {
     private final ObjectMapper mapper = new ObjectMapper();
 
     private static Role userRole;
+    private static User currentUser;
     private static int menuId;
     private static String menuTitle;
     private static int restaurantId;
@@ -84,6 +86,7 @@ public class MenuController {
             User user = userDao.getById(userId).orElse(null);
             if (user == null) return;
             userRole = user.getRole();
+            currentUser = user;
             if (userRole == Role.buyer) {
                 addFoodsButton.setVisible(false);
                 addFoodsButton.setManaged(false);
@@ -178,8 +181,9 @@ public class MenuController {
         HBox.setHgrow(spacer, Priority.ALWAYS);
 
         HBox rightBox = new HBox();
-// Delete Button
+
         if(userRole == Role.seller) {
+            // Delete Button
             Button deleteBtn = new Button("Delete");
             deleteBtn.setPrefWidth(100);
             deleteBtn.setPrefHeight(36);
@@ -197,10 +201,73 @@ public class MenuController {
             rightBox.setAlignment(Pos.CENTER_RIGHT);
         }
 
+        if(userRole == Role.buyer) {
+            // remove Button
+            Button removeBtn = new Button("-");
+            removeBtn.setMaxSize(36,36);
+            removeBtn.setStyle("""
+                    -fx-background-color: #ff4444;
+                    -fx-text-fill: white;
+                    -fx-font-size: 20px;
+                    -fx-font-weight: bold;
+                    -fx-background-radius: 10;
+                    -fx-cursor: hand;
+                """);
+            removeBtn.setOnAction(e -> handleRemove(food));
+
+            // add Button
+            Button addBtn = new Button("+");
+            addBtn.setMaxSize(36,36);
+            addBtn.setStyle("""
+                    -fx-background-color: #00aa88;
+                    -fx-text-fill: white;
+                    -fx-font-size: 20px;
+                    -fx-font-weight: bold;
+                    -fx-background-radius: 10;
+                    -fx-cursor: hand;
+                """);
+            addBtn.setOnAction(e -> handleAdd(food));
+
+
+            // Add both buttons to VBox
+            rightBox = new HBox(10, removeBtn,  addBtn);
+            rightBox.setAlignment(Pos.CENTER_RIGHT);
+        }
         card.setOnMouseClicked(e -> handleClick(food)); // full card click
 
         card.getChildren().addAll(logo, info, spacer, rightBox);
         return card;
+    }
+
+    private void handleRemove(Food food) {
+
+    }
+
+    private void handleAdd(Food food) {
+        Map<Integer, Order> cart = SessionManager.getOrderList();
+        if(!cart.containsKey(restaurantId)) {
+            Order tempOrder = new Order();
+            cart.put(restaurantId, tempOrder);
+        }
+        Order order = cart.get(restaurantId);
+        boolean found = false;
+        for(OrderItem orderItem : order.getItems()) {
+            if(orderItem.getItemId().equals(food.getId())) {
+                orderItem.setQuantity(orderItem.getQuantity() + 1);
+                found = true;
+            }
+        }
+        if(!found) {
+            order.getItems().add(new OrderItem(food.getId(),1));
+        }
+        order.setDeliveryAddress(currentUser.getAddress());
+        order.setCustomerId(currentUser.getId());
+        order.setRestaurantId(restaurantId);
+        order.setCouponId(0);
+        int rawPrice = 0;
+
+
+
     }
 
     private void handleComments(Food food) {

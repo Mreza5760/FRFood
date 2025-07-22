@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import org.FRFood.util.Status;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @JsonPropertyOrder({
@@ -52,7 +53,9 @@ public class Order {
     @JsonProperty("updated_at")
     private String updatedAt;
 
-    public Order(){}
+    public Order(){
+        items = new ArrayList<OrderItem>();
+    }
 
     public Integer getId() { return id; }
     public void setId(Integer id) { this.id = id; }
