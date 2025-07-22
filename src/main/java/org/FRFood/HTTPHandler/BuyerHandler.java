@@ -254,6 +254,8 @@ public class BuyerHandler implements HttpHandler {
             order.setAdditionalFee(restaurant.getAdditionalFee());
             order.setTaxFee(restaurant.getTaxFee());
             order.setCourierFee(randomPrice);
+            order.setCouponId(0);
+            order.setCourierId(0);
             order.setPayPrice(rawPrice + restaurant.getAdditionalFee() + restaurant.getTaxFee() + randomPrice);
             order.setCustomerId(user.getId());
             order.setId(orderDAO.insert(order));
