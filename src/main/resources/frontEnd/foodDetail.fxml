@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.geometry.Pos?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.*?>
+
+<VBox xmlns="http://javafx.com/javafx"
+      xmlns:fx="http://javafx.com/fxml"
+      fx:controller="org.FRFood.frontEnd.controller.FoodDetailsController"
+      spacing="25"
+      alignment="TOP_CENTER"
+      style="-fx-background-color: linear-gradient(to bottom, #eef3f9, #dbe5f1);"
+      prefWidth="900" prefHeight="700">
+
+    <padding>
+        <Insets top="40" left="50" right="50" bottom="40"/>
+    </padding>
+
+    <!-- Back button row -->
+    <HBox alignment="TOP_LEFT" prefWidth="Infinity">
+        <Button text="⬅ Back"
+                onAction="#handleBack"
+                style="-fx-background-color: #e74c3c; -fx-text-fill: white; -fx-font-size: 14px; -fx-font-weight: bold; -fx-background-radius: 8;"/>
+    </HBox>
+
+    <Label fx:id="itemNameLabel" style="-fx-font-size: 28px; -fx-font-weight: bold; -fx-text-fill: #1e2a38;"/>
+
+    <ImageView fx:id="itemImage" fitHeight="200" fitWidth="200" preserveRatio="true"
+               style="-fx-effect: dropshadow(gaussian, rgba(0,0,0,0.1), 10, 0, 0, 2);" />
+
+    <Label fx:id="itemDescriptionLabel" wrapText="true"
+           style="-fx-font-size: 16px; -fx-text-fill: #4a5a6a; -fx-padding: 0 0 10 0;" />
+
+    <HBox spacing="20" alignment="CENTER">
+        <Label text="💰 Price:" style="-fx-font-size: 16px; -fx-font-weight: bold;"/>
+        <Label fx:id="itemPriceLabel" style="-fx-font-size: 16px;"/>
+        <Label text="📦 Supply:" style="-fx-font-size: 16px; -fx-font-weight: bold;"/>
+        <Label fx:id="itemSupplyLabel" style="-fx-font-size: 16px;"/>
+    </HBox>
+
+    <Label text="⭐ Reviews" style="-fx-font-size: 20px; -fx-font-weight: bold; -fx-text-fill: #1e2a38;"/>
+
+    <VBox fx:id="reviewsContainer" spacing="15" alignment="TOP_LEFT"
+          style="-fx-background-color: white; -fx-padding: 20; -fx-background-radius: 12; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.08), 8, 0, 0, 2);"
+          maxWidth="800">
+    </VBox>
+
+</VBox>

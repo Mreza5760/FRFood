@@ -110,19 +110,23 @@ public class FoodDAOImp implements FoodDAO {
 
     @Override
     public void update(Food food) throws SQLException {
-        String sql = "UPDATE FoodItems SET id =? , restaurant_id=? , name=? , image=? , description=? , price=? , supply=?";
+        String sql = "UPDATE FoodItems SET  restaurant_id=? , name=? , image=? , description=? , price=? , supply=? WHERE id = ?";
         try (
                 Connection connection = DBConnector.gConnection();
                 PreparedStatement preparedStatement = connection.prepareStatement(sql);
         ) {
-            preparedStatement.setInt(1, food.getId());
-            preparedStatement.setInt(2, food.getRestaurantId());
-            preparedStatement.setString(3, food.getName());
-            preparedStatement.setString(4, food.getPicture());
-            preparedStatement.setString(5, food.getDescription());
-            preparedStatement.setInt(6, food.getPrice());
-            preparedStatement.setInt(7, food.getSupply());
+            preparedStatement.setInt(1, food.getRestaurantId());
+            preparedStatement.setString(2, food.getName());
+            preparedStatement.setString(3, food.getPicture());
+            preparedStatement.setString(4, food.getDescription());
+            preparedStatement.setInt(5, food.getPrice());
+            preparedStatement.setInt(6, food.getSupply());
+            preparedStatement.setInt(7, food.getId());
 
+            int rows = preparedStatement.executeUpdate();
+            if (rows == 0) {
+                throw new SQLException("Insert failed, no rows affected.");
+            }
 
             String sql3 ="DELETE FROM keywords WHERE food_id = ?";
             try(
@@ -144,10 +148,7 @@ public class FoodDAOImp implements FoodDAO {
                 }
             }
             preparedStatement2.close();
-            int rows = preparedStatement.executeUpdate();
-            if (rows == 0) {
-                throw new SQLException("Insert failed, no rows affected.");
-            }
+
         }
     }
 

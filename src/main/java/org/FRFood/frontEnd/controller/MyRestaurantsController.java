@@ -169,6 +169,8 @@ public class MyRestaurantsController {
     }
 
     private void handleOrder(Restaurant r) {
+        RestaurantOrdersController.setRestaurantId(r.getId());
+        SceneNavigator.switchTo("/frontend/restaurantOrders.fxml",restaurantList);
     }
 
     private void handleClick(Restaurant r) {

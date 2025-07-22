@@ -187,6 +187,8 @@ public class MenuController {
     }
 
     private void handleClick(Food food) {
+        FoodDetailsController.setItemId(food.getId());
+        SceneNavigator.switchTo("/frontend/FoodDetail.fxml",menu_name_label);
     }
 
     private void handleDelete(Food food) {

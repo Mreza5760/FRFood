@@ -48,7 +48,7 @@ public class RestaurantHandler implements HttpHandler {
                 }
                 case "GET" -> {
                     if (path.equals("/restaurants/mine")) myRestaurants(exchange);
-                    else if (path.matches("^/\\d+/orders$")) getOrders(exchange);
+                    else if (path.matches("^/restaurants/\\d+/orders$")) getOrders(exchange);
                     else if (path.matches("^/restaurants/\\d+/menus$")) getMenus(exchange);
                     else if (path.matches("^/restaurants/\\d+/items/[^/]+$")) getMenuItems(exchange);
                     else if (path.matches("^/restaurants/\\d+/menu/[^/]+$")) getItemsOutOfMenu(exchange);
@@ -56,7 +56,7 @@ public class RestaurantHandler implements HttpHandler {
                 }
                 case "PUT" -> {
                     if (path.matches("^/restaurants/\\d+$")) handleUpdateRestaurants(exchange);
-                    else if (path.matches("^/\\d+/item/\\d+$")) editItem(exchange);
+                    else if (path.matches("^/restaurants/\\d+/item/\\d+$")) editItem(exchange);
                     else if (path.matches("^/restaurants/\\d+/menu/[^/]+$")) addItemToMenu(exchange);
                 }
                 case "DELETE" -> {
@@ -66,7 +66,7 @@ public class RestaurantHandler implements HttpHandler {
                     else if (path.matches("^/restaurants/\\d+/menu/[^/]+/\\d+$")) deleteItemFromMenu(exchange);
                 }
                 case "PATCH" -> {
-                    if (path.matches("^/orders/\\d+$")) setStatus(exchange);
+                    if (path.matches("^/restaurants/orders/\\d+$")) setStatus(exchange);
                 }
                 default -> JsonResponse.sendJsonResponse(exchange, 404, "Not Found");
             }
@@ -86,17 +86,14 @@ public class RestaurantHandler implements HttpHandler {
                 HttpError.forbidden(exchange, "Only sellers can register restaurants");
                 return;
             }
-
             if (restaurant.getName() == null || restaurant.getAddress() == null || restaurant.getPhone() == null || restaurant.getTaxFee() == null || restaurant.getAdditionalFee() == null) {
                 HttpError.badRequest(exchange, "Missing required fields");
                 return;
             }
-
             if (!validatePhone(restaurant.getPhone())) {
                 HttpError.unsupported(exchange, "Invalid phone number");
                 return;
             }
-
             restaurant.setId(restaurantDAO.insert(restaurant, user.getId()));
             JsonResponse.sendJsonResponse(exchange, 201, objectMapper.writeValueAsString(restaurant));
         } catch (SQLException e) {
@@ -218,23 +215,20 @@ public class RestaurantHandler implements HttpHandler {
             HttpError.unauthorized(exchange, "Only sellers can edit items");
             return;
         }
-
         String[] parts = exchange.getRequestURI().getPath().split("/");
         int restaurantId = Integer.parseInt(parts[2]);
         int foodId = Integer.parseInt(parts[4]);
         Food food = objectMapper.readValue(exchange.getRequestBody(), Food.class);
         food.setRestaurantId(restaurantId);
         food.setId(foodId);
-
         try {
             var restaurantOpt = Authenticate.restaurantChecker(exchange, user, restaurantId);
             if (restaurantOpt.isEmpty()) return;
             Restaurant restaurant = restaurantOpt.get();
-
             foodDAO.update(food);
             JsonResponse.sendJsonResponse(exchange, 200, objectMapper.writeValueAsString(food));
         } catch (SQLException e) {
-            HttpError.internal(exchange, "Failed to edit food item");
+            HttpError.internal(exchange, "Failed to edit food item" + e.getMessage());
         }
     }
 
