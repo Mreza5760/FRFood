@@ -9,22 +9,31 @@
             fx:controller="org.FRFood.frontEnd.controller.WalletController"
             prefWidth="600" prefHeight="400">
 
-    <!-- Main VBox for vertical layout -->
-    <VBox spacing="20" alignment="TOP_CENTER" AnchorPane.topAnchor="20"
-          AnchorPane.leftAnchor="20" AnchorPane.rightAnchor="20" AnchorPane.bottomAnchor="20">
+    <VBox spacing="20" alignment="TOP_CENTER"
+          AnchorPane.topAnchor="20"
+          AnchorPane.leftAnchor="20"
+          AnchorPane.rightAnchor="20"
+          AnchorPane.bottomAnchor="20"
+          style="-fx-padding: 20;">
 
-        <!-- Wallet balance display -->
-        <Label fx:id="balanceLabel" text="Balance: $0.00" style="-fx-font-size: 20px; -fx-font-weight: bold;"/>
+        <!-- Current Wallet Balance -->
+        <Label fx:id="balanceLabel"
+               text="Wallet Balance: 0 Toman"
+               style="-fx-font-size: 20px; -fx-font-weight: bold;"/>
 
-        <!-- Row for input and buttons -->
+        <!-- Input and Deposit/Withdraw Buttons -->
         <HBox spacing="10" alignment="CENTER">
-            <TextField fx:id="amountField" promptText="Enter amount" prefWidth="200"/>
+            <TextField fx:id="amountField"
+                       promptText="Enter amount"
+                       prefWidth="200"/>
             <Button fx:id="depositButton" text="Deposit" prefWidth="100"/>
             <Button fx:id="withdrawButton" text="Withdraw" prefWidth="100"/>
         </HBox>
 
-        <!-- Transaction History Button -->
-        <Button fx:id="historyButton" text="Transaction History" prefWidth="200"/>
+        <!-- Transaction History -->
+        <Button fx:id="historyButton"
+                text="Transaction History"
+                prefWidth="200"/>
 
     </VBox>
 
