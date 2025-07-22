@@ -15,19 +15,20 @@ public class UserDAOImp implements UserDAO {
     @Override
     public int insert(User user) throws SQLException {
         BankAccountDAO bankAccountDAO = new BankAccountDAOImp();
-        String sql = "INSERT INTO Users (full_name, phone, email, password_hash, role, address, profile_image, bank_id, confirmed) " +
-                "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
+        String sql = "INSERT INTO Users (full_name, phone, wallet, email, password_hash, role, address, profile_image, bank_id, confirmed) " +
+                "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
         try (
                 Connection conn = DBConnector.gConnection();
                 PreparedStatement stmt = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)
         ) {
             stmt.setString(1, user.getFullName());
             stmt.setString(2, user.getPhoneNumber());
-            stmt.setString(3, user.getEmail());
-            stmt.setString(4, user.getPassword());
-            stmt.setString(5, user.getRole().toString());
-            stmt.setString(6, user.getAddress());
-            stmt.setString(7, user.getPicture());
+            stmt.setInt(3, 0);
+            stmt.setString(4, user.getEmail());
+            stmt.setString(5, user.getPassword());
+            stmt.setString(6, user.getRole().toString());
+            stmt.setString(7, user.getAddress());
+            stmt.setString(8, user.getPicture());
 
             if (user.getBank() != null) {
                 int bankId = bankAccountDAO.insert(user.getBank());

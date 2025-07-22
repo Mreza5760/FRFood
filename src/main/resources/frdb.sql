@@ -10,7 +10,7 @@ CREATE TABLE IF NOT EXISTS Users
     id            INTEGER AUTO_INCREMENT PRIMARY KEY,
     full_name     VARCHAR(255) NOT NULL,
     phone         VARCHAR(20)  NOT NULL UNIQUE,
-    wallet INTEGER ,
+    wallet        INTEGER ,
     email         VARCHAR(255),
     password_hash VARCHAR(255) NOT NULL,
     `role`        ENUM ('buyer',
