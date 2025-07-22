@@ -51,7 +51,7 @@ public class PanelController {
     }
 
     private void handleRestaurants() {
-        SceneNavigator.switchTo("/frontend/MyRestaurants.fxml",restaurantButton);
+        SceneNavigator.switchTo("/frontend/myRestaurants.fxml",restaurantButton);
     }
 
     private void setRoleBasedButtons() {
@@ -103,8 +103,8 @@ public class PanelController {
     }
 
     private void handleOrders() {
-        System.out.println("Navigating to Orders...");
-        // SceneNavigator.switchTo("/frontend/orders.fxml", orderButton);
+        SceneNavigator.switchTo("/frontEnd/buyerOrderPage.fxml", orderFoodButton);
+        System.out.println("Navigated to Buyer Order Page");
     }
 
     private void handleWallet() {

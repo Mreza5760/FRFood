@@ -51,7 +51,7 @@ public class MenuController {
 
     @FXML
     public void goBack(ActionEvent actionEvent) {
-        SceneNavigator.switchTo("/frontend/Restaurant.fxml",menu_name_label);
+        SceneNavigator.switchTo("/frontend/restaurant.fxml",menu_name_label);
     }
 
     @FXML

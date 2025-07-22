@@ -49,7 +49,7 @@ public class CreteFoodController {
     }
 
     public void goBack(ActionEvent actionEvent) {
-        SceneNavigator.switchTo("/frontend/Restaurant.fxml",logoStatusLabel);
+        SceneNavigator.switchTo("/frontend/restaurant.fxml",logoStatusLabel);
     }
 
     @FXML
@@ -112,7 +112,7 @@ public class CreteFoodController {
                         if (response.statusCode() == 200 || response.statusCode() == 201) {
                             Platform.runLater(() -> {
                                 showAlert(Alert.AlertType.INFORMATION, "Success", "Food created successfully.");
-                                SceneNavigator.switchTo("/frontend/Restaurant.fxml", logoStatusLabel);
+                                SceneNavigator.switchTo("/frontend/restaurant.fxml", logoStatusLabel);
                             });
                         } else {
                             Platform.runLater(() -> showAlert(Alert.AlertType.ERROR, "Error", "Failed to create food: " + response.body()));

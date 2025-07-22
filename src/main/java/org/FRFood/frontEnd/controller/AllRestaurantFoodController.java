@@ -52,7 +52,7 @@ public class AllRestaurantFoodController {
 
     @FXML
     public void goBack(ActionEvent actionEvent) {
-        SceneNavigator.switchTo("/frontend/Restaurant.fxml", foodList);
+        SceneNavigator.switchTo("/frontend/restaurant.fxml", foodList);
     }
 
     @FXML
