@@ -22,8 +22,8 @@
 
     <HBox spacing="20" alignment="CENTER" prefWidth="Infinity">
         <Button text="← Back"
-                onAction="#goBack"
                 prefWidth="120"
+                fx:id="backButton"
                 style="-fx-background-color: #ff5555; -fx-text-fill: white; -fx-font-weight: bold; -fx-background-radius: 10; -fx-cursor: hand; -fx-pref-height: 40;-fx-font-size: 14px;"/>
 
         <Region fx:id="spacer4" HBox.hgrow="ALWAYS"/>

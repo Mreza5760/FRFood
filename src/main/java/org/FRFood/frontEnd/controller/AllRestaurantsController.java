@@ -49,9 +49,7 @@ public class AllRestaurantsController {
 
 
     private void fetchRestaurants() {
-        String tempJson = "{\n" +
-                "  \"search\": \"\",\n" +
-                "  \"keywords\": []}" ;
+        String tempJson = "{\"search\": \"\" }";
         HttpRequest request = HttpRequest.newBuilder()
                 .uri(URI.create("http://localhost:8080/vendors"))
                 .header("Authorization", "Bearer " + SessionManager.getAuthToken())

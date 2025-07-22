@@ -42,6 +42,7 @@ import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.nio.charset.StandardCharsets;
+import java.sql.SQLException;
 import java.util.*;
 
 public class RestaurantController {
@@ -52,11 +53,15 @@ public class RestaurantController {
     private static String restaurantName;
     public TextField menuTitleField;
     public HBox HboxForTitleInput;
+    public Button backButton;
+
+    private static Role userRole;
 
     @FXML
     private VBox menuList;
 
     private final ObjectMapper mapper = new ObjectMapper();
+
 
     public static void setValues(int restaurantId, String restaurantName) {
         RestaurantController.restaurantId = restaurantId;
@@ -65,13 +70,39 @@ public class RestaurantController {
 
     @FXML
     public void initialize() {
-        restaurant_name_label.setText(restaurantName);
-        fetchMenus();
+        String token = SessionManager.getAuthToken();
+        if (token == null) return;
+
+        Jws<Claims> claimsJws = JwtUtil.validateToken(token);
+        int userId = Integer.parseInt(claimsJws.getBody().getSubject());
+
+        UserDAO userDao = new UserDAOImp();
+        try {
+            User user = userDao.getById(userId).orElse(null);
+            if (user == null) return;
+            userRole = user.getRole();
+            restaurant_name_label.setText(restaurantName);
+            if (userRole == Role.buyer) {
+                backButton.setOnAction((event) ->{SceneNavigator.switchTo("/frontend/myRestaurants.fxml", restaurant_name_label);});
+            } else {
+                backButton.setOnAction((event) ->{SceneNavigator.switchTo("/frontend/myRestaurants.fxml", restaurant_name_label);});
+            }
+            fetchMenus();
+        } catch (SQLException e) {
+            System.out.println(e);
+        }
     }
 
     private void fetchMenus() {
+
+
+        String url = "http://localhost:8080/restaurants/" + restaurantId + "/menus";
+        if (userRole == Role.buyer) {
+            url = "http://localhost:8080/vendors/" + restaurantId;
+        }
+
         HttpRequest request = HttpRequest.newBuilder()
-                .uri(URI.create("http://localhost:8080/restaurants/" + restaurantId + "/menus"))
+                .uri(URI.create(url))
                 .header("Authorization", "Bearer " + SessionManager.getAuthToken())
                 .GET()
                 .build();
@@ -79,33 +110,69 @@ public class RestaurantController {
         HttpClient.newHttpClient().sendAsync(request, HttpResponse.BodyHandlers.ofString())
                 .thenAccept(response -> {
                     if (response.statusCode() == 200) {
-                        displayMenus(response.body());
+                        ObjectMapper mapper = new ObjectMapper();
+                        try {
+                            JsonNode root = mapper.readTree(response.body());
+                            if (userRole == Role.buyer) {
+                                if(!root.has("menu_titles")) {
+                                    System.out.println("json is incorrect");
+                                    return;
+                                }
+                                JsonNode menuTitles = root.get("menu_titles");
+                                String titlesJson = mapper.writeValueAsString(menuTitles);
+                                displayMenus(titlesJson);
+                            } else {
+                                displayMenus(response.body());
+                            }
+                        } catch (Exception e) {
+                            System.out.println(e.getMessage());
+                        }
                     } else {
                         System.err.println("Failed to fetch restaurants: HTTP " + response.statusCode());
+                        System.err.println("Response body: " + response.body());
                     }
                 })
                 .exceptionally(e -> {
                     e.printStackTrace();
                     return null;
                 });
+
     }
 
     private void displayMenus(String body) {
         try {
-            List<Menu> menus = mapper.readValue(body, new TypeReference<>() {
-            });
-            Platform.runLater(() -> {
-                menuList.getChildren().clear();
-                for (Menu menu : menus) {
-                    RestaurantDAO restaurantDAO = new RestaurantDAOImp();
-                    try {
-                        menu = restaurantDAO.getMenuByTitle(menu.getTitle(), restaurantId).orElse(null);
-                    } catch (Exception e) {
-                        e.getStackTrace();
+            if (userRole == Role.seller) {
+                List<Menu> menus = mapper.readValue(body, new TypeReference<>() {
+                });
+                Platform.runLater(() -> {
+                    menuList.getChildren().clear();
+                    for (Menu menu : menus) {
+                        RestaurantDAO restaurantDAO = new RestaurantDAOImp();
+                        try {
+                            menu = restaurantDAO.getMenuByTitle(menu.getTitle(), restaurantId).orElse(null);
+                        } catch (Exception e) {
+                            e.getStackTrace();
+                        }
+                        menuList.getChildren().add(createMenuCard(menu));
                     }
-                    menuList.getChildren().add(createMenuCard(menu));
-                }
-            });
+                });
+            } else {
+                List<String> menus = mapper.readValue(body, new TypeReference<>() {
+                });
+                Platform.runLater(() -> {
+                    menuList.getChildren().clear();
+                    for (String menuTitle : menus) {
+                        Menu menu = null;
+                        RestaurantDAO restaurantDAO = new RestaurantDAOImp();
+                        try {
+                            menu = restaurantDAO.getMenuByTitle(menuTitle, restaurantId).orElse(null);
+                        } catch (Exception e) {
+                            e.getStackTrace();
+                        }
+                        menuList.getChildren().add(createMenuCard(menu));
+                    }
+                });
+            }
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -186,10 +253,6 @@ public class RestaurantController {
                     e.printStackTrace();
                     return null;
                 });
-    }
-
-    public void goBack(ActionEvent actionEvent) {
-        SceneNavigator.switchTo("/frontend/myRestaurants.fxml", restaurant_name_label);
     }
 
     public void addMenu(ActionEvent actionEvent) {
