@@ -80,7 +80,7 @@ public class OrderHandler implements HttpHandler {
 
         int amount = objectMapper.readTree(exchange.getRequestBody()).get("amount").asInt();
         if (amount == 0) {
-            HttpError.notFound(exchange, "Status not found");
+            HttpError.notFound(exchange, "Amount is zero");
             return;
         }
 
