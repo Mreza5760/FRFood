@@ -42,7 +42,7 @@ public class TransactionDAOImp implements TransactionDAO {
 
     @Override
     public int insert(Transaction transaction) throws SQLException {
-        String sql = "INSERT INTO Transactions (order_id, user_id, method, amount) VALUES (?, ?, ?, ?)";
+        String sql = "INSERT INTO transactions (order_id, user_id, method, amount) VALUES (?, ?, ?, ?)";
         try (Connection conn = DBConnector.gConnection();
              PreparedStatement stmt = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
             if (transaction.getOrderID() != 0)
@@ -50,7 +50,7 @@ public class TransactionDAOImp implements TransactionDAO {
             else
                 stmt.setNull(1, Types.INTEGER);
             stmt.setInt(2, transaction.getUserID());
-            stmt.setString(3, transaction.getMethod().toString());
+            stmt.setString(3, transaction.getMethod().name());
             stmt.setInt(4, transaction.getAmount());
 
             int rows = stmt.executeUpdate();

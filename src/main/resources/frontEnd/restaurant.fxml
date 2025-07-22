@@ -30,12 +30,14 @@
         <Button text="view foods"
                 onAction="#viewFoods"
                 prefWidth="120"
+                fx:id="viewFoodsButton"
                 style="-fx-background-color: #6600cc; -fx-text-fill: white; -fx-font-weight: bold; -fx-background-radius: 10; -fx-cursor: hand; -fx-pref-height: 40;-fx-font-size: 14px;"/>
 
         <Region fx:id="spacer1" HBox.hgrow="ALWAYS"/>
         <Button text="+ Add Food"
                 onAction="#addFood"
                 prefWidth="120"
+                fx:id="addFoodsButton"
                 style="-fx-background-color: #00aa88; -fx-text-fill: white; -fx-font-weight: bold; -fx-background-radius: 10; -fx-cursor: hand; -fx-pref-height: 40;-fx-font-size: 14px;"/>
 
 
@@ -43,6 +45,7 @@
         <Button text="+ Add Menu"
                 onAction="#addMenu"
                 prefWidth="120"
+                fx:id="addMenuButton"
                 style="-fx-background-color: #0077cc; -fx-text-fill: white; -fx-font-weight: bold; -fx-background-radius: 10; -fx-cursor: hand; -fx-pref-height:40;-fx-font-size: 14px;"/>
     </HBox>
     <HBox fx:id="HboxForTitleInput" spacing="10" alignment="CENTER" visible="false" managed="false">

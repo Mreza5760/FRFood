@@ -56,6 +56,9 @@ public class RestaurantController {
     public Button backButton;
 
     private static Role userRole;
+    public Button addMenuButton;
+    public Button addFoodsButton;
+    public Button viewFoodsButton;
 
     @FXML
     private VBox menuList;
@@ -83,7 +86,11 @@ public class RestaurantController {
             userRole = user.getRole();
             restaurant_name_label.setText(restaurantName);
             if (userRole == Role.buyer) {
-                backButton.setOnAction((event) ->{SceneNavigator.switchTo("/frontend/myRestaurants.fxml", restaurant_name_label);});
+                addFoodsButton.setVisible(false);
+                addFoodsButton.setManaged(false);
+                addMenuButton.setVisible(false);
+                addMenuButton.setManaged(false);
+                backButton.setOnAction((event) ->{SceneNavigator.switchTo("/frontend/allRestaurants.fxml", restaurant_name_label);});
             } else {
                 backButton.setOnAction((event) ->{SceneNavigator.switchTo("/frontend/myRestaurants.fxml", restaurant_name_label);});
             }
@@ -194,12 +201,13 @@ public class RestaurantController {
         info.getChildren().addAll(nameLabel);
         Region spacer = new Region();
         HBox.setHgrow(spacer, Priority.ALWAYS);
-
-// Delete Button
-        Button deleteBtn = new Button("Delete");
-        deleteBtn.setPrefWidth(100);
-        deleteBtn.setPrefHeight(36);
-        deleteBtn.setStyle("""
+        HBox rightBox = new HBox();
+        if(userRole == Role.seller) {
+            // Delete Button
+            Button deleteBtn = new Button("Delete");
+            deleteBtn.setPrefWidth(100);
+            deleteBtn.setPrefHeight(36);
+            deleteBtn.setStyle("""
                     -fx-background-color: #ff4444;
                     -fx-text-fill: white;
                     -fx-font-size: 14px;
@@ -207,13 +215,11 @@ public class RestaurantController {
                     -fx-background-radius: 10;
                     -fx-cursor: hand;
                 """);
-        deleteBtn.setOnAction(e -> handleDelete(menu));
+            deleteBtn.setOnAction(e -> handleDelete(menu));
+            rightBox = new HBox(10, deleteBtn);
+            rightBox.setAlignment(Pos.CENTER_RIGHT);
 
-// Add both buttons to VBox
-        HBox rightBox = new HBox(10, deleteBtn);
-        rightBox.setAlignment(Pos.CENTER_RIGHT);
-
-
+        }
         card.setOnMouseClicked(e -> handleClick(menu)); // full card click
 
         card.getChildren().addAll(info, spacer, rightBox);

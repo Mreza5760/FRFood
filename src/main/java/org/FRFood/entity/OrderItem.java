@@ -7,6 +7,13 @@ public class OrderItem {
     private Integer itemId;
     private Integer quantity;
 
+    public OrderItem(Integer itemId, Integer quantity) {
+        this.itemId = itemId;
+        this.quantity = quantity;
+    }
+
+    public OrderItem() {}
+
     public Integer getItemId() {
         return itemId;
     }
