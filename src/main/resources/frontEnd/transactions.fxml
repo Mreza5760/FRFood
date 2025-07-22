@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<AnchorPane xmlns="http://javafx.com/javafx/20.0.2"
+            xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="org.FRFood.frontEnd.controller.TransactionsController"
+            prefWidth="800" prefHeight="600">
+
+    <VBox spacing="10" alignment="TOP_CENTER"
+          AnchorPane.topAnchor="10" AnchorPane.leftAnchor="10"
+          AnchorPane.rightAnchor="10" AnchorPane.bottomAnchor="10">
+
+        <!-- Header with Back Button -->
+        <HBox alignment="CENTER_LEFT" spacing="10">
+            <Button fx:id="backButton" text="Back" prefWidth="100"/>
+            <Label text="Transaction History" style="-fx-font-size: 20px; -fx-font-weight: bold;"/>
+        </HBox>
+
+        <!-- Transactions Table -->
+        <TableView fx:id="transactionsTable" prefHeight="500" prefWidth="780">
+            <columns>
+                <TableColumn fx:id="idColumn" text="ID" prefWidth="60"/>
+                <TableColumn fx:id="orderIdColumn" text="Order ID" prefWidth="100"/>
+                <TableColumn fx:id="methodColumn" text="Method" prefWidth="120"/>
+                <TableColumn fx:id="statusColumn" text="Status" prefWidth="120"/>
+                <TableColumn fx:id="amountColumn" text="Amount" prefWidth="120"/>
+                <TableColumn fx:id="createdAtColumn" text="Created At" prefWidth="200"/>
+            </columns>
+        </TableView>
+
+    </VBox>
+</AnchorPane>

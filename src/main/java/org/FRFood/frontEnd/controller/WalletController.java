@@ -7,7 +7,12 @@ import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
+import org.FRFood.frontEnd.Util.SceneNavigator;
 import org.FRFood.frontEnd.Util.SessionManager;
+import javafx.stage.Stage;
+import javafx.scene.Scene;
+import javafx.fxml.FXMLLoader;
+import javafx.scene.Parent;
 
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -31,6 +36,9 @@ public class WalletController {
     @FXML
     private Button historyButton;
 
+    @FXML
+    private Button backButton;  // added backButton reference
+
     private int balance = 0;
     private final String token = SessionManager.getAuthToken();
 
@@ -41,6 +49,11 @@ public class WalletController {
         depositButton.setOnAction(e -> updateWallet(true));
         withdrawButton.setOnAction(e -> updateWallet(false));
         historyButton.setOnAction(e -> handleHistory());
+        backButton.setOnAction(e -> handleBack());  // added back button action
+    }
+
+    private void handleBack() {
+        SceneNavigator.switchTo("/frontend/panel.fxml",backButton);
     }
 
     private void loadWalletBalance() {

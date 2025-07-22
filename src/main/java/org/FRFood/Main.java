@@ -21,6 +21,7 @@ public class Main {
          server.createContext("/auth", new AuthHandler());
          server.createContext("/restaurants", new RestaurantHandler());
          server.createContext("/wallet", new OrderHandler());
+         server.createContext("/transactions", new OrderHandler());
          server.createContext("/",new BuyerHandler());
          server.setExecutor(Executors.newFixedThreadPool(4));
          server.start();

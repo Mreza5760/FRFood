@@ -16,6 +16,11 @@
           AnchorPane.bottomAnchor="20"
           style="-fx-padding: 20;">
 
+        <!-- Back Button at the top left -->
+        <HBox alignment="CENTER_LEFT" prefWidth="560">
+            <Button fx:id="backButton" text="Back" prefWidth="100"/>
+        </HBox>
+
         <!-- Current Wallet Balance -->
         <Label fx:id="balanceLabel"
                text="Wallet Balance: 0 Toman"
