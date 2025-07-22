@@ -27,8 +27,14 @@ public class OrderDAOImp implements OrderDAO {
             try (PreparedStatement stmt = conn.prepareStatement(sqlOrder, Statement.RETURN_GENERATED_KEYS)) {
                 stmt.setInt(1, order.getCustomerId());
                 stmt.setInt(2, order.getRestaurantId());
-                if (order.getCourierId() != null) stmt.setInt(3, order.getCourierId()); else stmt.setNull(3, Types.INTEGER);
-                if (order.getCouponId() != null) stmt.setInt(4, order.getCouponId()); else stmt.setNull(4, Types.INTEGER);
+                if (order.getCourierId() != 0)
+                    stmt.setInt(3, order.getCourierId());
+                else
+                    stmt.setNull(3, Types.INTEGER);
+                if (order.getCouponId() != 0)
+                    stmt.setInt(4, order.getCouponId());
+                else
+                    stmt.setNull(4, Types.INTEGER);
                 stmt.setString(5, order.getDeliveryAddress());
                 stmt.setInt(6, order.getRawPrice());
                 stmt.setInt(7, order.getTaxFee());
