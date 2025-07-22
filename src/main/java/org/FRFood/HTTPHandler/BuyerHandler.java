@@ -219,25 +219,25 @@ public class BuyerHandler implements HttpHandler {
                 return;
             }
             Restaurant restaurant = optionalRestaurant.get();
-            int rawPrice = 0;
-            for (OrderItem orderItem : order.getItems()) {
-                Optional<Food> optionalFood = foodDAO.getById(orderItem.getItemId());
-                if (optionalFood.isEmpty()) {
-                    HttpError.notFound(exchange, "Food not found");
-                    return;
-                }
-                Food food = optionalFood.get();
-                if (!food.getRestaurantId().equals(order.getRestaurantId())) {
-                    HttpError.unauthorized(exchange, "This food is not in the restaurant");
-                    return;
-                }
-                if (food.getSupply() < orderItem.getQuantity()) {
-                    HttpError.badRequest(exchange, "Supply is less than to quantity");
-                    return;
-                }
-                rawPrice += food.getPrice()*orderItem.getQuantity();
-            }
-
+//            int rawPrice = 0;
+//            for (OrderItem orderItem : order.getItems()) {
+//                Optional<Food> optionalFood = foodDAO.getById(orderItem.getItemId());
+//                if (optionalFood.isEmpty()) {
+//                    HttpError.notFound(exchange, "Food not found");
+//                    return;
+//                }
+//                Food food = optionalFood.get();
+//                if (!food.getRestaurantId().equals(order.getRestaurantId())) {
+//                    HttpError.unauthorized(exchange, "This food is not in the restaurant");
+//                    return;
+//                }
+//                if (food.getSupply() < orderItem.getQuantity()) {
+//                    HttpError.badRequest(exchange, "Supply is less than to quantity");
+//                    return;
+//                }
+//                rawPrice += food.getPrice()*orderItem.getQuantity();
+//            }
+//
             for (OrderItem orderItem : order.getItems()) {
                 Optional<Food> optionalFood = foodDAO.getById(orderItem.getItemId());
                 if (optionalFood.isEmpty()) return;
@@ -250,14 +250,14 @@ public class BuyerHandler implements HttpHandler {
             int randomPrice = rand.nextInt(91) + 10;
 
             order.setStatus(Status.waiting);
-            order.setRawPrice(rawPrice);
-            order.setAdditionalFee(restaurant.getAdditionalFee());
-            order.setTaxFee(restaurant.getTaxFee());
-            order.setCourierFee(randomPrice);
-            order.setCouponId(0);
-            order.setCourierId(0);
-            order.setPayPrice(rawPrice + restaurant.getAdditionalFee() + restaurant.getTaxFee() + randomPrice);
-            order.setCustomerId(user.getId());
+//            order.setRawPrice(rawPrice);
+//            order.setAdditionalFee(restaurant.getAdditionalFee());
+//            order.setTaxFee(restaurant.getTaxFee());
+//            order.setCourierFee(randomPrice);
+//            order.setCouponId(0);
+//            order.setCourierId(0);
+//            order.setPayPrice(rawPrice + restaurant.getAdditionalFee() + restaurant.getTaxFee() + randomPrice);
+//            order.setCustomerId(user.getId());
             order.setId(orderDAO.insert(order));
             order = orderDAO.getById(order.getId()).orElse(null);
             String jsonOutput = objectMapper.writeValueAsString(order);
