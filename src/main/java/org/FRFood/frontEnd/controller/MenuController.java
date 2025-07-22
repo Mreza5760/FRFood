@@ -2,6 +2,8 @@ package org.FRFood.frontEnd.controller;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.Jws;
 import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -17,10 +19,15 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.Region;
 import javafx.scene.layout.VBox;
+import org.FRFood.DAO.UserDAO;
+import org.FRFood.DAO.UserDAOImp;
 import org.FRFood.entity.Food;
 import org.FRFood.entity.Menu;
+import org.FRFood.entity.User;
 import org.FRFood.frontEnd.Util.SceneNavigator;
 import org.FRFood.frontEnd.Util.SessionManager;
+import org.FRFood.util.JwtUtil;
+import org.FRFood.util.Role;
 
 import java.io.ByteArrayInputStream;
 import java.net.URI;
@@ -29,6 +36,7 @@ import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.nio.charset.StandardCharsets;
+import java.sql.SQLException;
 import java.util.Base64;
 import java.util.List;
 
@@ -40,9 +48,12 @@ public class MenuController {
 
     private final ObjectMapper mapper = new ObjectMapper();
 
+    private static Role userRole;
     private static int menuId;
     private static String menuTitle;
     private static int restaurantId;
+    public Button addFoodsButton;
+
     public static void setData(int menuId, String menuTitle, int restaurantId) {
         MenuController.menuId = menuId;
         MenuController.menuTitle = menuTitle;
@@ -51,23 +62,45 @@ public class MenuController {
 
     @FXML
     public void goBack(ActionEvent actionEvent) {
-        SceneNavigator.switchTo("/frontend/restaurant.fxml",menu_name_label);
+        SceneNavigator.switchTo("/frontend/restaurant.fxml", menu_name_label);
     }
 
     @FXML
     public void addFood(ActionEvent actionEvent) {
-        AddFoodToMenuController.setData(menuId,menuTitle,restaurantId);
-        SceneNavigator.switchTo("/frontend/addFoodToMenu.fxml",menu_name_label);
+        AddFoodToMenuController.setData(menuId, menuTitle, restaurantId);
+        SceneNavigator.switchTo("/frontend/addFoodToMenu.fxml", menu_name_label);
     }
 
     @FXML
-    private void initialize(){
-        menu_name_label.setText(menuTitle);
-        fetchFoods();
+    private void initialize() {
+        String token = SessionManager.getAuthToken();
+        if (token == null) return;
+
+        Jws<Claims> claimsJws = JwtUtil.validateToken(token);
+        int userId = Integer.parseInt(claimsJws.getBody().getSubject());
+
+        UserDAO userDao = new UserDAOImp();
+        try {
+            User user = userDao.getById(userId).orElse(null);
+            if (user == null) return;
+            userRole = user.getRole();
+            if (userRole == Role.buyer) {
+                addFoodsButton.setVisible(false);
+                addFoodsButton.setManaged(false);
+            }
+            menu_name_label.setText(menuTitle);
+            fetchFoods();
+        } catch (
+                SQLException e) {
+            System.out.println(e);
+        }
+
+        ;
+
     }
 
     private void fetchFoods() {
-        String safeUrl = "http://localhost:8080/restaurants/" + restaurantId + "/items/" +URLEncoder.encode(menuTitle, StandardCharsets.UTF_8);
+        String safeUrl = "http://localhost:8080/restaurants/" + restaurantId + "/items/" + URLEncoder.encode(menuTitle, StandardCharsets.UTF_8);
         URI uri = URI.create(safeUrl);
         HttpRequest request = HttpRequest.newBuilder()
                 .uri(uri)
@@ -133,36 +166,24 @@ public class MenuController {
         Label supplyLabel = new Label("📍 Supply: " + food.getSupply());
         supplyLabel.setStyle("-fx-font-size: 14px; -fx-text-fill: #3a3a3a;");
 
-        Label feeLabel = new Label("💰 Price: " + food.getPrice()+"$");
+        Label feeLabel = new Label("💰 Price: " + food.getPrice() + "$");
         feeLabel.setStyle("-fx-font-size: 14px; -fx-text-fill: #3a3a3a;");
-        
+
         Label descriptionLabel = new Label("📝 " + food.getDescription());
         descriptionLabel.setStyle("-fx-font-size: 14px; -fx-text-fill: #3a3a3a;");
 
-        info.getChildren().addAll(nameLabel, supplyLabel,  feeLabel,descriptionLabel);
+        info.getChildren().addAll(nameLabel, supplyLabel, feeLabel, descriptionLabel);
 
         Region spacer = new Region();
         HBox.setHgrow(spacer, Priority.ALWAYS);
 
-        // Comments Button
-        Button CommentsBtn = new Button("Comments");
-        CommentsBtn.setPrefWidth(100);
-        CommentsBtn.setPrefHeight(36);
-        CommentsBtn.setStyle("""
-                    -fx-background-color: #007acc;
-                    -fx-text-fill: white;
-                    -fx-font-size: 14px;
-                    -fx-font-weight: bold;
-                    -fx-background-radius: 10;
-                    -fx-cursor: hand;
-                """);
-        CommentsBtn.setOnAction(e -> handleComments(food));
-
+        HBox rightBox = new HBox();
 // Delete Button
-        Button deleteBtn = new Button("Delete");
-        deleteBtn.setPrefWidth(100);
-        deleteBtn.setPrefHeight(36);
-        deleteBtn.setStyle("""
+        if(userRole == Role.seller) {
+            Button deleteBtn = new Button("Delete");
+            deleteBtn.setPrefWidth(100);
+            deleteBtn.setPrefHeight(36);
+            deleteBtn.setStyle("""
                     -fx-background-color: #ff4444;
                     -fx-text-fill: white;
                     -fx-font-size: 14px;
@@ -170,12 +191,11 @@ public class MenuController {
                     -fx-background-radius: 10;
                     -fx-cursor: hand;
                 """);
-        deleteBtn.setOnAction(e -> handleDelete(food));
-
-// Add both buttons to VBox
-        HBox rightBox = new HBox(10, CommentsBtn, deleteBtn);
-        rightBox.setAlignment(Pos.CENTER_RIGHT);
-
+            deleteBtn.setOnAction(e -> handleDelete(food));
+            // Add both buttons to VBox
+            rightBox = new HBox(10, deleteBtn);
+            rightBox.setAlignment(Pos.CENTER_RIGHT);
+        }
 
         card.setOnMouseClicked(e -> handleClick(food)); // full card click
 
@@ -188,11 +208,11 @@ public class MenuController {
 
     private void handleClick(Food food) {
         FoodDetailsController.setItemId(food.getId());
-        SceneNavigator.switchTo("/frontend/FoodDetail.fxml",menu_name_label);
+        SceneNavigator.switchTo("/frontend/FoodDetail.fxml", menu_name_label);
     }
 
     private void handleDelete(Food food) {
-        String safeUrl = "http://localhost:8080/restaurants/" + restaurantId + "/menu/" +URLEncoder.encode(menuTitle, StandardCharsets.UTF_8)+"/"+food.getId();
+        String safeUrl = "http://localhost:8080/restaurants/" + restaurantId + "/menu/" + URLEncoder.encode(menuTitle, StandardCharsets.UTF_8) + "/" + food.getId();
         URI uri = URI.create(safeUrl);
 //        String url = "http://localhost:8080/restaurants/" + restaurantId+"/menu/" + menuTitle + "/" + food.getId();
         HttpRequest request = HttpRequest.newBuilder()

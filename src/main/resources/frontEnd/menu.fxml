@@ -30,6 +30,7 @@
         <Button text="+ Add Food"
                 onAction="#addFood"
                 prefWidth="120"
+                fx:id="addFoodsButton"
                 style="-fx-background-color: #00aa88; -fx-text-fill: white; -fx-font-weight: bold; -fx-background-radius: 10; -fx-cursor: hand; -fx-pref-height: 40;-fx-font-size: 14px;"/>
 
     </HBox>

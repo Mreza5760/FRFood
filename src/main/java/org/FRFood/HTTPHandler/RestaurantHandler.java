@@ -475,16 +475,10 @@ public class RestaurantHandler implements HttpHandler {
         var userOpt = Authenticate.authenticate(exchange);
         if (userOpt.isEmpty()) return;
         User user = userOpt.get();
-        if (!user.getRole().equals(seller)) {
-            HttpError.unauthorized(exchange, "Only sellers can get menu items");
-            return;
-        }
 
         String title = URLDecoder.decode(exchange.getRequestURI().getPath().split("/")[4], StandardCharsets.UTF_8);
         int restaurantId = Integer.parseInt(exchange.getRequestURI().getPath().split("/")[2]);
         try {
-            Optional<Restaurant> optionalRestaurant = Authenticate.restaurantChecker(exchange, user, restaurantId);
-            if (optionalRestaurant.isEmpty()) return;
             Optional<Menu> optionalMenu = restaurantDAO.getMenuByTitle(title, restaurantId);
             if (optionalMenu.isEmpty()) {
                 HttpError.notFound(exchange, "Menu title not found");
