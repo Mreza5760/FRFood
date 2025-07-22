@@ -24,6 +24,8 @@ public class PanelController {
     @FXML
     private Button orderFoodButton;
     @FXML
+    private Button favoriteRestaurantsButton; // NEW
+    @FXML
     private Button walletButton;
     @FXML
     private Button profileButton;
@@ -34,7 +36,7 @@ public class PanelController {
     @FXML
     private Button addRestaurantButton;
 
-    // Admin-only buttons
+    // Admin-only
     @FXML
     private Button usersButton;
     @FXML
@@ -50,12 +52,13 @@ public class PanelController {
 
         logoutButton.setOnAction(e -> handleLogout());
         orderFoodButton.setOnAction(e -> handleOrders());
+        favoriteRestaurantsButton.setOnAction(e -> handleFavorites());
         addRestaurantButton.setOnAction(e -> handleCreateRestaurant());
         restaurantButton.setOnAction(e -> handleRestaurants());
         walletButton.setOnAction(e -> handleWallet());
         profileButton.setOnAction(e -> handleProfile());
 
-        // Admin buttons (currently placeholders)
+        // Admin placeholders
         usersButton.setOnAction(e -> System.out.println("Users clicked"));
         ordersButton.setOnAction(e -> System.out.println("Orders clicked"));
         transactionsButton.setOnAction(e -> System.out.println("Transactions clicked"));
@@ -83,6 +86,8 @@ public class PanelController {
             case buyer -> {
                 orderFoodButton.setVisible(true);
                 orderFoodButton.setManaged(true);
+                favoriteRestaurantsButton.setVisible(true);
+                favoriteRestaurantsButton.setManaged(true);
             }
             case seller -> {
                 restaurantButton.setVisible(true);
@@ -122,6 +127,11 @@ public class PanelController {
 
     private void handleOrders() {
         SceneNavigator.switchTo("/frontEnd/buyerOrderPage.fxml", orderFoodButton);
+    }
+
+    private void handleFavorites() {
+        SceneNavigator.switchTo("/frontEnd/favorites.fxml", favoriteRestaurantsButton);
+        System.out.println("Navigated to Favorite Restaurants");
     }
 
     private void handleWallet() {
