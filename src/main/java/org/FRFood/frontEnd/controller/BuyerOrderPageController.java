@@ -16,10 +16,6 @@ public class BuyerOrderPageController {
     @FXML
     private Button restaurantButton;
 
-    @FXML
-    private TextField searchBox1;
-    @FXML
-    private TextField searchBox2;
 
     @FXML
     private void initialize() {
@@ -36,15 +32,12 @@ public class BuyerOrderPageController {
                 System.out.println("My Orders clicked (not implemented)")
         );
         restaurantButton.setOnAction(event ->
-                System.out.println("Restaurants clicked (not implemented)")
+                restaurantsHandle()
         );
 
-        // Placeholder search actions
-        searchBox1.setOnAction(event ->
-                System.out.println("Search Vendor: " + searchBox1.getText())
-        );
-        searchBox2.setOnAction(event ->
-                System.out.println("Search Food: " + searchBox2.getText())
-        );
+    }
+
+    private void restaurantsHandle() {
+        SceneNavigator.switchTo("/frontEnd/allRestaurants.fxml", restaurantButton);
     }
 }

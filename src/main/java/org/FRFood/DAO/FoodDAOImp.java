@@ -47,12 +47,22 @@ public class FoodDAOImp implements FoodDAO {
         if (food == null) {
             throw new SQLException("Food Not Found");
         }
-        Set<String> foodKeywordNames = new HashSet<String>();
-        for (Keyword keyword : food.getKeywords()) {
-            foodKeywordNames.add(keyword.getName());
+        if (input == null){
+            return true;
         }
-        Set<String> inputSet = new HashSet<>(input);
-        return foodKeywordNames.equals(inputSet);
+        List<Keyword> keywords = food.getKeywords();
+        for(String temp : input){
+            boolean tempCondition = false;
+            for(Keyword keyword : keywords){
+                if(keyword.getName().equals(temp)){
+                    tempCondition =true;
+                }
+            }
+            if(!tempCondition){
+                return false;
+            }
+        }
+        return true;
     }
 
     @Override
