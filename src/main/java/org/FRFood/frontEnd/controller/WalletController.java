@@ -68,7 +68,10 @@ public class WalletController {
     private void updateWallet(boolean isDeposit) {
         try {
             int amount = Integer.parseInt(amountField.getText());
-            if (amount <= 0) return;
+            if (amount < 0) {
+                System.out.println("Invalid amount");
+                return;
+            }
 
             if (!isDeposit && amount > balance) {
                 System.out.println("Not enough balance for withdrawal.");
