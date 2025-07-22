@@ -92,20 +92,23 @@ public class BuyerHandler implements HttpHandler {
         try {
             List<Restaurant> restaurantsFiltered = new ArrayList<>();
             List<Restaurant> restaurants = restaurantDAO.searchByString(req.search);
-            for (Restaurant restaurant : restaurants) {
-                boolean haveFood = false;
-                List<Food> foods = restaurantDAO.getFoods(restaurant.getId());
-                for (Food food : foods) {
-                    if (foodDAO.doesHaveKeywords(req.keywords, food.getId())) {
-                        haveFood = true;
-                        break;
+            if(req.keywords != null) {
+                for (Restaurant restaurant : restaurants) {
+                    boolean haveFood = false;
+                    List<Food> foods = restaurantDAO.getFoods(restaurant.getId());
+                    for (Food food : foods) {
+                        if (foodDAO.doesHaveKeywords(req.keywords, food.getId())) {
+                            haveFood = true;
+                            break;
+                        }
+                    }
+                    if (haveFood) {
+                        restaurantsFiltered.add(restaurant);
                     }
                 }
-                if (haveFood) {
-                    restaurantsFiltered.add(restaurant);
-                }
+            }else{
+                restaurantsFiltered = restaurants;
             }
-
             String json = objectMapper.writeValueAsString(restaurantsFiltered);
             JsonResponse.sendJsonResponse(exchange, 200, json);
         } catch (SQLException e) {

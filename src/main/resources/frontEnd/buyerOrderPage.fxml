@@ -1,49 +1,50 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import javafx.geometry.Insets?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
-<?import javafx.geometry.Insets?>
-<?import javafx.geometry.Pos?>
 
 <BorderPane xmlns="http://javafx.com/javafx"
             xmlns:fx="http://javafx.com/fxml"
             fx:controller="org.FRFood.frontEnd.controller.BuyerOrderPageController"
-            style="-fx-background-color: linear-gradient(to bottom, #f8fafc, #e5ebf3);">
+            style="-fx-background-color: linear-gradient(to bottom, #f8fafc, #e5ebf3);"
+            prefWidth="800" prefHeight="600">
 
     <!-- Top Bar -->
-    <HBox spacing="15" alignment="CENTER_LEFT"
-          style="-fx-padding: 15; -fx-background-color: #eef3f9; -fx-border-color: #ccd4e0; -fx-border-width: 0 0 1 0;"
-          BorderPane.alignment="CENTER">
-        <Button fx:id="backButton" text="← Back"
-                style="-fx-background-color: #ff5555; -fx-text-fill: white; -fx-font-weight: bold;
-                       -fx-background-radius: 8; -fx-pref-height: 38; -fx-font-size: 14px;"/>
+    <top>
+        <HBox spacing="15" alignment="CENTER_LEFT"
+              style="-fx-padding: 15; -fx-background-color: #eef3f9; -fx-border-color: #ccd4e0; -fx-border-width: 0 0 1 0;">
+            <Button fx:id="backButton" text="← Back"
+                    style="-fx-background-color: #ff5555; -fx-text-fill: white; -fx-font-weight: bold;
+                           -fx-background-radius: 8; -fx-pref-height: 38; -fx-font-size: 14px;"/>
 
-        <Region HBox.hgrow="ALWAYS"/>
-        <TextField fx:id="searchBox1" promptText="Search vendor..."
-                   style="-fx-background-radius: 8; -fx-padding: 6; -fx-pref-width: 200;"/>
-        <TextField fx:id="searchBox2" promptText="Search food..."
-                   style="-fx-background-radius: 8; -fx-padding: 6; -fx-pref-width: 200;"/>
-    </HBox>
+            <Region HBox.hgrow="ALWAYS"/>
 
-    <!-- Center Section -->
-    <VBox spacing="20" alignment="TOP_CENTER" style="-fx-padding: 40;" BorderPane.alignment="CENTER">
-        <Label text="Buyer Order Page"
-               style="-fx-font-size: 26px; -fx-font-weight: bold; -fx-text-fill: #2c3e50;"/>
+        </HBox>
+    </top>
 
-        <Button fx:id="orderHistoryButton" text="Order History"
-                prefWidth="250" prefHeight="45"
-                style="-fx-background-color: #0077cc; -fx-text-fill: white;
-                       -fx-font-weight: bold; -fx-background-radius: 8; -fx-font-size: 16;"/>
+    <!-- Center Content -->
+    <center>
+        <VBox alignment="TOP_CENTER" spacing="25" style="-fx-padding: 40;">
+            <Label text="🍽 Buyer Order Page"
+                   style="-fx-font-size: 30px; -fx-font-weight: bold; -fx-text-fill: #1e2a38;"/>
 
-        <Button fx:id="myOrdersButton" text="My Orders"
-                prefWidth="250" prefHeight="45"
-                style="-fx-background-color: #00aa88; -fx-text-fill: white;
-                       -fx-font-weight: bold; -fx-background-radius: 8; -fx-font-size: 16;"/>
+            <VBox spacing="20" alignment="CENTER">
+                <Button fx:id="orderHistoryButton" text="📜 Order History"
+                        prefWidth="250" prefHeight="50"
+                        style="-fx-background-color: #0077cc; -fx-text-fill: white;
+                               -fx-font-weight: bold; -fx-background-radius: 10; -fx-font-size: 16px;"/>
 
-        <Button fx:id="restaurantButton" text="Restaurants"
-                prefWidth="250" prefHeight="45"
-                style="-fx-background-color: #ff9900; -fx-text-fill: white;
-                       -fx-font-weight: bold; -fx-background-radius: 8; -fx-font-size: 16;"/>
-    </VBox>
+                <Button fx:id="myOrdersButton" text="🛍 My Orders"
+                        prefWidth="250" prefHeight="50"
+                        style="-fx-background-color: #00aa88; -fx-text-fill: white;
+                               -fx-font-weight: bold; -fx-background-radius: 10; -fx-font-size: 16px;"/>
 
+                <Button fx:id="restaurantButton" text="🏪 Restaurants"
+                        prefWidth="250" prefHeight="50"
+                        style="-fx-background-color: #ff9900; -fx-text-fill: white;
+                               -fx-font-weight: bold; -fx-background-radius: 10; -fx-font-size: 16px;"/>
+            </VBox>
+        </VBox>
+    </center>
 </BorderPane>
