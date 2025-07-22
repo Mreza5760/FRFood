@@ -231,13 +231,25 @@ public class BuyerHandler implements HttpHandler {
                     HttpError.unauthorized(exchange, "This food is not in the restaurant");
                     return;
                 }
-                rawPrice += food.getPrice();
+                if (food.getSupply() < orderItem.getQuantity()) {
+                    HttpError.badRequest(exchange, "Supply is less than to quantity");
+                    return;
+                }
+                rawPrice += food.getPrice()*orderItem.getQuantity();
+            }
+
+            for (OrderItem orderItem : order.getItems()) {
+                Optional<Food> optionalFood = foodDAO.getById(orderItem.getItemId());
+                if (optionalFood.isEmpty()) return;
+                Food food = optionalFood.get();
+                food.setSupply(food.getSupply()-orderItem.getQuantity());
+                foodDAO.update(food);
             }
 
             Random rand = new Random();
             int randomPrice = rand.nextInt(91) + 10;
 
-            order.setStatus(Status.unpaid);
+            order.setStatus(Status.waiting);
             order.setRawPrice(rawPrice);
             order.setAdditionalFee(restaurant.getAdditionalFee());
             order.setTaxFee(restaurant.getTaxFee());

@@ -52,7 +52,6 @@ public class RestaurantHandler implements HttpHandler {
                     else if (path.matches("^/restaurants/\\d+/menus$")) getMenus(exchange);
                     else if (path.matches("^/restaurants/\\d+/items/[^/]+$")) getMenuItems(exchange);
                     else if (path.matches("^/restaurants/\\d+/menu/[^/]+$")) getItemsOutOfMenu(exchange);
-//                    else if (path.matches("^/restaurants/keywords$")) getKeywords(exchange);
                 }
                 case "PUT" -> {
                     if (path.matches("^/restaurants/\\d+$")) handleUpdateRestaurants(exchange);
@@ -456,6 +455,16 @@ public class RestaurantHandler implements HttpHandler {
                 Optional<User> optionalCustomer = new UserDAOImp().getById(order.getCustomerId());
                 if (optionalCustomer.isEmpty()) return;
                 User customer = optionalCustomer.get();
+                for (OrderItem orderItem : order.getItems()) {
+                    Optional<Food> optionalFood = foodDAO.getById(orderItem.getItemId());
+                    if (optionalFood.isEmpty()) {
+                        HttpError.notFound(exchange, "Item id not found");
+                        return;
+                    }
+                    Food food = optionalFood.get();
+                    food.setSupply(food.getSupply()+orderItem.getQuantity());
+                    foodDAO.update(food);
+                }
                 new UserDAOImp().setWallet(customer.getId(), customer.getWallet() + order.getPayPrice());
             } else if (status == Status.preparing) {
                 Optional<User> optionalOwner = new UserDAOImp().getById(restaurant.getOwner().getId());
@@ -555,22 +564,4 @@ public class RestaurantHandler implements HttpHandler {
             HttpError.internal(exchange, "Internal error");
         }
     }
-
-//    private void getKeywords(HttpExchange exchange) throws IOException {
-//        var userOpt = Authenticate.authenticate(exchange);
-//        if (userOpt.isEmpty()) return;
-//        User user = userOpt.get();
-//        if (!user.getRole().equals(seller)) {
-//            HttpError.unauthorized(exchange, "Only sellers can get keywords");
-//            return;
-//        }
-//
-//        try {
-//            List<Keyword> keywords = new KeywordDAOImp().getAllKeywords();
-//            String json = objectMapper.writeValueAsString(keywords);
-//            JsonResponse.sendJsonResponse(exchange, 200, json);
-//        } catch (SQLException e) {
-//            HttpError.internal(exchange, "Internal error");
-//        }
-//    }
 }
