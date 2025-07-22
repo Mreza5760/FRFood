@@ -55,6 +55,7 @@ public class Order {
 
     public Order(){
         items = new ArrayList<OrderItem>();
+        rawPrice = 0;
     }
 
     public Integer getId() { return id; }
