@@ -108,8 +108,8 @@ public class PanelController {
     }
 
     private void handleWallet() {
-        System.out.println("Wallet clicked (fetch logic can go here)");
-        // Future: Fetch wallet API call
+        SceneNavigator.switchTo("/frontEnd/wallet.fxml", walletButton);
+        System.out.println("Navigated to Wallet");
     }
 
     private void handleProfile() {
