@@ -18,13 +18,13 @@ import java.sql.SQLException;
 public class PanelController {
 
     @FXML
-    public Button addRestaurantButton;
-    @FXML
     private Label welcomeLabel;
     @FXML
     private Button logoutButton;
     @FXML
     private Button orderFoodButton;
+    @FXML
+    private Button favoriteRestaurantsButton; // NEW
     @FXML
     private Button walletButton;
     @FXML
@@ -33,25 +33,35 @@ public class PanelController {
     private Button restaurantButton;
     @FXML
     private Button deliveriesButton;
+    @FXML
+    private Button addRestaurantButton;
+
+    // Admin-only
+    @FXML
+    private Button usersButton;
+    @FXML
+    private Button ordersButton;
+    @FXML
+    private Button transactionsButton;
 
     private final ObjectMapper objectMapper = new ObjectMapper();
 
     @FXML
     public void initialize() {
-        // Role-based button visibility
         setRoleBasedButtons();
 
-        // Button actions
         logoutButton.setOnAction(e -> handleLogout());
         orderFoodButton.setOnAction(e -> handleOrders());
+        favoriteRestaurantsButton.setOnAction(e -> handleFavorites());
         addRestaurantButton.setOnAction(e -> handleCreateRestaurant());
         restaurantButton.setOnAction(e -> handleRestaurants());
         walletButton.setOnAction(e -> handleWallet());
         profileButton.setOnAction(e -> handleProfile());
-    }
 
-    private void handleRestaurants() {
-        SceneNavigator.switchTo("/frontend/myRestaurants.fxml",restaurantButton);
+        // Admin placeholders
+        usersButton.setOnAction(e -> System.out.println("Users clicked"));
+        ordersButton.setOnAction(e -> System.out.println("Orders clicked"));
+        transactionsButton.setOnAction(e -> System.out.println("Transactions clicked"));
     }
 
     private void setRoleBasedButtons() {
@@ -72,12 +82,12 @@ public class PanelController {
 
         welcomeLabel.setText("Welcome, " + user.getFullName() + "!");
 
-        // Show only relevant button based on role
-        System.out.println("Welcome: " + welcomeLabel.getText());
         switch (user.getRole()) {
             case buyer -> {
                 orderFoodButton.setVisible(true);
                 orderFoodButton.setManaged(true);
+                favoriteRestaurantsButton.setVisible(true);
+                favoriteRestaurantsButton.setManaged(true);
             }
             case seller -> {
                 restaurantButton.setVisible(true);
@@ -89,6 +99,20 @@ public class PanelController {
                 deliveriesButton.setVisible(true);
                 deliveriesButton.setManaged(true);
             }
+            case admin -> {
+                usersButton.setVisible(true);
+                usersButton.setManaged(true);
+                ordersButton.setVisible(true);
+                ordersButton.setManaged(true);
+                transactionsButton.setVisible(true);
+                transactionsButton.setManaged(true);
+
+                // Hide Wallet & Profile for Admin
+                walletButton.setVisible(false);
+                walletButton.setManaged(false);
+                profileButton.setVisible(false);
+                profileButton.setManaged(false);
+            }
         }
     }
 
@@ -99,21 +123,26 @@ public class PanelController {
     private void handleLogout() {
         SessionManager.logout();
         SceneNavigator.switchTo("/frontend/home.fxml", logoutButton);
-        System.out.println("Logout successful");
     }
 
     private void handleOrders() {
         SceneNavigator.switchTo("/frontEnd/buyerOrderPage.fxml", orderFoodButton);
-        System.out.println("Navigated to Buyer Order Page");
+    }
+
+    private void handleFavorites() {
+        SceneNavigator.switchTo("/frontEnd/favorites.fxml", favoriteRestaurantsButton);
+        System.out.println("Navigated to Favorite Restaurants");
     }
 
     private void handleWallet() {
         SceneNavigator.switchTo("/frontEnd/wallet.fxml", walletButton);
-        System.out.println("Navigated to Wallet");
     }
 
     private void handleProfile() {
         SceneNavigator.switchTo("/frontend/profile.fxml", profileButton);
-        System.out.println("Navigated to Profile");
+    }
+
+    private void handleRestaurants() {
+        SceneNavigator.switchTo("/frontend/myRestaurants.fxml", restaurantButton);
     }
 }
