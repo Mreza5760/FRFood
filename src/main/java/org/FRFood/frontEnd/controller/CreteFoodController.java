@@ -10,8 +10,6 @@ import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.CheckBoxListCell;
 import javafx.stage.FileChooser;
-import org.FRFood.DAO.KeywordDAO;
-import org.FRFood.DAO.KeywordDAOImp;
 import org.FRFood.entity.Food;
 import org.FRFood.entity.Keyword;
 import org.FRFood.frontEnd.Util.FoodRequest;
