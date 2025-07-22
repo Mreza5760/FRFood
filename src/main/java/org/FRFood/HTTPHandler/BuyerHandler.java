@@ -49,7 +49,7 @@ public class BuyerHandler implements HttpHandler {
                     switch (path) {
                         case "/vendors" -> handleVendorsList(exchange);
                         case "/items" -> handleItemsList(exchange);
-                        case "/orders" -> handleSubmitOrder(exchange);
+//                        case "/orders" -> handleSubmitOrder(exchange);
                         case "/ratings" -> handeSubmitRate(exchange);
                         default -> HttpError.notFound(exchange, "Not Found");
                     }
@@ -195,30 +195,30 @@ public class BuyerHandler implements HttpHandler {
         }
     }
 
-    private void handleSubmitOrder(HttpExchange exchange) throws IOException {
-        var userOpt = Authenticate.authenticate(exchange);
-        if (userOpt.isEmpty()) return;
-        User user = userOpt.get();
-
-        if (!user.getRole().equals(buyer)) {
-            HttpError.unauthorized(exchange, "Only buyers can submit orders");
-            return;
-        }
-
-        Order order = objectMapper.readValue(exchange.getRequestBody(), Order.class);
-
-        if (order.getDeliveryAddress() == null || order.getRestaurantId() == null || order.getItems() == null) {
-            HttpError.badRequest(exchange, "Missing required fields");
-            return;
-        }
-
-        try {
-            Optional<Restaurant> optionalRestaurant = restaurantDAO.getById(order.getRestaurantId());
-            if (optionalRestaurant.isEmpty()) {
-                HttpError.notFound(exchange, "Restaurant not found");
-                return;
-            }
-            Restaurant restaurant = optionalRestaurant.get();
+//    private void handleSubmitOrder(HttpExchange exchange) throws IOException {
+//        var userOpt = Authenticate.authenticate(exchange);
+//        if (userOpt.isEmpty()) return;
+//        User user = userOpt.get();
+//
+//        if (!user.getRole().equals(buyer)) {
+//            HttpError.unauthorized(exchange, "Only buyers can submit orders");
+//            return;
+//        }
+//
+//        Order order = objectMapper.readValue(exchange.getRequestBody(), Order.class);
+//
+//        if (order.getDeliveryAddress() == null || order.getRestaurantId() == null || order.getItems() == null) {
+//            HttpError.badRequest(exchange, "Missing required fields");
+//            return;
+//        }
+//
+//        try {
+//            Optional<Restaurant> optionalRestaurant = restaurantDAO.getById(order.getRestaurantId());
+//            if (optionalRestaurant.isEmpty()) {
+//                HttpError.notFound(exchange, "Restaurant not found");
+//                return;
+//            }
+//            Restaurant restaurant = optionalRestaurant.get();
 //            int rawPrice = 0;
 //            for (OrderItem orderItem : order.getItems()) {
 //                Optional<Food> optionalFood = foodDAO.getById(orderItem.getItemId());
@@ -238,18 +238,18 @@ public class BuyerHandler implements HttpHandler {
 //                rawPrice += food.getPrice()*orderItem.getQuantity();
 //            }
 //
-            for (OrderItem orderItem : order.getItems()) {
-                Optional<Food> optionalFood = foodDAO.getById(orderItem.getItemId());
-                if (optionalFood.isEmpty()) return;
-                Food food = optionalFood.get();
-                food.setSupply(food.getSupply()-orderItem.getQuantity());
-                foodDAO.update(food);
-            }
-
-            Random rand = new Random();
-            int randomPrice = rand.nextInt(91) + 10;
-
-            order.setStatus(Status.waiting);
+//            for (OrderItem orderItem : order.getItems()) {
+//                Optional<Food> optionalFood = foodDAO.getById(orderItem.getItemId());
+//                if (optionalFood.isEmpty()) return;
+//                Food food = optionalFood.get();
+//                food.setSupply(food.getSupply()-orderItem.getQuantity());
+//                foodDAO.update(food);
+//            }
+//
+//            Random rand = new Random();
+//            int randomPrice = rand.nextInt(91) + 10;
+//
+//            order.setStatus(Status.waiting);
 //            order.setRawPrice(rawPrice);
 //            order.setAdditionalFee(restaurant.getAdditionalFee());
 //            order.setTaxFee(restaurant.getTaxFee());
@@ -258,14 +258,14 @@ public class BuyerHandler implements HttpHandler {
 //            order.setCourierId(0);
 //            order.setPayPrice(rawPrice + restaurant.getAdditionalFee() + restaurant.getTaxFee() + randomPrice);
 //            order.setCustomerId(user.getId());
-            order.setId(orderDAO.insert(order));
-            order = orderDAO.getById(order.getId()).orElse(null);
-            String jsonOutput = objectMapper.writeValueAsString(order);
-            JsonResponse.sendJsonResponse(exchange, 200, jsonOutput);
-        } catch (Exception e) {
-            HttpError.internal(exchange, "Internal server error");
-        }
-    }
+//            order.setId(orderDAO.insert(order));
+//            order = orderDAO.getById(order.getId()).orElse(null);
+//            String jsonOutput = objectMapper.writeValueAsString(order);
+//            JsonResponse.sendJsonResponse(exchange, 200, jsonOutput);
+//        } catch (Exception e) {
+//            HttpError.internal(exchange, "Internal server error");
+//        }
+//    }
 
     private void handleGetOrder(HttpExchange exchange) throws IOException {
         var userOpt = Authenticate.authenticate(exchange);

@@ -70,7 +70,7 @@ public class AuthHandler implements HttpHandler {
             return;
         }
 
-        if ((user.getBank() == null || user.getBank().getId() == null || user.getBank().getAccountNumber() == null) || user.getFullName() == null || user.getPhoneNumber() == null || user.getPassword() == null || user.getRole() == null) {
+        if ((user.getBank() == null || user.getBank().getName() == null || user.getBank().getAccountNumber() == null) || user.getFullName() == null || user.getPhoneNumber() == null || user.getPassword() == null || user.getRole() == null) {
             HttpError.notFound(exchange, "Missing required fields");
             return;
         }
