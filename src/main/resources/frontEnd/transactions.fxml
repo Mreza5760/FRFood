@@ -20,7 +20,7 @@
         </HBox>
 
         <!-- Transactions Table -->
-        <TableView fx:id="transactionsTable" prefHeight="500" prefWidth="780">
+        <TableView fx:id="transactionsTable" prefHeight="500" prefWidth="600">
             <columns>
                 <TableColumn fx:id="idColumn" text="ID" prefWidth="60"/>
                 <TableColumn fx:id="orderIdColumn" text="Order ID" prefWidth="100"/>

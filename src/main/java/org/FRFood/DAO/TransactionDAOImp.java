@@ -45,11 +45,7 @@ public class TransactionDAOImp implements TransactionDAO {
         String sql = "INSERT INTO Transactions (order_id, user_id, method, amount) VALUES (?, ?, ?, ?)";
         try (Connection conn = DBConnector.gConnection();
              PreparedStatement stmt = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
-            if (transaction.getOrderID() != null) {
-                stmt.setInt(1, transaction.getOrderID());
-            } else {
-                stmt.setNull(1, Types.INTEGER);
-            }
+            stmt.setInt(1, transaction.getOrderID());
             stmt.setInt(2, transaction.getUserID());
             stmt.setString(3, transaction.getMethod().name());
             stmt.setInt(4, transaction.getAmount());
