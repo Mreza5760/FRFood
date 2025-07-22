@@ -4,11 +4,11 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
 import org.FRFood.DAO.*;
-import org.FRFood.entity.Order;
-import org.FRFood.entity.Transaction;
-import org.FRFood.entity.User;
+import org.FRFood.entity.*;
+import org.FRFood.util.BuyerReq.OrderReq;
 import org.FRFood.util.HttpError;
 import org.FRFood.util.JsonResponse;
+import org.FRFood.util.Status;
 import org.FRFood.util.TransactionMethod;
 
 import java.io.IOException;
@@ -104,15 +104,70 @@ public class OrderHandler implements HttpHandler {
         Optional<User> authenticatedUserOptional = authenticate(exchange);
         if (authenticatedUserOptional.isEmpty()) return;
         User user = authenticatedUserOptional.get();
-        Transaction transaction = objectMapper.readValue(exchange.getRequestBody(), Transaction.class);
+        Transaction transaction = new Transaction();
+        OrderReq orderReq = objectMapper.readValue(exchange.getRequestBody(), OrderReq.class);
+        Order order = orderReq.order;
+        transaction.setOrderID(order.getId());
+        transaction.setMethod(orderReq.method);
+
+        if (order.getDeliveryAddress() == null || order.getRestaurantId() == null || order.getItems() == null) {
+            HttpError.badRequest(exchange, "Missing required fields");
+            return;
+        }
+
+        FoodDAO foodDAO = new FoodDAOImp();
+        RestaurantDAO restaurantDAO = new RestaurantDAOImp();
 
         try {
-            Optional<Order> orderOptional = orderDAO.getById(transaction.getOrderID());
-            if (orderOptional.isEmpty()) {
-                HttpError.notFound(exchange, "Status not found");
+            Optional<Restaurant> optionalRestaurant = restaurantDAO.getById(order.getRestaurantId());
+            if (optionalRestaurant.isEmpty()) {
+                HttpError.notFound(exchange, "Restaurant not found");
                 return;
             }
-            Order order = orderOptional.get();
+//            Restaurant restaurant = optionalRestaurant.get();
+//            int rawPrice = 0;
+//            for (OrderItem orderItem : order.getItems()) {
+//                Optional<Food> optionalFood = foodDAO.getById(orderItem.getItemId());
+//                if (optionalFood.isEmpty()) {
+//                    HttpError.notFound(exchange, "Food not found");
+//                    return;
+//                }
+//                Food food = optionalFood.get();
+//                if (!food.getRestaurantId().equals(order.getRestaurantId())) {
+//                    HttpError.unauthorized(exchange, "This food is not in the restaurant");
+//                    return;
+//                }
+//                if (food.getSupply() < orderItem.getQuantity()) {
+//                    HttpError.badRequest(exchange, "Supply is less than to quantity");
+//                    return;
+//                }
+//                rawPrice += food.getPrice()*orderItem.getQuantity();
+//            }
+//
+            for (OrderItem orderItem : order.getItems()) {
+                Optional<Food> optionalFood = foodDAO.getById(orderItem.getItemId());
+                if (optionalFood.isEmpty()) return;
+                Food food = optionalFood.get();
+                food.setSupply(food.getSupply()-orderItem.getQuantity());
+                foodDAO.update(food);
+            }
+//
+//            Random rand = new Random();
+//            int randomPrice = rand.nextInt(91) + 10;
+//
+            order.setStatus(Status.waiting);
+//            order.setRawPrice(rawPrice);
+//            order.setAdditionalFee(restaurant.getAdditionalFee());
+//            order.setTaxFee(restaurant.getTaxFee());
+//            order.setCourierFee(randomPrice);
+//            order.setCouponId(0);
+//            order.setCourierId(0);
+//            order.setPayPrice(rawPrice + restaurant.getAdditionalFee() + restaurant.getTaxFee() + randomPrice);
+//            order.setCustomerId(user.getId());
+
+            transaction.setUserID(user.getId());
+            transaction.setAmount(order.getPayPrice());
+
             if (transaction.getMethod().equals(wallet)) {
                 if (user.getWallet() < transaction.getAmount()) {
                     HttpError.unauthorized(exchange, "Not enough money");
@@ -121,9 +176,8 @@ public class OrderHandler implements HttpHandler {
                     user.setWallet(user.getWallet() - transaction.getAmount());
                 }
             }
-
-            transaction.setUserID(user.getId());
-            transaction.setAmount(order.getPayPrice());
+            order.setId(orderDAO.insert(order));
+            transaction.setOrderID(order.getId());
             transaction.setId(transactionDAO.insert(transaction));
             JsonResponse.sendJsonResponse(exchange, 200, "{message: payed}");
         } catch (SQLException e) {
