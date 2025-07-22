@@ -241,7 +241,7 @@ public class MenuController {
         Map<Integer, Order> cart = SessionManager.getOrderList();
         Order order = new Order();
 
-        if(cart.containsKey(food.getId())) {
+        if(cart.containsKey(restaurantId)) {
             order = cart.get(restaurantId);
         }else{
             Order tempOrder = new Order();
