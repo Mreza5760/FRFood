@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.geometry.Pos?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<VBox xmlns="http://javafx.com/javafx"
+      xmlns:fx="http://javafx.com/fxml"
+      fx:controller="org.FRFood.frontEnd.controller.RestaurantOrdersController"
+      spacing="20" alignment="TOP_CENTER"
+      style="-fx-background-color: linear-gradient(to bottom, #eef3f9, #dbe5f1);"
+      prefWidth="900" prefHeight="700">
+
+    <padding>
+        <Insets top="30" right="30" bottom="30" left="30"/>
+    </padding>
+
+    <!-- Top bar with Back button and title -->
+    <HBox alignment="CENTER_LEFT" spacing="10">
+        <Button text="⬅ Back" onAction="#handleBack"
+                style="-fx-background-color: #e74c3c; -fx-text-fill: white; -fx-font-weight: bold; -fx-background-radius: 8;"/>
+        <Label text="📋 Restaurant Orders"
+               style="-fx-font-size: 24px; -fx-font-weight: bold; -fx-text-fill: #1e2a38;"/>
+    </HBox>
+
+    <!-- Scrollable list of order cards -->
+    <ScrollPane fitToWidth="true" style="-fx-background: transparent;">
+        <VBox fx:id="ordersContainer" spacing="15" alignment="TOP_CENTER"/>
+    </ScrollPane>
+</VBox>

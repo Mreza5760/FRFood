@@ -110,7 +110,7 @@ public class FoodDAOImp implements FoodDAO {
 
     @Override
     public void update(Food food) throws SQLException {
-        String sql = "UPDATE FoodItems SET  restaurant_id=? , name=? , image=? , description=? , price=? , supply=?";
+        String sql = "UPDATE FoodItems SET  restaurant_id=? , name=? , image=? , description=? , price=? , supply=? WHERE id = ?";
         try (
                 Connection connection = DBConnector.gConnection();
                 PreparedStatement preparedStatement = connection.prepareStatement(sql);
@@ -121,6 +121,7 @@ public class FoodDAOImp implements FoodDAO {
             preparedStatement.setString(4, food.getDescription());
             preparedStatement.setInt(5, food.getPrice());
             preparedStatement.setInt(6, food.getSupply());
+            preparedStatement.setInt(7, food.getId());
 
             int rows = preparedStatement.executeUpdate();
             if (rows == 0) {

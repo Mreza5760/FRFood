@@ -12,6 +12,7 @@ import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
+import org.FRFood.frontEnd.Util.FoodRequest;
 import org.FRFood.frontEnd.Util.SceneNavigator;
 import org.FRFood.frontEnd.Util.SessionManager;
 
@@ -19,6 +20,7 @@ import java.io.*;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.Base64;
+import java.util.List;
 
 public class UpdateFoodController {
 
@@ -79,15 +81,18 @@ public class UpdateFoodController {
                 conn.setRequestProperty("Content-Type", "application/json");
                 conn.setDoOutput(true);
 
+                String keywordText = keywordsField.getText();
+                List<String> keywords = List.of(keywordText.split(","));
+
                 ObjectMapper mapper = new ObjectMapper();
-                String requestBody = mapper.createObjectNode()
-                        .put("name", nameField.getText())
-                        .put("imageBase64", logoBase64)
-                        .put("description", descriptionField.getText())
-                        .put("price", Integer.parseInt(priceField.getText()))
-                        .put("supply", Integer.parseInt(supplyField.getText()))
-                        .put("logoBase64", logoBase64)
-                        .toString();
+                String requestBody = mapper.writeValueAsString(new FoodRequest(
+                        nameField.getText(),
+                        logoBase64,
+                        descriptionField.getText(),
+                        Integer.parseInt(priceField.getText()),
+                        Integer.parseInt(supplyField.getText()),
+                        keywords
+                ));
 
                 try (OutputStream os = conn.getOutputStream()) {
                     os.write(requestBody.getBytes());
@@ -100,7 +105,7 @@ public class UpdateFoodController {
                 if (responseCode == 200) {
                     Platform.runLater(() -> {
                         // Go back to restaurant list
-                        SceneNavigator.switchTo("/frontend/MyRestaurants.fxml", (Node) event.getSource());
+                        SceneNavigator.switchTo("/frontend/allRestaurantFood.fxml", (Node) event.getSource());
                     });
                 }
 

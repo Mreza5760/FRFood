@@ -237,8 +237,9 @@ public class AllRestaurantFoodController {
             UpdateFoodController controller = loader.getController();
             StringBuilder keywords = new StringBuilder();
             for(Keyword f : food.getKeywords()) {
-                keywords.append(f.getName()).append(" ");
+                keywords.append(f.getName()).append(",");
             }
+            keywords.deleteCharAt(keywords.length()-1);
             controller.setFoodData(restaurantId,food.getId(),food.getName(),food.getSupply(),food.getPrice(),keywords.toString(),food.getDescription(),food.getPicture());
 
 

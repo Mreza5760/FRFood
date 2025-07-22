@@ -84,12 +84,13 @@ public class CreateRestaurantController {
                 }
 
                 int responseCode = conn.getResponseCode();
+                String mess = conn.getResponseMessage();
                 Platform.runLater(() -> {
                     if (responseCode == 200 || responseCode == 201) {
                         responseLabel.setStyle("-fx-text-fill: #00aa88;");
                         responseLabel.setText("✅ Restaurant created successfully!");
                     } else {
-                        responseLabel.setText("❌ Failed to create restaurant (Code " + responseCode + ")");
+                        responseLabel.setText("❌ Failed to create restaurant (Code " + responseCode+ ")" + mess);
                     }
                 });
 
