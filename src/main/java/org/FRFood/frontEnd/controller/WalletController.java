@@ -107,7 +107,7 @@ public class WalletController {
                             amountField.clear();
                         });
                     } else {
-                        System.out.println("Wallet update failed: " + responseCode);
+                        System.out.println("Wallet update failed: " + responseCode + ": " + conn.getResponseMessage());
                     }
 
                 } catch (Exception e) {

@@ -88,17 +88,17 @@ public class UserDAOImp implements UserDAO {
     }
 
     @Override
-    public void setWallet(int userId, int wallet) throws SQLException {
-        String sql = "UPDATE Users SET wallet = ? WHERE user_id = ?";
+    public void setWallet(int userId, int amount) throws SQLException {
+        String sql = "UPDATE Users SET wallet = ? WHERE id = ?";
         try(
                 Connection conn = DBConnector.gConnection();
                 PreparedStatement stmt = conn.prepareStatement(sql)
                 ){
-            stmt.setInt(1, wallet);
+            stmt.setInt(1, amount);
             stmt.setInt(2, userId);
             int rows = stmt.executeUpdate();
             if (rows == 0) {
-                throw new SQLException("Insert failed, no rows affected.");
+                throw new SQLException("Update failed, no rows affected.");
             }
         }
     }

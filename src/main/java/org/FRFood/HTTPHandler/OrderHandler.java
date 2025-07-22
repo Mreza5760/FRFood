@@ -85,14 +85,14 @@ public class OrderHandler implements HttpHandler {
         }
 
         try {
-            Transaction transaction = new Transaction();
-            transaction.setAmount(amount);
-            transaction.setUserID(user.getId());
-            transaction.setId(transactionDAO.insert(transaction));
+//            Transaction transaction = new Transaction();
+//            transaction.setAmount(amount);
+//            transaction.setUserID(user.getId());
+//            transaction.setId(transactionDAO.insert(transaction));
             userDAO.setWallet(user.getId(), user.getWallet()+amount);
             JsonResponse.sendJsonResponse(exchange, 200, "{message: wallet updated}");
         } catch (SQLException e) {
-            HttpError.internal(exchange, "Internal server error while updating profile");
+            HttpError.internal(exchange, "Internal server error while updating profile" + e.getMessage());
         }
     }
 
