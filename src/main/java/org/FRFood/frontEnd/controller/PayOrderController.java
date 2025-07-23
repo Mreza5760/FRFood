@@ -25,11 +25,16 @@ public class PayOrderController {
 
     public Button acceptButton;
     public Button declineButton;
-    @FXML private VBox detailsBox;
-    @FXML private VBox itemsBox;
-    @FXML private Button payCardButton;
-    @FXML private Button payWalletButton;
-    @FXML private Button foodIsReadyButton;
+    @FXML
+    private VBox detailsBox;
+    @FXML
+    private VBox itemsBox;
+    @FXML
+    private Button payCardButton;
+    @FXML
+    private Button payWalletButton;
+    @FXML
+    private Button foodIsReadyButton;
 
     private Order currentOrder;
     private Restaurant restaurant;
@@ -46,15 +51,17 @@ public class PayOrderController {
             payCardButton.setManaged(true);
             payWalletButton.setVisible(true);
             payWalletButton.setManaged(true);
-        }
-        else if(mode == 3 && currentOrder.getStatus() == Status.waiting) {
+        } else if (mode == 3 && currentOrder.getStatus() == Status.waiting) {
             acceptButton.setVisible(true);
             acceptButton.setManaged(true);
             declineButton.setVisible(true);
             declineButton.setManaged(true);
-        }else if(mode == 3 && currentOrder.getStatus() == Status.preparing){
+        } else if (mode == 3 && currentOrder.getStatus() == Status.preparing) {
             foodIsReadyButton.setVisible(true);
             foodIsReadyButton.setManaged(true);
+        } else if (mode == 4) {
+            acceptButton.setVisible(true);
+            acceptButton.setManaged(true);
         }
         // Populate details
         detailsBox.getChildren().addAll(
@@ -70,7 +77,7 @@ public class PayOrderController {
                 new Label("💳 Total to Pay: " + order.getPayPrice())
         );
 
-        if(mode != 1){
+        if (mode != 1) {
             detailsBox.getChildren().add(new Label("⏱ Created at: " + order.getCreatedAt()));
         }
 
@@ -96,15 +103,15 @@ public class PayOrderController {
     }
 
     public void handleBack() {
-        if(mode == 2){
-            SceneNavigator.switchTo("/frontend/orderHistory.fxml",payCardButton);
-        }else if(mode == 1){
-            SceneNavigator.switchTo("/frontend/cart.fxml",payCardButton);
-        }else if (mode == 3){
-            SceneNavigator.switchTo("/frontend/restaurantOrders.fxml",payWalletButton);
+        if (mode == 2) {
+            SceneNavigator.switchTo("/frontend/orderHistory.fxml", payCardButton);
+        } else if (mode == 1) {
+            SceneNavigator.switchTo("/frontend/cart.fxml", payCardButton);
+        } else if (mode == 3) {
+            SceneNavigator.switchTo("/frontend/restaurantOrders.fxml", payWalletButton);
         }
     }
-    
+
     private void sendPaymentRequest(String method) {
         try {
             URL url = new URL("http://localhost:8080/payment/online");
@@ -155,21 +162,29 @@ public class PayOrderController {
     }
 
     public void handleDecline(ActionEvent actionEvent) {
-        updateOrderStatus(currentOrder.getId(),"cancelled");
+        updateOrderStatus(currentOrder.getId(), "cancelled");
     }
 
     public void handleAccept(ActionEvent actionEvent) {
-        updateOrderStatus(currentOrder.getId(),"preparing");
+        if (mode == 4) {
+            updateOrderStatus(currentOrder.getId(), "onTheWay");
+        } else {
+            updateOrderStatus(currentOrder.getId(), "preparing");
+        }
     }
 
     public void handleFoodReady(ActionEvent actionEvent) {
-        updateOrderStatus(currentOrder.getId(),"findingCourier");
+        updateOrderStatus(currentOrder.getId(), "findingCourier");
     }
 
     private void updateOrderStatus(int orderId, String newStatus) {
         new Thread(() -> {
             try {
-                URL url = new URL("http://localhost:8080/restaurants/orders/" + orderId);
+                String temp = "http://localhost:8080/restaurants/orders/" + orderId;
+                if (mode == 4) {
+                    temp = "http://localhost:8080/deliveries/" + orderId;
+                }
+                URL url = new URL(temp);
                 HttpURLConnection conn = (HttpURLConnection) url.openConnection();
                 conn.setRequestMethod("POST");
                 conn.setRequestProperty("X-HTTP-Method-Override", "PATCH");

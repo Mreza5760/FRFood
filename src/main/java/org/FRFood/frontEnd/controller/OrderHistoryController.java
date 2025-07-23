@@ -35,14 +35,24 @@ public class OrderHistoryController {
 
     private final ObjectMapper mapper = new ObjectMapper();
 
+    private static int mode;
+
+    public static void setMode(int mode) {
+        OrderHistoryController.mode = mode;
+    }
+
     @FXML
     public void initialize() {
         fetchOrders();
     }
 
     private void fetchOrders() {
+        String uri ="http://localhost:8080/orders/history";
+        if(mode == 2){
+            uri = "http://localhost:8080/deliveries/available";
+        }
         HttpRequest request = HttpRequest.newBuilder()
-                .uri(URI.create("http://localhost:8080/orders/history"))
+                .uri(URI.create(uri))
                 .header("Authorization", "Bearer " + SessionManager.getAuthToken())
                 .GET()
                 .build();
@@ -52,7 +62,7 @@ public class OrderHistoryController {
                     if (response.statusCode() == 200) {
                         displayRestaurants(response.body());
                     } else {
-                        System.err.println("Failed to fetch restaurants: HTTP " + response.statusCode()+response.body());
+                        System.err.println("Failed to fetch orders: HTTP " + response.statusCode()+response.body());
                     }
                 })
                 .exceptionally(e -> {
@@ -196,7 +206,11 @@ public class OrderHistoryController {
 
 
         if (controller != null) {
-            controller.setOrder(theOrder, r,2);
+            if(mode == 2){
+                controller.setOrder(theOrder, r,4);
+            }else {
+                controller.setOrder(theOrder, r, 2);
+            }
         }
     }
 

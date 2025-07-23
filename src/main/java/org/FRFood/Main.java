@@ -21,6 +21,7 @@ public class Main {
          server.createContext("/transactions", new OrderHandler());
          server.createContext("/payment", new OrderHandler());
          server.createContext("/admin", new AdminHandler());
+         server.createContext("/deliveries", new CourierHandler());
          server.createContext("/",new BuyerHandler());
          server.setExecutor(Executors.newFixedThreadPool(4));
          server.start();
