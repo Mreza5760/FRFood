@@ -41,7 +41,7 @@ public class OrderDAOImp implements OrderDAO {
                 stmt.setInt(8, order.getAdditionalFee());
                 stmt.setInt(9, order.getCourierFee());
                 stmt.setInt(10, order.getPayPrice());
-                stmt.setString(11, order.getStatus().name());
+                stmt.setString(11, order.getStatus().toString());
 
                 if (stmt.executeUpdate() == 0) {
                     conn.rollback();
@@ -59,7 +59,7 @@ public class OrderDAOImp implements OrderDAO {
             }
 
             insertOrderItems(conn, orderId, order.getItems());
-            conn.commit(); // All good
+            conn.commit();
 
             return orderId;
         }
@@ -91,7 +91,7 @@ public class OrderDAOImp implements OrderDAO {
 
     @Override
     public List<Order> getAvailableOrders() throws SQLException {
-        String sql = "SELECT * FROM Orders WHERE status = 'finding courier' ORDER BY created_at ASC";
+        String sql = "SELECT * FROM Orders WHERE status = 'findingCourier' ORDER BY created_at ASC";
         return fetchOrders(sql);
     }
 
@@ -112,7 +112,7 @@ public class OrderDAOImp implements OrderDAO {
         String sql = "UPDATE Orders SET status = ? WHERE id = ?";
         try (Connection conn = DBConnector.gConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
-            stmt.setString(1, status.name());
+            stmt.setString(1, status.toString());
             stmt.setInt(2, orderID);
             if (stmt.executeUpdate() == 0) {
                 throw new SQLException("No order updated (id=" + orderID + ")");
@@ -126,7 +126,6 @@ public class OrderDAOImp implements OrderDAO {
         return fetchOrders(sql);
     }
 
-    /* ---------------- Private Helpers ---------------- */
 
     private List<Order> fetchOrders(String sql, Object... params) throws SQLException {
         List<Order> orders = new ArrayList<>();
@@ -194,8 +193,7 @@ public class OrderDAOImp implements OrderDAO {
         order.setCourierFee(rs.getInt("courier_fee"));
         order.setPayPrice(rs.getInt("pay_price"));
 
-        // Normalize status enum (handles spaces like "unpaid and cancelled")
-        String statusStr = rs.getString("status").replace(" ", "_");
+        String statusStr = rs.getString("status");
         order.setStatus(Status.valueOf(statusStr));
 
         order.setCreatedAt(rs.getString("created_at"));
