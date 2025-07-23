@@ -74,5 +74,14 @@
                 visible="false"
                 style="-fx-background-color: #00aa88; -fx-text-fill: white; -fx-font-size: 14px; -fx-font-weight: bold; -fx-background-radius: 10;"
                 prefWidth="180" prefHeight="40"/>
+
+
+        <Button fx:id="addRatingButton" text="Rate this food!"
+                onAction="#handleAddRating"
+                managed="false"
+                visible="false"
+                style="-fx-background-color: #00aa88; -fx-text-fill: white; -fx-font-size: 14px; -fx-font-weight: bold; -fx-background-radius: 10;"
+                prefWidth="180" prefHeight="40"/>
+
     </HBox>
 </VBox>

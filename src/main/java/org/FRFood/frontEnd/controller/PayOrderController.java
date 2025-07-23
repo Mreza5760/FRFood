@@ -24,6 +24,7 @@ public class PayOrderController {
 
     public Button acceptButton;
     public Button declineButton;
+    public Button addRatingButton;
     @FXML
     private VBox detailsBox;
     @FXML
@@ -53,7 +54,10 @@ public class PayOrderController {
             payCardButton.setManaged(true);
             payWalletButton.setVisible(true);
             payWalletButton.setManaged(true);
-        } else if (mode == 3 && currentOrder.getStatus() == Status.waiting) {
+        }else if(mode == 2 && currentOrder.getStatus() == Status.completed) {
+            addRatingButton.setVisible(true);
+            addRatingButton.setManaged(true);
+        }else if (mode == 3 && currentOrder.getStatus() == Status.waiting) {
             acceptButton.setVisible(true);
             acceptButton.setManaged(true);
             declineButton.setVisible(true);
@@ -222,4 +226,8 @@ public class PayOrderController {
     }
 
 
+    public void handleAddRating(ActionEvent actionEvent) {
+        AddRatingController.setOrderId(currentOrder.getId());
+        SceneNavigator.switchTo("/frontend/addRating.fxml", payWalletButton);
+    }
 }
