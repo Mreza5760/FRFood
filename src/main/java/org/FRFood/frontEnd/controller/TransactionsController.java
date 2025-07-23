@@ -5,13 +5,12 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
-import javafx.scene.control.*;
+import javafx.scene.control.Button;
+import javafx.scene.control.TableColumn;
+import javafx.scene.control.TableView;
 import javafx.scene.control.cell.PropertyValueFactory;
-import javafx.scene.Node;
-import javafx.fxml.FXMLLoader;
-import javafx.scene.Parent;
-import javafx.scene.Scene;
-import javafx.stage.Stage;
+import javafx.util.Callback;
+import javafx.scene.control.TableCell;
 import org.FRFood.entity.Transaction;
 import org.FRFood.frontEnd.Util.SceneNavigator;
 import org.FRFood.frontEnd.Util.SessionManager;
@@ -24,30 +23,42 @@ import java.util.List;
 public class TransactionsController {
 
     @FXML private TableView<Transaction> transactionsTable;
-    @FXML private TableColumn<Transaction, Integer> idColumn;
     @FXML private TableColumn<Transaction, Integer> orderIdColumn;
     @FXML private TableColumn<Transaction, String> methodColumn;
-    @FXML private TableColumn<Transaction, String> statusColumn;
     @FXML private TableColumn<Transaction, Integer> amountColumn;
-    @FXML private TableColumn<Transaction, String> createdAtColumn;
     @FXML private Button backButton;
 
     private final String token = SessionManager.getAuthToken();
 
     @FXML
     public void initialize() {
-        // Bind table columns to Transaction fields
-        idColumn.setCellValueFactory(new PropertyValueFactory<>("id"));
+        // Setup columns
         orderIdColumn.setCellValueFactory(new PropertyValueFactory<>("orderID"));
         methodColumn.setCellValueFactory(new PropertyValueFactory<>("method"));
         amountColumn.setCellValueFactory(new PropertyValueFactory<>("amount"));
-        createdAtColumn.setCellValueFactory(new PropertyValueFactory<>("createdAt"));
+
+        // Customize Order ID column to show "Wallet Charge" for 0
+        orderIdColumn.setCellFactory(new Callback<>() {
+            @Override
+            public TableCell<Transaction, Integer> call(TableColumn<Transaction, Integer> param) {
+                return new TableCell<>() {
+                    @Override
+                    protected void updateItem(Integer item, boolean empty) {
+                        super.updateItem(item, empty);
+                        if (empty || item == null) {
+                            setText(null);
+                        } else {
+                            setText(item == 0 ? "Wallet Charge" : String.valueOf(item));
+                        }
+                    }
+                };
+            }
+        });
 
         loadTransactions();
 
-        backButton.setOnAction(e -> {
-            SceneNavigator.switchTo("/frontend/wallet.fxml",backButton);
-        });
+        // Back button goes to wallet page
+        backButton.setOnAction(e -> SceneNavigator.switchTo("/frontend/wallet.fxml", backButton));
     }
 
     private void loadTransactions() {
@@ -58,12 +69,14 @@ public class TransactionsController {
                 conn.setRequestMethod("GET");
                 conn.setRequestProperty("Authorization", "Bearer " + token);
 
-                InputStream responseStream = conn.getInputStream();
-                ObjectMapper mapper = new ObjectMapper();
-                List<Transaction> transactions = mapper.readValue(responseStream, new TypeReference<>() {});
+                try (InputStream responseStream = conn.getInputStream()) {
+                    ObjectMapper mapper = new ObjectMapper();
+                    List<Transaction> transactions = mapper.readValue(responseStream, new TypeReference<>() {});
 
-                Platform.runLater(() -> transactionsTable.setItems(FXCollections.observableArrayList(transactions)));
-
+                    Platform.runLater(() ->
+                            transactionsTable.setItems(FXCollections.observableArrayList(transactions))
+                    );
+                }
             } catch (Exception e) {
                 e.printStackTrace();
             }

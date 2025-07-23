@@ -124,46 +124,18 @@ public class OrderHandler implements HttpHandler {
                 HttpError.notFound(exchange, "Restaurant not found");
                 return;
             }
-//            Restaurant restaurant = optionalRestaurant.get();
-//            int rawPrice = 0;
-//            for (OrderItem orderItem : order.getItems()) {
-//                Optional<Food> optionalFood = foodDAO.getById(orderItem.getItemId());
-//                if (optionalFood.isEmpty()) {
-//                    HttpError.notFound(exchange, "Food not found");
-//                    return;
-//                }
-//                Food food = optionalFood.get();
-//                if (!food.getRestaurantId().equals(order.getRestaurantId())) {
-//                    HttpError.unauthorized(exchange, "This food is not in the restaurant");
-//                    return;
-//                }
-//                if (food.getSupply() < orderItem.getQuantity()) {
-//                    HttpError.badRequest(exchange, "Supply is less than to quantity");
-//                    return;
-//                }
-//                rawPrice += food.getPrice()*orderItem.getQuantity();
-//            }
-//
+
             for (OrderItem orderItem : order.getItems()) {
                 Optional<Food> optionalFood = foodDAO.getById(orderItem.getItemId());
-                if (optionalFood.isEmpty()) return;
+                if (optionalFood.isEmpty()) {
+                    HttpError.notFound(exchange, "Food not found");
+                    return;
+                }
                 Food food = optionalFood.get();
                 food.setSupply(food.getSupply()-orderItem.getQuantity());
                 foodDAO.update(food);
             }
-//
-//            Random rand = new Random();
-//            int randomPrice = rand.nextInt(91) + 10;
-//
             order.setStatus(Status.waiting);
-//            order.setRawPrice(rawPrice);
-//            order.setAdditionalFee(restaurant.getAdditionalFee());
-//            order.setTaxFee(restaurant.getTaxFee());
-//            order.setCourierFee(randomPrice);
-//            order.setCouponId(0);
-//            order.setCourierId(0);
-//            order.setPayPrice(rawPrice + restaurant.getAdditionalFee() + restaurant.getTaxFee() + randomPrice);
-//            order.setCustomerId(user.getId());
 
             transaction.setUserID(user.getId());
             transaction.setAmount(order.getPayPrice());
