@@ -20,7 +20,7 @@ public interface OrderDAO {
 
     List<Order> getRestaurantOrders(int restaurantID) throws SQLException;
 
-    void changeStatus(Integer orderID, Status status,int userId) throws SQLException;
+    void changeStatus(Integer orderID, Status status, int userId) throws SQLException;
 
     List<Order> getAllOrders() throws SQLException;
 }

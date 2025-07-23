@@ -34,8 +34,7 @@
                 <TableColumn fx:id="addressColumn" text="Address" prefWidth="200"/>
                 <TableColumn fx:id="walletColumn" text="Wallet" prefWidth="80"/>
                 <TableColumn fx:id="roleColumn" text="Role" prefWidth="100"/>
-                <TableColumn fx:id="confirmedColumn" text="Confirmed" prefWidth="90"/>
-                <TableColumn fx:id="actionColumn" text="Actions" prefWidth="150"/>
+                <TableColumn fx:id="confirmedColumn" text="Status" prefWidth="150"/>
             </columns>
         </TableView>
     </VBox>

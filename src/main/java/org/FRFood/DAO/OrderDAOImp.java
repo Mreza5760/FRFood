@@ -108,7 +108,7 @@ public class OrderDAOImp implements OrderDAO {
     }
 
     @Override
-    public void changeStatus(Integer orderID, Status status,int userId) throws SQLException {
+    public void changeStatus(Integer orderID, Status status, int userId) throws SQLException {
         String sql = "UPDATE Orders SET status = ? WHERE id = ?";
         try (Connection conn = DBConnector.gConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {

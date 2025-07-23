@@ -30,15 +30,13 @@ public class AllUsersController {
     @FXML private TableColumn<User, String> addressColumn;
     @FXML private TableColumn<User, Integer> walletColumn;
     @FXML private TableColumn<User, String> roleColumn;
-    @FXML private TableColumn<User, Boolean> confirmedColumn;
-    @FXML private TableColumn<User, Void> actionColumn;
+    @FXML private TableColumn<User, Void> confirmedColumn; // change to Void for custom cell with buttons
     @FXML private Button backButton;
 
     private final String token = SessionManager.getAuthToken();
 
     @FXML
     public void initialize() {
-        // Bind fields
         idColumn.setCellValueFactory(new PropertyValueFactory<>("id"));
         nameColumn.setCellValueFactory(new PropertyValueFactory<>("fullName"));
         phoneColumn.setCellValueFactory(new PropertyValueFactory<>("phoneNumber"));
@@ -46,16 +44,16 @@ public class AllUsersController {
         addressColumn.setCellValueFactory(new PropertyValueFactory<>("address"));
         walletColumn.setCellValueFactory(new PropertyValueFactory<>("wallet"));
         roleColumn.setCellValueFactory(new PropertyValueFactory<>("role"));
-        confirmedColumn.setCellValueFactory(new PropertyValueFactory<>("confirmed"));
 
-        addActionButtons();
+        setupConfirmedColumn();
+
         loadUsers();
 
         backButton.setOnAction(e -> SceneNavigator.switchTo("/frontend/panel.fxml", backButton));
     }
 
-    private void addActionButtons() {
-        actionColumn.setCellFactory(param -> new TableCell<>() {
+    private void setupConfirmedColumn() {
+        confirmedColumn.setCellFactory(param -> new TableCell<>() {
             private final Button acceptButton = new Button("Accept");
             private final Button declineButton = new Button("Decline");
             private final HBox container = new HBox(10, acceptButton, declineButton);
@@ -64,17 +62,34 @@ public class AllUsersController {
                 acceptButton.setStyle("-fx-background-color: #00aa88; -fx-text-fill: white; -fx-background-radius: 5;");
                 declineButton.setStyle("-fx-background-color: #cc3300; -fx-text-fill: white; -fx-background-radius: 5;");
 
-                acceptButton.setOnAction(e -> updateUserStatus("approved"));
-                declineButton.setOnAction(e -> updateUserStatus("declined"));
+                acceptButton.setOnAction(e -> {
+                    if (showConfirmation("Approve this user?")) {
+                        updateUserStatus("approved", false);
+                    }
+                });
+                declineButton.setOnAction(e -> {
+                    if (showConfirmation("Decline and delete this user?")) {
+                        updateUserStatus("declined", true);
+                    }
+                });
             }
 
-            private void updateUserStatus(String status) {
+            private boolean showConfirmation(String message) {
+                Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+                alert.setTitle("Confirm Action");
+                alert.setHeaderText(null);
+                alert.setContentText(message);
+                return alert.showAndWait().filter(btn -> btn == ButtonType.OK).isPresent();
+            }
+
+            private void updateUserStatus(String status, boolean removeUser) {
                 User user = getTableView().getItems().get(getIndex());
                 new Thread(() -> {
                     try {
                         URL url = new URL("http://localhost:8080/admin/users/" + user.getId() + "/status");
                         HttpURLConnection conn = (HttpURLConnection) url.openConnection();
                         conn.setRequestMethod("POST");
+                        conn.setRequestProperty("X-HTTP-Method-Override", "PATCH");
                         conn.setRequestProperty("Authorization", "Bearer " + token);
                         conn.setRequestProperty("Content-Type", "application/json");
                         conn.setDoOutput(true);
@@ -85,11 +100,17 @@ public class AllUsersController {
                         }
 
                         if (conn.getResponseCode() == 200) {
-                            Platform.runLater(() -> usersTable.getItems().remove(user)); // Remove from list after action
+                            Platform.runLater(() -> {
+                                if (removeUser) {
+                                    usersTable.getItems().remove(user);
+                                } else {
+                                    user.setConfirmed(true);
+                                    usersTable.refresh();
+                                }
+                            });
                         } else {
                             System.err.println("Failed to update user status: " + conn.getResponseCode());
                         }
-
                     } catch (Exception ex) {
                         ex.printStackTrace();
                     }
@@ -101,11 +122,19 @@ public class AllUsersController {
                 super.updateItem(item, empty);
                 if (empty) {
                     setGraphic(null);
+                    setText(null);
                 } else {
                     User user = getTableView().getItems().get(getIndex());
-                    // Only show buttons for unconfirmed AND non-admin users
-                    setGraphic(!user.isConfirmed() && !"admin".equalsIgnoreCase(String.valueOf(user.getRole()))
-                            ? container : null);
+                    if (user.isConfirmed()) {
+                        setText("Confirmed");
+                        setGraphic(null);
+                    } else if (!"admin".equalsIgnoreCase(String.valueOf(user.getRole()))) {
+                        setText(null);
+                        setGraphic(container);
+                    } else {
+                        setText(null);
+                        setGraphic(null);
+                    }
                 }
             }
         });
@@ -123,7 +152,6 @@ public class AllUsersController {
                     ObjectMapper mapper = new ObjectMapper();
                     List<User> users = mapper.readValue(responseStream, new TypeReference<>() {});
 
-                    // Filter out admins so they don't even show up
                     users.removeIf(u -> "admin".equalsIgnoreCase(String.valueOf(u.getRole())));
 
                     ObservableList<User> observableList = FXCollections.observableArrayList(users);
