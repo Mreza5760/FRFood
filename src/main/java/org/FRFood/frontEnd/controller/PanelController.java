@@ -18,6 +18,8 @@ import java.sql.SQLException;
 public class PanelController {
 
     public Button activeOrdersButton;
+
+    public Button deliveryHistoryButton;
     @FXML
     private Label welcomeLabel;
     @FXML
@@ -60,11 +62,17 @@ public class PanelController {
         profileButton.setOnAction(e -> handleProfile());
         deliveriesButton.setOnAction(e -> handleDeliveriesButton());
         activeOrdersButton.setOnAction(e -> handleActiveOrders());
+        deliveryHistoryButton.setOnAction(e -> handleDeliveriesHistory());
 
         // Admin placeholders
         usersButton.setOnAction(e -> handleAllUsers());
         ordersButton.setOnAction(e -> System.out.println("Orders clicked"));
         transactionsButton.setOnAction(e -> handleTransactions());
+    }
+
+    private void handleDeliveriesHistory() {
+        OrderHistoryController.setMode(4);
+        SceneNavigator.switchTo("/frontend/orderHistory.fxml",restaurantButton);
     }
 
     private void handleActiveOrders() {
@@ -113,6 +121,8 @@ public class PanelController {
                 deliveriesButton.setManaged(true);
                 activeOrdersButton.setVisible(true);
                 activeOrdersButton.setManaged(true);
+                deliveryHistoryButton.setVisible(true);
+                deliveryHistoryButton.setManaged(true);
             }
             case admin -> {
                 usersButton.setVisible(true);

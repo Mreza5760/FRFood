@@ -50,8 +50,10 @@ public class OrderHistoryController {
         String uri = "http://localhost:8080/orders/history";
         if (mode == 2) {
             uri = "http://localhost:8080/deliveries/available";
-        }else if(mode == 3){
+        } else if (mode == 3) {
             uri = "http://localhost:8080/deliveries/order";
+        }else if (mode == 4) {
+            uri = "http://localhost:8080/deliveries/history";
         }
         HttpRequest request = HttpRequest.newBuilder()
                 .uri(URI.create(uri))
@@ -209,13 +211,14 @@ public class OrderHistoryController {
 
 
         if (controller != null) {
-            if (mode == 2) {
+            if (mode == 2 || mode == 3) {
                 controller.setOrder(theOrder, r, 4);
-            } else {
+            }  else {
                 controller.setOrder(theOrder, r, 2);
             }
         }
     }
+
 
     @FXML
     private void goBack() {

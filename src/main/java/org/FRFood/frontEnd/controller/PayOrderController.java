@@ -36,6 +36,9 @@ public class PayOrderController {
     @FXML
     private Button foodIsReadyButton;
 
+    @FXML
+    private Button finishButton;
+
     private Order currentOrder;
     private Restaurant restaurant;
     private int mode;
@@ -62,6 +65,9 @@ public class PayOrderController {
         } else if (mode == 4 &&  currentOrder.getStatus() == Status.findingCourier) {
             acceptButton.setVisible(true);
             acceptButton.setManaged(true);
+        }else if (mode == 4 &&  currentOrder.getStatus() == Status.onTheWay){
+            finishButton.setVisible(true);
+            finishButton.setManaged(true);
         }
         // Populate details
         detailsBox.getChildren().addAll(
@@ -180,6 +186,10 @@ public class PayOrderController {
         updateOrderStatus(currentOrder.getId(), "findingCourier");
     }
 
+    public void handleFinish(ActionEvent actionEvent) {
+        updateOrderStatus(currentOrder.getId(), "completed");
+    }
+
     private void updateOrderStatus(int orderId, String newStatus) {
         new Thread(() -> {
             try {
@@ -211,5 +221,6 @@ public class PayOrderController {
             }
         }).start();
     }
+
 
 }
