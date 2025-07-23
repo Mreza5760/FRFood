@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<AnchorPane xmlns="http://javafx.com/javafx/20.0.2"
+            xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="org.FRFood.frontEnd.controller.AllUsersController"
+            prefWidth="1000" prefHeight="600"
+            style="-fx-background-color: linear-gradient(to bottom, #eef3f9, #dbe5f1);">
+
+    <VBox spacing="20" alignment="TOP_CENTER"
+          AnchorPane.topAnchor="20" AnchorPane.leftAnchor="20"
+          AnchorPane.rightAnchor="20" AnchorPane.bottomAnchor="20">
+
+        <!-- Header with Back Button -->
+        <HBox alignment="CENTER_LEFT" spacing="10" prefWidth="960">
+            <Button fx:id="backButton" text="Back"
+                    style="-fx-background-color: #555; -fx-text-fill: white; -fx-font-size: 14px; -fx-background-radius: 6;"
+                    prefWidth="100"/>
+            <Label text="All Users"
+                   style="-fx-font-size: 22px; -fx-font-weight: bold; -fx-text-fill: #1e2a38;"/>
+        </HBox>
+
+        <!-- Users Table -->
+        <TableView fx:id="usersTable" prefHeight="500" prefWidth="960"
+                   style="-fx-background-color: white; -fx-border-color: #ccc; -fx-border-radius: 6;">
+            <columns>
+                <TableColumn fx:id="idColumn" text="ID" prefWidth="50"/>
+                <TableColumn fx:id="nameColumn" text="Full Name" prefWidth="150"/>
+                <TableColumn fx:id="phoneColumn" text="Phone" prefWidth="120"/>
+                <TableColumn fx:id="emailColumn" text="Email" prefWidth="150"/>
+                <TableColumn fx:id="addressColumn" text="Address" prefWidth="200"/>
+                <TableColumn fx:id="walletColumn" text="Wallet" prefWidth="80"/>
+                <TableColumn fx:id="roleColumn" text="Role" prefWidth="100"/>
+                <TableColumn fx:id="confirmedColumn" text="Confirmed" prefWidth="90"/>
+                <TableColumn fx:id="actionColumn" text="Actions" prefWidth="150"/>
+            </columns>
+        </TableView>
+    </VBox>
+</AnchorPane>

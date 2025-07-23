@@ -18,7 +18,6 @@ public class User {
     private Role role;
     @JsonProperty("bank_info")
     private BankAccount bank;
-    @JsonIgnore
     private boolean confirmed;
     private Integer wallet;
 

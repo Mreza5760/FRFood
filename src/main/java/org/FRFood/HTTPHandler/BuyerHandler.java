@@ -12,11 +12,8 @@ import com.sun.net.httpserver.HttpExchange;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import static org.FRFood.util.Authenticate.authenticate;
 
-import java.util.List;
-import java.util.Random;
-import java.util.Optional;
+import java.util.*;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.sql.SQLException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
@@ -300,7 +297,6 @@ public class BuyerHandler implements HttpHandler {
         }
     }
 
-    // TODO has query
     private void handleOrdersHistory(HttpExchange exchange) throws IOException {
         var userOpt = Authenticate.authenticate(exchange);
         if (userOpt.isEmpty()) return;
@@ -311,8 +307,49 @@ public class BuyerHandler implements HttpHandler {
             return;
         }
 
+        String query = exchange.getRequestURI().getQuery();
+
         try {
             List<Order> orders = orderDAO.getUserOrders(user.getId());
+
+            if (query != null && !query.isEmpty()) {
+                String[] parts = query.split("&");
+                Map<String, String> params = new HashMap<>();
+                for (String part : parts) {
+                    String[] keyValue = part.split("=");
+                    params.put(keyValue[0], keyValue[1]);
+                }
+                for (Order order : orders) {
+                    Optional<Restaurant> optionalRestaurant = restaurantDAO.getById(order.getRestaurantId());
+                    if (optionalRestaurant.isEmpty()) {
+                        HttpError.notFound(exchange, "Restaurant not found");
+                        return;
+                    }
+                    Restaurant restaurant = optionalRestaurant.get();
+                    if (params.containsKey("vendor") && !restaurant.getName().contains(params.get("vendor"))) {
+                        orders.remove(order);
+                    } else if (params.containsKey("search")) {
+                        List<OrderItem> items = order.getItems();
+                        boolean found = false;
+                        for (OrderItem item : items) {
+                            Optional<Food> optionalFood = foodDAO.getById(item.getItemId());
+                            if (optionalFood.isEmpty()) {
+                                HttpError.notFound(exchange, "Food not found");
+                                return;
+                            }
+                            Food food = optionalFood.get();
+                            if (food.getName().contains(params.get("search"))) {
+                                found = true;
+                                break;
+                            }
+                        }
+                        if (!found) {
+                            orders.remove(order);
+                        }
+                    }
+                }
+            }
+
             String json = objectMapper.writeValueAsString(orders);
             JsonResponse.sendJsonResponse(exchange, 200, json);
         } catch (Exception e) {
@@ -400,124 +437,151 @@ public class BuyerHandler implements HttpHandler {
     }
 
     private void handeSubmitRate(HttpExchange exchange) throws IOException {
-        Optional<User> authenticatedUserOptional = authenticate(exchange);
-        if (authenticatedUserOptional.isEmpty()) {
+        var userOpt = Authenticate.authenticate(exchange);
+        if (userOpt.isEmpty()) return;
+        User user = userOpt.get();
+        if (!user.getRole().equals(buyer)) {
+            HttpError.unauthorized(exchange, "Only buyers can submit rate");
             return;
         }
+
         Rate rate = objectMapper.readValue(exchange.getRequestBody(), Rate.class);
-        // رای ندادن نیز 0
-        if (rate.getRating() == 0 || rate.getComment() == null) {
-            JsonResponse.sendJsonResponse(exchange, 400, "{\"error\":\"Missing required fields\"}");
+
+        if (rate.getRating() == null || rate.getComment() == null) {
+            HttpError.badRequest(exchange, "Invalid rate");
             return;
         }
+
         try {
+            rate.setUserId(user.getId());
             rate.setId(rateDAO.insert(rate));
-            rate.setUserId(authenticatedUserOptional.get().getId());
             String json = objectMapper.writeValueAsString(rate);
             JsonResponse.sendJsonResponse(exchange, 200, json);
         } catch (Exception e) {
-//            e.printStackTrace();
-            JsonResponse.sendJsonResponse(exchange, 500, "{\"error\":\"Internal server error\"}");
+              HttpError.internal(exchange, "Internal server error");
         }
     }
 
     private void handeGetFoodRates(HttpExchange exchange) throws IOException {
-        Optional<User> authenticatedUserOptional = authenticate(exchange);
-        if (authenticatedUserOptional.isEmpty()) {
+        var userOpt = Authenticate.authenticate(exchange);
+        if (userOpt.isEmpty()) return;
+        User user = userOpt.get();
+        if (!user.getRole().equals(buyer)) {
+            HttpError.unauthorized(exchange, "Only buyers can get food rates");
             return;
         }
+
         String path = exchange.getRequestURI().getPath();
         String[] parts = path.split("/");
         int foodId = Integer.parseInt(parts[3]);
+
         try {
             Optional<Food> optionalFood = foodDAO.getById(foodId);
             if (optionalFood.isEmpty()) {
-                // ارور
+                HttpError.notFound(exchange, "Food not found");
                 return;
             }
+
             Food food = optionalFood.get();
             List<Rate> rates = rateDAO.getFoodRates(food);
             String json = objectMapper.writeValueAsString(rates);
             JsonResponse.sendJsonResponse(exchange, 200, json);
         } catch (Exception e) {
-//            e.printStackTrace();
-            JsonResponse.sendJsonResponse(exchange, 500, "{\"error\":\"Internal server error\"}");
+            HttpError.internal(exchange, "Internal server error");
         }
     }
 
     private void handleGetRate(HttpExchange exchange) throws IOException {
-        Optional<User> authenticatedUserOptional = authenticate(exchange);
-        if (authenticatedUserOptional.isEmpty()) {
+        var userOpt = Authenticate.authenticate(exchange);
+        if (userOpt.isEmpty()) return;
+        User user = userOpt.get();
+        if (!user.getRole().equals(buyer)) {
+            HttpError.unauthorized(exchange, "Only buyers can get food rates");
             return;
         }
+
         String path = exchange.getRequestURI().getPath();
         String[] parts = path.split("/");
         int id = Integer.parseInt(parts[2]);
+
         try {
             Optional<Rate> optionalRate = rateDAO.getById(id);
             if (optionalRate.isEmpty()) {
+                HttpError.notFound(exchange, "Rate not found");
                 return;
             }
+
             Rate rate = optionalRate.get();
             String json = objectMapper.writeValueAsString(rate);
             JsonResponse.sendJsonResponse(exchange, 200, json);
         } catch (Exception e) {
-//            e.printStackTrace();
-            JsonResponse.sendJsonResponse(exchange, 500, "{\"error\":\"Internal server error\"}");
+            HttpError.internal(exchange, "Internal server error");
         }
     }
 
     private void handleDeleteRate(HttpExchange exchange) throws IOException {
-        Optional<User> authenticatedUserOptional = authenticate(exchange);
-        if (authenticatedUserOptional.isEmpty()) {
+        var userOpt = Authenticate.authenticate(exchange);
+        if (userOpt.isEmpty()) return;
+        User user = userOpt.get();
+        if (!user.getRole().equals(buyer)) {
+            HttpError.unauthorized(exchange, "Only buyers can delete rates");
             return;
         }
+
         String path = exchange.getRequestURI().getPath();
         String[] parts = path.split("/");
         int id = Integer.parseInt(parts[2]);
+
         try {
             Optional<Rate> optionalRate = rateDAO.getById(id);
             if (optionalRate.isEmpty()) {
+                HttpError.notFound(exchange, "Rate not found");
                 return;
             }
             Rate rate = optionalRate.get();
-            if (!rate.getUserId().equals(authenticatedUserOptional.get().getId())) {
-                // صاحب اش نیست
+            if (!rate.getUserId().equals(user.getId())) {
+                HttpError.unauthorized(exchange, "You are not allowed to delete this rate");
                 return;
             }
+
             rateDAO.deleteById(id);
             JsonResponse.sendJsonResponse(exchange,200,"{\"message\":\"Rate deleted\"}");
         } catch (Exception e) {
-//            e.printStackTrace();
-            JsonResponse.sendJsonResponse(exchange, 500, "{\"error\":\"Internal server error\"}");
+              HttpError.internal(exchange, "Internal server error");
         }
     }
 
     private void handleUpdateRate(HttpExchange exchange) throws IOException {
-        Optional<User> authenticatedUserOptional = authenticate(exchange);
-        if (authenticatedUserOptional.isEmpty()) {
+        var userOpt = Authenticate.authenticate(exchange);
+        if (userOpt.isEmpty()) return;
+        User user = userOpt.get();
+        if (!user.getRole().equals(buyer)) {
+            HttpError.unauthorized(exchange, "Only buyers can update rates");
             return;
         }
+
         String path = exchange.getRequestURI().getPath();
         String[] parts = path.split("/");
         int id = Integer.parseInt(parts[2]);
+
         try {
             Rate rate = objectMapper.readValue(exchange.getRequestBody(), Rate.class);
             rate.setId(id);
             Optional<Rate> optionalRate = rateDAO.getById(id);
             if (optionalRate.isEmpty()) {
+                HttpError.notFound(exchange, "Rate not found");
                 return;
             }
             Rate currRate = optionalRate.get();
-            if (!currRate.getUserId().equals(authenticatedUserOptional.get().getId())) {
-                // صاحب اش نیست
+            if (!currRate.getUserId().equals(user.getId())) {
+                HttpError.unauthorized(exchange, "You are not allowed to update this rate");
                 return;
             }
+
             rateDAO.updateById(id, rate);
             JsonResponse.sendJsonResponse(exchange,200,"{\"message\":\"Rate updated\"}");
-        }  catch (Exception e) {
-            //            e.printStackTrace();
-            JsonResponse.sendJsonResponse(exchange, 500, "{\"error\":\"Internal server error\"}");
+        } catch (Exception e) {
+            HttpError.internal(exchange, "Internal server error");
         }
     }
 

@@ -10,11 +10,9 @@ import static org.FRFood.util.Validation.validatePhoneNumber;
 
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 import java.io.IOException;
 import java.sql.SQLException;
-import java.util.Optional;
 
 import com.sun.net.httpserver.HttpHandler;
 import com.sun.net.httpserver.HttpExchange;
@@ -395,7 +393,6 @@ public class RestaurantHandler implements HttpHandler {
         }
     }
 
-    // TODO can have query
     private void getOrders(HttpExchange exchange) throws IOException {
         var userOpt = Authenticate.authenticate(exchange);
         if (userOpt.isEmpty()) return;
@@ -405,13 +402,50 @@ public class RestaurantHandler implements HttpHandler {
             return;
         }
 
+        String query = exchange.getRequestURI().getQuery();
         int restaurantId = Integer.parseInt(exchange.getRequestURI().getPath().split("/")[2]);
 
         try {
             var restaurantOpt = Authenticate.restaurantChecker(exchange, user, restaurantId);
             if (restaurantOpt.isEmpty()) return;
-
             List<Order> orders = orderDAO.getRestaurantOrders(restaurantId);
+
+            if (query != null && !query.isEmpty()) {
+                String[] parts = query.split("&");
+                Map<String, String> params = new HashMap<>();
+                for (String part : parts) {
+                    String[] keyValue = part.split("=");
+                    params.put(keyValue[0], keyValue[1]);
+                }
+                for (Order order : orders) {
+                    if (params.containsKey("status") && !order.getStatus().toString().equals(params.get("status"))) {
+                        orders.remove(order);
+                    } else if (params.containsKey("user") && order.getCustomerId() != Integer.parseInt(params.get("user"))) {
+                        orders.remove(order);
+                    } else if (params.containsKey("courier") &&  order.getCourierId() != Integer.parseInt(params.get("courier"))) {
+                      orders.remove(order);
+                    } else if (params.containsKey("search")) {
+                        List<OrderItem> items = order.getItems();
+                        boolean found = false;
+                        for (OrderItem item : items) {
+                            Optional<Food> optionalFood = foodDAO.getById(item.getItemId());
+                            if (optionalFood.isEmpty()) {
+                                HttpError.notFound(exchange, "Food not found");
+                                return;
+                            }
+                            Food food = optionalFood.get();
+                            if (food.getName().contains(params.get("search"))) {
+                                found = true;
+                                break;
+                            }
+                        }
+                        if (!found) {
+                            orders.remove(order);
+                        }
+                    }
+                }
+            }
+
             JsonResponse.sendJsonResponse(exchange, 200, objectMapper.writeValueAsString(orders));
         } catch (SQLException e) {
             HttpError.internal(exchange, "Failed to get restaurant orders");

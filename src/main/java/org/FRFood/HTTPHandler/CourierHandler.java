@@ -1,7 +1,6 @@
 package org.FRFood.HTTPHandler;
 
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.io.IOException;
 import java.sql.SQLException;
 
@@ -10,12 +9,9 @@ import com.sun.net.httpserver.HttpHandler;
 import com.sun.net.httpserver.HttpExchange;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import org.FRFood.DAO.UserDAOImp;
-import org.FRFood.entity.User;
-import org.FRFood.DAO.OrderDAO;
-import org.FRFood.entity.Order;
+import org.FRFood.DAO.*;
+import org.FRFood.entity.*;
 import org.FRFood.util.HttpError;
-import org.FRFood.DAO.OrderDAOImp;
 import org.FRFood.util.JsonResponse;
 import org.FRFood.util.Status;
 
@@ -48,6 +44,7 @@ public class CourierHandler implements HttpHandler {
                     switch (path) {
                         case "/deliveries/available" -> handleGetOrders(exchange);
                         case "/deliveries/history" -> handleGetHistory(exchange);
+                        case "/deliveries/order" -> handleActiveOrder(exchange);
                     }
                 }
                 case "PATCH" -> {
@@ -119,6 +116,18 @@ public class CourierHandler implements HttpHandler {
 
             if (status == Status.completed) {
                 new UserDAOImp().setWallet(user.getId(), user.getWallet() + order.getCourierFee());
+            } else {
+                int activeOrder = 0;
+                List<Order> orders = orderDAO.getCourierOrders(user.getId());
+                for (Order tempOrder : orders) {
+                    if (tempOrder.getStatus() == Status.onTheWay) {
+                        activeOrder++;
+                    }
+                }
+                if (activeOrder >= 1) {
+                    HttpError.forbidden(exchange, "There is a active order");
+                    return;
+                }
             }
 
             orderDAO.changeStatus(orderId, status);
@@ -128,8 +137,69 @@ public class CourierHandler implements HttpHandler {
         }
     }
 
-    // TODO has query
     private void handleGetHistory(HttpExchange exchange) throws IOException {
+        Optional<User> authenticatedUserOptional = authenticate(exchange);
+        if (authenticatedUserOptional.isEmpty()) return;
+        User user = authenticatedUserOptional.get();
+        if (!user.getRole().equals(courier)) {
+            HttpError.forbidden(exchange, "Only for Courier");
+            return;
+        }
+
+        String query = exchange.getRequestURI().getQuery();
+        FoodDAO foodDAO = new FoodDAOImp();
+        RestaurantDAO restaurantDAO = new RestaurantDAOImp();
+
+        try {
+            List<Order> orders = orderDAO.getCourierOrders(user.getId());
+
+            if (query != null && !query.isEmpty()) {
+                String[] parts = query.split("&");
+                Map<String, String> params = new HashMap<>();
+                for (String part : parts) {
+                    String[] keyValue = part.split("=");
+                    params.put(keyValue[0], keyValue[1]);
+                }
+                for (Order order : orders) {
+                    Optional<Restaurant> optionalRestaurant = restaurantDAO.getById(order.getRestaurantId());
+                    if (optionalRestaurant.isEmpty()) {
+                        HttpError.notFound(exchange, "Restaurant not found");
+                        return;
+                    }
+                    Restaurant restaurant = optionalRestaurant.get();
+                    if (params.containsKey("vendor") && !restaurant.getName().contains(params.get("vendor"))) {
+                        orders.remove(order);
+                    } else if (params.containsKey("user") && order.getCustomerId() != Integer.parseInt(params.get("user"))) {
+                        orders.remove(order);
+                    } else if (params.containsKey("search")) {
+                        List<OrderItem> items = order.getItems();
+                        boolean found = false;
+                        for (OrderItem item : items) {
+                            Optional<Food> optionalFood = foodDAO.getById(item.getItemId());
+                            if (optionalFood.isEmpty()) {
+                                HttpError.notFound(exchange, "Food not found");
+                                return;
+                            }
+                            Food food = optionalFood.get();
+                            if (food.getName().contains(params.get("search"))) {
+                                found = true;
+                                break;
+                            }
+                        }
+                        if (!found) {
+                            orders.remove(order);
+                        }
+                    }
+                }
+            }
+
+            JsonResponse.sendJsonResponse(exchange, 200, objectMapper.writeValueAsString(orders));
+        }  catch (SQLException e) {
+            HttpError.internal(exchange, "Internal server error while updating profile");
+        }
+    }
+
+    private void handleActiveOrder(HttpExchange exchange) throws IOException {
         Optional<User> authenticatedUserOptional = authenticate(exchange);
         if (authenticatedUserOptional.isEmpty()) return;
         User user = authenticatedUserOptional.get();
@@ -140,8 +210,18 @@ public class CourierHandler implements HttpHandler {
 
         try {
             List<Order> orders = orderDAO.getCourierOrders(user.getId());
-            JsonResponse.sendJsonResponse(exchange, 200, objectMapper.writeValueAsString(orders));
-        }  catch (SQLException e) {
+            List<Order> activeOrder =  new ArrayList<>();
+            for (Order order : orders) {
+                if (order.getStatus() == Status.onTheWay) {
+                    activeOrder.add(order);
+                }
+            }
+            if (activeOrder.size() > 1) {
+                HttpError.badRequest(exchange, "There are more than one active order");
+                return;
+            }
+            JsonResponse.sendJsonResponse(exchange, 200, objectMapper.writeValueAsString(activeOrder));
+        } catch (SQLException e) {
             HttpError.internal(exchange, "Internal server error while updating profile");
         }
     }

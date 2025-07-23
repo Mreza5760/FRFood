@@ -9,8 +9,8 @@ import java.sql.SQLException;
 
 public interface RateDAO {
     int insert(Rate rate) throws SQLException;
-    boolean deleteById(int id) throws SQLException;
-    boolean updateById(int id, Rate rate) throws SQLException;
+    void deleteById(int id) throws SQLException;
+    void updateById(int id, Rate rate) throws SQLException;
     Optional<Rate> getById(int id) throws SQLException;
     List<Rate> getFoodRates(Food food) throws SQLException;
 }

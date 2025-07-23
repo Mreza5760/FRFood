@@ -60,7 +60,7 @@ public class PanelController {
         deliveriesButton.setOnAction(e -> handleDeliveriesButton());
 
         // Admin placeholders
-        usersButton.setOnAction(e -> System.out.println("Users clicked"));
+        usersButton.setOnAction(e -> handleAllUsers());
         ordersButton.setOnAction(e -> System.out.println("Orders clicked"));
         transactionsButton.setOnAction(e -> handleTransactions());
     }
@@ -152,7 +152,11 @@ public class PanelController {
         SceneNavigator.switchTo("/frontend/myRestaurants.fxml", restaurantButton);
     }
 
-    private  void handleTransactions() {
+    private void handleTransactions() {
         SceneNavigator.switchTo("/frontEnd/adminTransactions.fxml", transactionsButton);
+    }
+
+    private void handleAllUsers() {
+        SceneNavigator.switchTo("/frontEnd/allUsers.fxml", usersButton);
     }
 }
