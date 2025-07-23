@@ -1,5 +1,6 @@
 package org.FRFood.frontEnd.controller;
 
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import javafx.application.Platform;
@@ -27,7 +28,7 @@ import java.net.http.HttpResponse;
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
 
-public class CartController {
+public class OrderHistoryController {
 
     @FXML
     private VBox restaurantList;
@@ -36,37 +37,36 @@ public class CartController {
 
     @FXML
     public void initialize() {
-        displayRestaurants();
+        fetchOrders();
     }
 
-//    private void fetchRestaurants() {
-//        HttpRequest request = HttpRequest.newBuilder()
-//                .uri(URI.create("http://localhost:8080/restaurants/mine"))
-//                .header("Authorization", "Bearer " + SessionManager.getAuthToken())
-//                .GET()
-//                .build();
-//
-//        HttpClient.newHttpClient().sendAsync(request, HttpResponse.BodyHandlers.ofString())
-//                .thenAccept(response -> {
-//                    if (response.statusCode() == 200) {
-//                        displayRestaurants(response.body());
-//                    } else {
-//                        System.err.println("Failed to fetch restaurants: HTTP " + response.statusCode());
-//                    }
-//                })
-//                .exceptionally(e -> {
-//                    e.printStackTrace();
-//                    return null;
-//                });
-//    }
+    private void fetchOrders() {
+        HttpRequest request = HttpRequest.newBuilder()
+                .uri(URI.create("http://localhost:8080/orders/history"))
+                .header("Authorization", "Bearer " + SessionManager.getAuthToken())
+                .GET()
+                .build();
 
-    private void displayRestaurants() {
+        HttpClient.newHttpClient().sendAsync(request, HttpResponse.BodyHandlers.ofString())
+                .thenAccept(response -> {
+                    if (response.statusCode() == 200) {
+                        displayRestaurants(response.body());
+                    } else {
+                        System.err.println("Failed to fetch restaurants: HTTP " + response.statusCode()+response.body());
+                    }
+                })
+                .exceptionally(e -> {
+                    e.printStackTrace();
+                    return null;
+                });
+    }
+
+    private void displayRestaurants(String body) {
         try {
-            Map<Integer, Order> orderList = SessionManager.getOrderList();
-            Set<Integer> keys = orderList.keySet();
+            List<Order> orders = mapper.readValue(body, new TypeReference<>() {});
             List<java.util.concurrent.CompletableFuture<Restaurant>> futures = new ArrayList<>();
-            for (Integer key : keys) {
-                Order order = orderList.get(key);
+
+            for(Order order : orders) {
                 int restaurantId = order.getRestaurantId();
                 futures.add(fetchRestaurant(restaurantId));
             }
@@ -88,7 +88,7 @@ public class CartController {
                         Platform.runLater(() -> {
                             restaurantList.getChildren().clear();
                             for (Restaurant r : restaurants) {
-                                restaurantList.getChildren().add(createRestaurantCard(r, orderList.get(r.getId())));
+                                restaurantList.getChildren().add(createRestaurantCard(r,getOrderWithRestaurant(r,orders)));
                             }
                         });
                     });
@@ -96,6 +96,17 @@ public class CartController {
         } catch (Exception e) {
             e.printStackTrace();
         }
+    }
+
+    private Order getOrderWithRestaurant(Restaurant r,List<Order> orders) {
+        for(Order o : orders) {
+            if(o.getRestaurantId().equals(r.getId())) {
+                orders.remove(o);
+                return o;
+            }
+        }
+
+        return null;
     }
 
     private CompletableFuture<Restaurant> fetchRestaurant(int restaurantId) {
@@ -117,7 +128,7 @@ public class CartController {
                             e.printStackTrace();
                         }
                     } else {
-                        System.err.println("Failed to fetch restaurant: HTTP " + response.statusCode());
+                        System.err.println("Failed to fetch restaurant: HTTP " + response.statusCode()+response.body());
                     }
                     return null;
                 });
@@ -166,7 +177,7 @@ public class CartController {
         card.setOnMouseClicked(e -> handleClick(r,order)); // full card click
 
 
-        Label temp = new Label("💰 raw price: " + order.getRawPrice() + " | Total: " + order.getPayPrice());
+        Label temp = new Label("💰 raw price: " + order.getRawPrice() + " | Total: " + order.getPayPrice()+" | Status: " +order.getStatus());
         temp.setStyle("-fx-font-size: 14px; -fx-text-fill: #3a3a3a;");
         HBox rightBox = new HBox(10, temp);
         rightBox.setAlignment(Pos.CENTER_RIGHT);
@@ -190,7 +201,7 @@ public class CartController {
 
 
         if (controller != null) {
-            controller.setOrder(theOrder, r,1);
+            controller.setOrder(theOrder, r,2);
         }
     }
 
@@ -240,11 +251,11 @@ public class CartController {
 
         HttpClient.newHttpClient().sendAsync(request, HttpResponse.BodyHandlers.ofString())
                 .thenAccept(response -> {
-                    displayRestaurants();
+                    fetchOrders();
                     if (response.statusCode() == 200 || response.statusCode() == 204) {
                         System.out.println("Deleted restaurant: " + r.getName());
                         // Optionally refresh the list on UI thread
-                        Platform.runLater(this::displayRestaurants);
+                        Platform.runLater(this::fetchOrders);
                     } else {
                         System.err.println("Failed to delete restaurant: HTTP " + response.statusCode());
                     }

@@ -316,7 +316,7 @@ public class BuyerHandler implements HttpHandler {
             String json = objectMapper.writeValueAsString(orders);
             JsonResponse.sendJsonResponse(exchange, 200, json);
         } catch (Exception e) {
-            HttpError.internal(exchange, "Internal server error");
+            HttpError.internal(exchange, "Internal server error" + e.getMessage());
         }
     }
 

@@ -26,7 +26,7 @@ public class BuyerOrderPageController {
 
         // Placeholder actions
         orderHistoryButton.setOnAction(event ->
-                System.out.println("Order History clicked (not implemented)")
+                SceneNavigator.switchTo("/frontEnd/orderHistory.fxml", orderHistoryButton)
         );
         myOrdersButton.setOnAction(event ->
                 SceneNavigator.switchTo("/frontEnd/cart.fxml", myOrdersButton)

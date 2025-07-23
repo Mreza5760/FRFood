@@ -13,6 +13,7 @@ import org.FRFood.entity.Order;
 import org.FRFood.entity.OrderItem;
 import org.FRFood.entity.Restaurant;
 import org.FRFood.frontEnd.Util.SceneNavigator;
+import org.FRFood.frontEnd.Util.SessionManager;
 
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
@@ -28,11 +29,20 @@ public class PayOrderController {
 
     private Order currentOrder;
     private Restaurant restaurant;
+    private int mode;
 
-    public void setOrder(Order order,Restaurant restaurant) {
+    public void setOrder(Order order,Restaurant restaurant,int inMode) {
         this.currentOrder = order;
         this.restaurant = restaurant;
+        this.mode = inMode;
 
+
+        if (mode == 2) {
+            payCardButton.setVisible(false);
+            payCardButton.setManaged(false);
+            payWalletButton.setVisible(false);
+            payWalletButton.setManaged(false);
+        }
         // Populate details
         detailsBox.getChildren().addAll(
                 new Label("📦 Status: " + order.getStatus()),
@@ -47,6 +57,10 @@ public class PayOrderController {
                 new Label("💳 Total to Pay: " + order.getPayPrice())
         );
 
+        if(mode == 2){
+            detailsBox.getChildren().add(new Label("⏱ Created at: " + order.getCreatedAt()));
+        }
+
         // Populate order items
         for (OrderItem item : order.getItems()) {
             String itemText = "🍔food id:" + item.getItemId() + " | " + "quantity :" + item.getQuantity();
@@ -59,7 +73,7 @@ public class PayOrderController {
     @FXML
     private void handlePayWithCard() {
         System.out.println("Paying with card for order ID: " + currentOrder.getId());
-        sendPaymentRequest("card");
+        sendPaymentRequest("online");
     }
 
     @FXML
@@ -68,8 +82,12 @@ public class PayOrderController {
         sendPaymentRequest("wallet");
     }
 
-    public void handleBack(ActionEvent actionEvent) {
-        SceneNavigator.switchTo("/frontend/cart.fxml",payCardButton);
+    public void handleBack() {
+        if(mode == 2){
+            SceneNavigator.switchTo("/frontend/orderHistory.fxml",payCardButton);
+        }else{
+            SceneNavigator.switchTo("/frontend/cart.fxml",payCardButton);
+        }
     }
     private void sendPaymentRequest(String method) {
         try {
@@ -78,6 +96,7 @@ public class PayOrderController {
 
             connection.setRequestMethod("POST");
             connection.setRequestProperty("Content-Type", "application/json");
+            connection.setRequestProperty("Authorization", "Bearer " + SessionManager.getAuthToken());
             connection.setDoOutput(true);
 
             // Prepare the payload
@@ -97,9 +116,10 @@ public class PayOrderController {
             int responseCode = connection.getResponseCode();
             if (responseCode == 200 || responseCode == 201) {
                 showAlert("Success", "Payment successful with " + method + "!", Alert.AlertType.INFORMATION);
-                handleBack(new ActionEvent());
+                SessionManager.getOrderList().remove(currentOrder.getRestaurantId());
+                handleBack();
             } else {
-                showAlert("Failed", "Payment failed! Status: " + responseCode, Alert.AlertType.ERROR);
+                showAlert("Failed", "Payment failed! Status: " + responseCode + connection.getResponseMessage(), Alert.AlertType.ERROR);
             }
 
         } catch (Exception e) {
