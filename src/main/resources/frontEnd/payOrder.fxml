@@ -35,11 +35,36 @@
     <HBox spacing="20" alignment="CENTER">
         <Button fx:id="payCardButton" text="💳 Pay with Card"
                 onAction="#handlePayWithCard"
+                managed="false"
+                visible="false"
                 style="-fx-background-color: #0077cc; -fx-text-fill: white; -fx-font-size: 14px; -fx-font-weight: bold; -fx-background-radius: 10;"
                 prefWidth="180" prefHeight="40"/>
 
         <Button fx:id="payWalletButton" text="👛 Pay with Wallet"
                 onAction="#handlePayWithWallet"
+                managed="false"
+                visible="false"
+                style="-fx-background-color: #00aa88; -fx-text-fill: white; -fx-font-size: 14px; -fx-font-weight: bold; -fx-background-radius: 10;"
+                prefWidth="180" prefHeight="40"/>
+
+        <Button fx:id="acceptButton" text="✅ Accept"
+                onAction="#handleAccept"
+                managed="false"
+                visible="false"
+                style="-fx-background-color: #00aa88; -fx-text-fill: white; -fx-font-size: 14px; -fx-font-weight: bold; -fx-background-radius: 10;"
+                prefWidth="180" prefHeight="40"/>
+
+        <Button fx:id="declineButton" text="❌ Decline"
+                onAction="#handleDecline"
+                managed="false"
+                visible="false"
+                style="-fx-background-color: #d9534f; -fx-text-fill: white; -fx-font-size: 14px; -fx-font-weight: bold; -fx-background-radius: 10;"
+                prefWidth="180" prefHeight="40"/>
+
+        <Button fx:id="foodIsReadyButton" text="✅ Food is Ready"
+                onAction="#handleFoodReady"
+                managed="false"
+                visible="false"
                 style="-fx-background-color: #00aa88; -fx-text-fill: white; -fx-font-size: 14px; -fx-font-weight: bold; -fx-background-radius: 10;"
                 prefWidth="180" prefHeight="40"/>
     </HBox>

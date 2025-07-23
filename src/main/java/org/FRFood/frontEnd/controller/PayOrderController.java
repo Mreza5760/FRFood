@@ -14,6 +14,7 @@ import org.FRFood.entity.OrderItem;
 import org.FRFood.entity.Restaurant;
 import org.FRFood.frontEnd.Util.SceneNavigator;
 import org.FRFood.frontEnd.Util.SessionManager;
+import org.FRFood.util.Status;
 
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
@@ -22,26 +23,38 @@ import java.nio.charset.StandardCharsets;
 
 public class PayOrderController {
 
+    public Button acceptButton;
+    public Button declineButton;
     @FXML private VBox detailsBox;
     @FXML private VBox itemsBox;
     @FXML private Button payCardButton;
     @FXML private Button payWalletButton;
+    @FXML private Button foodIsReadyButton;
 
     private Order currentOrder;
     private Restaurant restaurant;
     private int mode;
 
-    public void setOrder(Order order,Restaurant restaurant,int inMode) {
+    public void setOrder(Order order, Restaurant restaurant, int inMode) {
         this.currentOrder = order;
         this.restaurant = restaurant;
         this.mode = inMode;
 
 
-        if (mode == 2) {
-            payCardButton.setVisible(false);
-            payCardButton.setManaged(false);
-            payWalletButton.setVisible(false);
-            payWalletButton.setManaged(false);
+        if (mode == 1) {
+            payCardButton.setVisible(true);
+            payCardButton.setManaged(true);
+            payWalletButton.setVisible(true);
+            payWalletButton.setManaged(true);
+        }
+        else if(mode == 3 && currentOrder.getStatus() == Status.waiting) {
+            acceptButton.setVisible(true);
+            acceptButton.setManaged(true);
+            declineButton.setVisible(true);
+            declineButton.setManaged(true);
+        }else if(mode == 3 && currentOrder.getStatus() == Status.preparing){
+            foodIsReadyButton.setVisible(true);
+            foodIsReadyButton.setManaged(true);
         }
         // Populate details
         detailsBox.getChildren().addAll(
@@ -57,7 +70,7 @@ public class PayOrderController {
                 new Label("💳 Total to Pay: " + order.getPayPrice())
         );
 
-        if(mode == 2){
+        if(mode != 1){
             detailsBox.getChildren().add(new Label("⏱ Created at: " + order.getCreatedAt()));
         }
 
@@ -85,10 +98,13 @@ public class PayOrderController {
     public void handleBack() {
         if(mode == 2){
             SceneNavigator.switchTo("/frontend/orderHistory.fxml",payCardButton);
-        }else{
+        }else if(mode == 1){
             SceneNavigator.switchTo("/frontend/cart.fxml",payCardButton);
+        }else if (mode == 3){
+            SceneNavigator.switchTo("/frontend/restaurantOrders.fxml",payWalletButton);
         }
     }
+    
     private void sendPaymentRequest(String method) {
         try {
             URL url = new URL("http://localhost:8080/payment/online");
@@ -136,6 +152,46 @@ public class PayOrderController {
             alert.setContentText(message);
             alert.showAndWait();
         });
+    }
+
+    public void handleDecline(ActionEvent actionEvent) {
+        updateOrderStatus(currentOrder.getId(),"cancelled");
+    }
+
+    public void handleAccept(ActionEvent actionEvent) {
+        updateOrderStatus(currentOrder.getId(),"preparing");
+    }
+
+    public void handleFoodReady(ActionEvent actionEvent) {
+        updateOrderStatus(currentOrder.getId(),"findingCourier");
+    }
+
+    private void updateOrderStatus(int orderId, String newStatus) {
+        new Thread(() -> {
+            try {
+                URL url = new URL("http://localhost:8080/restaurants/orders/" + orderId);
+                HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+                conn.setRequestMethod("POST");
+                conn.setRequestProperty("X-HTTP-Method-Override", "PATCH");
+                conn.setRequestProperty("Authorization", "Bearer " + SessionManager.getAuthToken());
+                conn.setRequestProperty("Content-Type", "application/json");
+                conn.setDoOutput(true);
+
+                String body = "{\"status\":\"" + newStatus + "\"}";
+                try (OutputStream os = conn.getOutputStream()) {
+                    os.write(body.getBytes());
+                }
+                int code = conn.getResponseCode();
+                System.out.println("PATCH status code: " + code);
+
+                // Refresh on success
+                if (code >= 200 && code < 300) {
+                    Platform.runLater(this::handleBack);
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }).start();
     }
 
 }

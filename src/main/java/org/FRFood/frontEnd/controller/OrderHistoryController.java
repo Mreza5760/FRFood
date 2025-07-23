@@ -187,11 +187,6 @@ public class OrderHistoryController {
         return card;
     }
 
-    private void handleOrder(Restaurant r) {
-        RestaurantOrdersController.setRestaurantId(r.getId());
-        SceneNavigator.switchTo("/frontend/restaurantOrders.fxml", restaurantList);
-    }
-
     private void handleClick(Restaurant r,Order theOrder) {
         PayOrderController controller = SceneNavigator.switchToWithController(
                 "/frontend/payOrder.fxml",
@@ -205,64 +200,8 @@ public class OrderHistoryController {
         }
     }
 
-    private void handleUpdate(Restaurant r) {
-        FXMLLoader loader = new FXMLLoader(getClass().getResource("/frontend/updateRestaurant.fxml"));
-        try {
-            Parent root = loader.load();
-
-            UpdateRestaurantController controller = loader.getController();
-
-            controller.setRestaurantData(
-                    r.getId(),
-                    r.getName(),
-                    r.getAddress(),
-                    r.getPhone(),
-                    r.getTaxFee(),
-                    r.getAdditionalFee(),
-                    r.getLogo()
-            );
-
-            Stage stage = (Stage) restaurantList.getScene().getWindow();
-            double currentWidth = stage.getWidth();
-            double currentHeight = stage.getHeight();
-            stage.setScene(new Scene(root));
-            stage.setWidth(currentWidth);
-            stage.setHeight(currentHeight);
-            stage.show();
-        } catch (Exception e) {
-            System.out.println(e.getMessage());
-        }
-
-    }
-
     @FXML
     private void goBack() {
         SceneNavigator.switchTo("/frontend/buyerOrderPage.fxml", restaurantList);
-    }
-
-    private void handleDelete(Restaurant r) {
-        String url = "http://localhost:8080/restaurants/" + r.getId();
-
-        HttpRequest request = HttpRequest.newBuilder()
-                .uri(URI.create(url))
-                .header("Authorization", "Bearer " + SessionManager.getAuthToken())
-                .DELETE()
-                .build();
-
-        HttpClient.newHttpClient().sendAsync(request, HttpResponse.BodyHandlers.ofString())
-                .thenAccept(response -> {
-                    fetchOrders();
-                    if (response.statusCode() == 200 || response.statusCode() == 204) {
-                        System.out.println("Deleted restaurant: " + r.getName());
-                        // Optionally refresh the list on UI thread
-                        Platform.runLater(this::fetchOrders);
-                    } else {
-                        System.err.println("Failed to delete restaurant: HTTP " + response.statusCode());
-                    }
-                })
-                .exceptionally(e -> {
-                    e.printStackTrace();
-                    return null;
-                });
     }
 }
