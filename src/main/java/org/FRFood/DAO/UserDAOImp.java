@@ -179,14 +179,15 @@ public class UserDAOImp implements UserDAO {
     }
 
     @Override
-    public boolean deleteById(int id) throws  SQLException {
+    public void deleteById(int id) throws  SQLException {
         String sql = "DELETE FROM Users WHERE id = ?";
         try (
                 Connection conn = DBConnector.gConnection();
                 PreparedStatement stmt = conn.prepareStatement(sql)
         ) {
             stmt.setInt(1, id);
-            return stmt.executeUpdate() > 0;
+            if (stmt.executeUpdate() == 0)
+                throw new SQLException("Delete failed, no rows affected.");
         }
     }
 

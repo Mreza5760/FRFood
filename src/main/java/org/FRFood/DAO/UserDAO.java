@@ -8,7 +8,7 @@ import java.util.Optional;
 import java.sql.SQLException;
 
 public interface UserDAO {
-    boolean deleteById(int id) throws SQLException;
+    void deleteById(int id) throws SQLException;
 
     void update(User currentUser) throws SQLException;
 

@@ -1,5 +1,6 @@
 package org.FRFood.HTTPHandler;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
@@ -47,7 +48,7 @@ public class AdminHandler implements HttpHandler {
                 }
                 case "PATH" -> {
                     if (path.matches("/admin/users/\\d+/status")) {
-                        approveUser(exchange);
+                        handleUserStatus(exchange);
                     } else {
                         HttpError.notFound(exchange, "Not Found");
                     }
@@ -64,7 +65,7 @@ public class AdminHandler implements HttpHandler {
         if (authenticatedUserOptional.isEmpty()) return;
         User user = authenticatedUserOptional.get();
 
-        if (user.getRole().equals(admin)) {
+        if (!user.getRole().equals(admin)) {
             HttpError.forbidden(exchange, "Only Admin Allowed");
             return;
         }
@@ -77,12 +78,12 @@ public class AdminHandler implements HttpHandler {
         }
     }
 
-    private void approveUser(HttpExchange exchange) throws IOException {
+    private void handleUserStatus(HttpExchange exchange) throws IOException {
         Optional<User> authenticatedUserOptional = authenticate(exchange);
         if (authenticatedUserOptional.isEmpty()) return;
         User user = authenticatedUserOptional.get();
 
-        if (user.getRole().equals(admin)) {
+        if (!user.getRole().equals(admin)) {
             HttpError.forbidden(exchange, "Only Admin Allowed");
             return;
         }
@@ -91,22 +92,35 @@ public class AdminHandler implements HttpHandler {
         String[] parts = path.split("/");
         int id = Integer.parseInt(parts[3]);
 
+        JsonNode jsonNode = objectMapper.readTree(exchange.getRequestBody());
+        String status = jsonNode.path("status").asText();
+
         try {
             Optional<User> optionalUser = userDAO.getById(id);
             if (optionalUser.isEmpty()) {
-                HttpError.notFound(exchange, "Not Found");
+                HttpError.notFound(exchange, "User not found");
                 return;
             }
-            User userToUpdate = optionalUser.get();
-            if (userToUpdate.isConfirmed()) {
-                HttpError.badRequest(exchange, "User is already confirmed");
-                return;
+            User targetUser = optionalUser.get();
+
+            switch (status) {
+                case "approved" -> {
+                    if (targetUser.isConfirmed()) {
+                        HttpError.badRequest(exchange, "User is already confirmed");
+                        return;
+                    }
+                    userDAO.makeConfirmed(id);
+                    JsonResponse.sendJsonResponse(exchange, 200, "{\"message\":\"User approved\"}");
+                }
+                case "declined" -> {
+                    userDAO.deleteById(id);
+                    JsonResponse.sendJsonResponse(exchange, 200, "{\"message\":\"User declined and deleted\"}");
+                }
+                default -> HttpError.badRequest(exchange, "Invalid status");
             }
 
-            userDAO.makeConfirmed(userToUpdate.getId());
-            JsonResponse.sendJsonResponse(exchange, 200, "{message: success}");
         } catch (SQLException e) {
-            HttpError.internal(exchange, "Internal server error while updating profile");
+            HttpError.internal(exchange, "Internal server error while updating user");
         }
     }
 
