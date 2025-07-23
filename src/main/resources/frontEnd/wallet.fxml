@@ -7,39 +7,52 @@
 <AnchorPane xmlns="http://javafx.com/javafx/20.0.2"
             xmlns:fx="http://javafx.com/fxml/1"
             fx:controller="org.FRFood.frontEnd.controller.WalletController"
-            prefWidth="600" prefHeight="400">
+            prefWidth="600" prefHeight="400"
+            style="-fx-background-color: linear-gradient(to bottom, #eef3f9, #dbe5f1);">
 
-    <VBox spacing="20" alignment="TOP_CENTER"
+    <VBox spacing="25" alignment="TOP_CENTER"
           AnchorPane.topAnchor="20"
           AnchorPane.leftAnchor="20"
           AnchorPane.rightAnchor="20"
           AnchorPane.bottomAnchor="20"
           style="-fx-padding: 20;">
 
-        <!-- Back Button at the top left -->
-        <HBox alignment="CENTER_LEFT" prefWidth="560">
-            <Button fx:id="backButton" text="Back" prefWidth="100"/>
+        <!-- Header with Back Button -->
+        <HBox alignment="CENTER_LEFT" spacing="15"
+              style="-fx-background-color: #0077cc; -fx-padding: 10; -fx-background-radius: 8;">
+            <Button fx:id="backButton" text="⬅ Back"
+                    prefWidth="100"
+                    style="-fx-background-color: white; -fx-text-fill: #0077cc;
+                           -fx-font-size: 14px; -fx-background-radius: 5; -fx-cursor: hand;"/>
+            <Label text="Wallet"
+                   style="-fx-font-size: 22px; -fx-font-weight: bold; -fx-text-fill: white;"/>
         </HBox>
 
         <!-- Current Wallet Balance -->
         <Label fx:id="balanceLabel"
                text="Wallet Balance: 0 Toman"
-               style="-fx-font-size: 20px; -fx-font-weight: bold;"/>
+               style="-fx-font-size: 20px; -fx-font-weight: bold; -fx-text-fill: #1e2a38;"/>
 
-        <!-- Input and Deposit/Withdraw Buttons -->
-        <HBox spacing="10" alignment="CENTER">
+        <!-- Input + Deposit/Withdraw Buttons -->
+        <HBox spacing="15" alignment="CENTER">
             <TextField fx:id="amountField"
                        promptText="Enter amount"
-                       prefWidth="200"/>
-            <Button fx:id="depositButton" text="Deposit" prefWidth="100"/>
-            <Button fx:id="withdrawButton" text="Withdraw" prefWidth="100"/>
+                       prefWidth="200"
+                       style="-fx-font-size: 14px; -fx-background-radius: 5;"/>
+            <Button fx:id="depositButton" text="Deposit" prefWidth="120"
+                    style="-fx-background-color: #00aa88; -fx-text-fill: white;
+                           -fx-font-size: 14px; -fx-background-radius: 5; -fx-cursor: hand;"/>
+            <Button fx:id="withdrawButton" text="Withdraw" prefWidth="120"
+                    style="-fx-background-color: #cc3300; -fx-text-fill: white;
+                           -fx-font-size: 14px; -fx-background-radius: 5; -fx-cursor: hand;"/>
         </HBox>
 
         <!-- Transaction History -->
         <Button fx:id="historyButton"
-                text="Transaction History"
-                prefWidth="200"/>
+                text="View Transaction History"
+                prefWidth="250"
+                style="-fx-background-color: #ff9900; -fx-text-fill: white;
+                       -fx-font-size: 16px; -fx-font-weight: bold; -fx-background-radius: 8; -fx-cursor: hand;"/>
 
     </VBox>
-
 </AnchorPane>
