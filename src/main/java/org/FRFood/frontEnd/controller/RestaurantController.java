@@ -3,53 +3,40 @@ package org.FRFood.frontEnd.controller;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import io.jsonwebtoken.Claims;
-import io.jsonwebtoken.Jws;
 import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
-import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
-import javafx.scene.image.Image;
-import javafx.scene.image.ImageView;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.Region;
 import javafx.scene.layout.VBox;
-import org.FRFood.DAO.RestaurantDAO;
-import org.FRFood.DAO.RestaurantDAOImp;
-import org.FRFood.DAO.UserDAO;
-import org.FRFood.DAO.UserDAOImp;
 import org.FRFood.entity.Menu;
 import org.FRFood.entity.Restaurant;
-import org.FRFood.entity.User;
+import org.FRFood.entity.Role;
 import org.FRFood.frontEnd.Util.SceneNavigator;
 import org.FRFood.frontEnd.Util.SessionManager;
-import org.FRFood.util.Authenticate;
-import org.FRFood.util.JwtUtil;
-import org.FRFood.util.Role;
 
-import java.io.ByteArrayInputStream;
+
 import java.net.URI;
 import java.net.URLEncoder;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.nio.charset.StandardCharsets;
-import java.sql.SQLException;
 import java.util.*;
 
 public class RestaurantController {
 
     @FXML
     public Label restaurant_name_label;
-    private static int restaurantId;
+    private static Restaurant restaurant;
     private static String restaurantName;
     public TextField menuTitleField;
     public HBox HboxForTitleInput;
@@ -66,46 +53,37 @@ public class RestaurantController {
     private final ObjectMapper mapper = new ObjectMapper();
 
 
-    public static void setValues(int restaurantId, String restaurantName) {
-        RestaurantController.restaurantId = restaurantId;
-        RestaurantController.restaurantName = restaurantName;
+    public static void setValues(Restaurant restaurant) {
+        RestaurantController.restaurant = restaurant;
+        RestaurantController.restaurantName = restaurant.getName();
     }
 
     @FXML
     public void initialize() {
-        String token = SessionManager.getAuthToken();
-        if (token == null) return;
-
-        Jws<Claims> claimsJws = JwtUtil.validateToken(token);
-        int userId = Integer.parseInt(claimsJws.getBody().getSubject());
-
-        UserDAO userDao = new UserDAOImp();
-        try {
-            User user = userDao.getById(userId).orElse(null);
-            if (user == null) return;
-            userRole = user.getRole();
-            restaurant_name_label.setText(restaurantName);
-            if (userRole == Role.buyer) {
-                addFoodsButton.setVisible(false);
-                addFoodsButton.setManaged(false);
-                addMenuButton.setVisible(false);
-                addMenuButton.setManaged(false);
-                backButton.setOnAction((event) ->{SceneNavigator.switchTo("/frontend/allRestaurants.fxml", restaurant_name_label);});
-            } else {
-                backButton.setOnAction((event) ->{SceneNavigator.switchTo("/frontend/myRestaurants.fxml", restaurant_name_label);});
-            }
-            fetchMenus();
-        } catch (SQLException e) {
-            System.out.println(e);
+        userRole = SessionManager.getCurrentUser().getRole();
+        restaurant_name_label.setText(restaurantName);
+        if (userRole == Role.buyer) {
+            addFoodsButton.setVisible(false);
+            addFoodsButton.setManaged(false);
+            addMenuButton.setVisible(false);
+            addMenuButton.setManaged(false);
+            backButton.setOnAction((event) -> {
+                SceneNavigator.switchTo("/frontend/allRestaurants.fxml", restaurant_name_label);
+            });
+        } else {
+            backButton.setOnAction((event) -> {
+                SceneNavigator.switchTo("/frontend/myRestaurants.fxml", restaurant_name_label);
+            });
         }
+        fetchMenus();
     }
 
     private void fetchMenus() {
 
 
-        String url = "http://localhost:8080/restaurants/" + restaurantId + "/menus";
+        String url = "http://localhost:8080/restaurants/" + restaurant.getId() + "/menus";
         if (userRole == Role.buyer) {
-            url = "http://localhost:8080/vendors/" + restaurantId;
+            url = "http://localhost:8080/vendors/" + restaurant.getId();
         }
 
         HttpRequest request = HttpRequest.newBuilder()
@@ -121,7 +99,7 @@ public class RestaurantController {
                         try {
                             JsonNode root = mapper.readTree(response.body());
                             if (userRole == Role.buyer) {
-                                if(!root.has("menu_titles")) {
+                                if (!root.has("menu_titles")) {
                                     System.out.println("json is incorrect");
                                     return;
                                 }
@@ -154,12 +132,7 @@ public class RestaurantController {
                 Platform.runLater(() -> {
                     menuList.getChildren().clear();
                     for (Menu menu : menus) {
-                        RestaurantDAO restaurantDAO = new RestaurantDAOImp();
-                        try {
-                            menu = restaurantDAO.getMenuByTitle(menu.getTitle(), restaurantId).orElse(null);
-                        } catch (Exception e) {
-                            e.getStackTrace();
-                        }
+                        menu.setRestaurant(restaurant);
                         menuList.getChildren().add(createMenuCard(menu));
                     }
                 });
@@ -169,13 +142,9 @@ public class RestaurantController {
                 Platform.runLater(() -> {
                     menuList.getChildren().clear();
                     for (String menuTitle : menus) {
-                        Menu menu = null;
-                        RestaurantDAO restaurantDAO = new RestaurantDAOImp();
-                        try {
-                            menu = restaurantDAO.getMenuByTitle(menuTitle, restaurantId).orElse(null);
-                        } catch (Exception e) {
-                            e.getStackTrace();
-                        }
+                        Menu menu = new Menu();
+                        menu.setTitle(menuTitle);
+                        menu.setRestaurant(restaurant);
                         menuList.getChildren().add(createMenuCard(menu));
                     }
                 });
@@ -202,19 +171,19 @@ public class RestaurantController {
         Region spacer = new Region();
         HBox.setHgrow(spacer, Priority.ALWAYS);
         HBox rightBox = new HBox();
-        if(userRole == Role.seller) {
+        if (userRole == Role.seller) {
             // Delete Button
             Button deleteBtn = new Button("Delete");
             deleteBtn.setPrefWidth(100);
             deleteBtn.setPrefHeight(36);
             deleteBtn.setStyle("""
-                    -fx-background-color: #ff4444;
-                    -fx-text-fill: white;
-                    -fx-font-size: 14px;
-                    -fx-font-weight: bold;
-                    -fx-background-radius: 10;
-                    -fx-cursor: hand;
-                """);
+                        -fx-background-color: #ff4444;
+                        -fx-text-fill: white;
+                        -fx-font-size: 14px;
+                        -fx-font-weight: bold;
+                        -fx-background-radius: 10;
+                        -fx-cursor: hand;
+                    """);
             deleteBtn.setOnAction(e -> handleDelete(menu));
             rightBox = new HBox(10, deleteBtn);
             rightBox.setAlignment(Pos.CENTER_RIGHT);
@@ -227,12 +196,12 @@ public class RestaurantController {
     }
 
     private void handleClick(Menu menu) {
-        MenuController.setData(menu.getId(), menu.getTitle(), restaurantId);
+        MenuController.setData(menu.getId(), menu.getTitle(), restaurant);
         SceneNavigator.switchTo("/frontend/menu.fxml", restaurant_name_label);
     }
 
     private void handleDelete(Menu menu) {
-        String safeUrl = "http://localhost:8080/restaurants/" + restaurantId + "/menu/" + URLEncoder.encode(menu.getTitle(), StandardCharsets.UTF_8);
+        String safeUrl = "http://localhost:8080/restaurants/" + restaurant.getId() + "/menu/" + URLEncoder.encode(menu.getTitle(), StandardCharsets.UTF_8);
         URI uri = URI.create(safeUrl);
         HttpRequest request = HttpRequest.newBuilder()
                 .uri(uri)
@@ -267,7 +236,7 @@ public class RestaurantController {
     }
 
     public void addFood(ActionEvent actionEvent) {
-        CreteFoodController.setRestaurantId(restaurantId);
+        CreteFoodController.setRestaurantId(restaurant.getId());
         SceneNavigator.switchTo("/frontend/createFood.fxml", restaurant_name_label);
     }
 
@@ -282,7 +251,7 @@ public class RestaurantController {
             e.printStackTrace();
         }
         HttpRequest request = HttpRequest.newBuilder()
-                .uri(URI.create("http://localhost:8080/restaurants/" + restaurantId + "/menu"))
+                .uri(URI.create("http://localhost:8080/restaurants/" + restaurant.getId() + "/menu"))
                 .header("Authorization", "Bearer " + SessionManager.getAuthToken())
                 .POST(HttpRequest.BodyPublishers.ofString(jsonBody))
                 .build();
@@ -309,7 +278,7 @@ public class RestaurantController {
     }
 
     public void viewFoods(ActionEvent actionEvent) {
-        AllRestaurantFoodController.setData(restaurantId, restaurantName);
+        AllRestaurantFoodController.setData(restaurant.getId(), restaurantName);
         SceneNavigator.switchTo("/frontend/allRestaurantFood.fxml", restaurant_name_label);
     }
 }

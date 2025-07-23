@@ -3,7 +3,7 @@ package org.FRFood.DAO;
 import org.FRFood.entity.Order;
 import org.FRFood.entity.OrderItem;
 import org.FRFood.util.DBConnector;
-import org.FRFood.util.Status;
+import org.FRFood.entity.Status;
 
 import java.sql.*;
 import java.util.ArrayList;

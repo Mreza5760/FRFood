@@ -4,9 +4,8 @@ import org.FRFood.DAO.*;
 import org.FRFood.util.*;
 import org.FRFood.entity.*;
 
-import static org.FRFood.util.Role.*;
+import static org.FRFood.entity.Role.*;
 import static org.FRFood.util.Validation.validatePhone;
-import static org.FRFood.util.Validation.validatePhoneNumber;
 
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;

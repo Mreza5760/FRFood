@@ -1,4 +1,4 @@
-package org.FRFood.util;
+package org.FRFood.entity;
 
 public enum Role {
     admin,

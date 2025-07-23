@@ -1,6 +1,5 @@
 package org.FRFood.entity;
 
-import org.FRFood.util.TransactionMethod;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 public class Transaction {

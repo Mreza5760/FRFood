@@ -5,16 +5,12 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
-import javafx.fxml.FXMLLoader;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
-import javafx.scene.Parent;
-import javafx.scene.Scene;
 import javafx.scene.control.Label;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.*;
-import javafx.stage.Stage;
 import org.FRFood.entity.Order;
 import org.FRFood.entity.Restaurant;
 import org.FRFood.frontEnd.Util.SceneNavigator;
@@ -211,7 +207,7 @@ public class OrderHistoryController {
 
 
         if (controller != null) {
-            if (mode == 2 || mode == 3) {
+            if (mode == 2 || mode == 3 || mode == 4) {
                 controller.setOrder(theOrder, r, 4);
             }  else {
                 controller.setOrder(theOrder, r, 2);
@@ -222,7 +218,7 @@ public class OrderHistoryController {
 
     @FXML
     private void goBack() {
-        if (mode == 2 || mode == 3) {
+        if (mode == 2 || mode == 3 || mode == 4) {
             SceneNavigator.switchTo("/frontend/panel.fxml", restaurantList);
         } else {
             SceneNavigator.switchTo("/frontend/buyerOrderPage.fxml", restaurantList);

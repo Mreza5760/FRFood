@@ -2,16 +2,11 @@ package org.FRFood.frontEnd.controller;
 
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
-import javafx.fxml.FXMLLoader;
-import javafx.scene.*;
-import javafx.stage.Stage;
 import javafx.scene.control.Button;
-import javafx.scene.Node;
 import org.FRFood.frontEnd.Util.SceneNavigator;
 import org.FRFood.frontEnd.Util.SessionManager;
 
 import java.io.IOException;
-import java.util.Objects;
 
 public class HomeController {
 

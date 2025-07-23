@@ -9,10 +9,6 @@ import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import org.FRFood.frontEnd.Util.SceneNavigator;
 import org.FRFood.frontEnd.Util.SessionManager;
-import javafx.stage.Stage;
-import javafx.scene.Scene;
-import javafx.fxml.FXMLLoader;
-import javafx.scene.Parent;
 
 import java.io.InputStream;
 import java.io.OutputStream;

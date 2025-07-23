@@ -4,7 +4,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
-import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
@@ -12,9 +11,9 @@ import javafx.scene.layout.VBox;
 import org.FRFood.entity.Order;
 import org.FRFood.entity.OrderItem;
 import org.FRFood.entity.Restaurant;
+import org.FRFood.entity.Status;
 import org.FRFood.frontEnd.Util.SceneNavigator;
 import org.FRFood.frontEnd.Util.SessionManager;
-import org.FRFood.util.Status;
 
 import java.io.OutputStream;
 import java.net.HttpURLConnection;

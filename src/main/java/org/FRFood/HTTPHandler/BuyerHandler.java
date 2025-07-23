@@ -4,7 +4,7 @@ import org.FRFood.DAO.*;
 import org.FRFood.util.*;
 import org.FRFood.entity.*;
 
-import static org.FRFood.util.Role.*;
+import static org.FRFood.entity.Role.*;
 import org.FRFood.util.BuyerReq.ItemsReq;
 import com.sun.net.httpserver.HttpHandler;
 import org.FRFood.util.BuyerReq.VendorsReq;

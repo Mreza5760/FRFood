@@ -1,28 +1,20 @@
 package org.FRFood.frontEnd.controller;
 
-import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.geometry.Insets;
-import javafx.geometry.Pos;
 import javafx.scene.control.*;
 import javafx.scene.layout.*;
-import javafx.scene.Node;
 import javafx.event.ActionEvent;
 import org.FRFood.entity.Order;
-import org.FRFood.entity.OrderItem;
 import org.FRFood.entity.Restaurant;
 import org.FRFood.frontEnd.Util.SceneNavigator;
 import org.FRFood.frontEnd.Util.SessionManager;
-import org.FRFood.util.Status;
 
-import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.Arrays;
-import java.util.Base64;
-import java.util.Iterator;
 import java.util.List;
 
 import static io.jsonwebtoken.lang.Strings.capitalize;

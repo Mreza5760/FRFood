@@ -1,7 +1,7 @@
 package org.FRFood.DAO;
 
 import org.FRFood.entity.Order;
-import org.FRFood.util.Status;
+import org.FRFood.entity.Status;
 
 import java.util.List;
 import java.util.Optional;

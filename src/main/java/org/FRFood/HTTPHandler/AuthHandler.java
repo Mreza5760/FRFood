@@ -1,5 +1,7 @@
 package org.FRFood.HTTPHandler;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.FRFood.DAO.*;
 import org.FRFood.util.*;
 import org.FRFood.entity.*;
@@ -127,7 +129,14 @@ public class AuthHandler implements HttpHandler {
             }
 
             String token = JwtUtil.generateToken(user);
-            JsonResponse.sendJsonResponse(exchange, 200, "{\"token\":\"" + token + "\"}");
+            ObjectMapper mapper = new ObjectMapper();
+            ObjectNode root = mapper.createObjectNode();
+            root.put("message", "Login successful");
+            root.put("token", token);
+            JsonNode userNode = mapper.valueToTree(user);
+            root.set("user", userNode);
+            String jsonOutput = mapper.writeValueAsString(root);
+            JsonResponse.sendJsonResponse(exchange, 200, jsonOutput);
         } catch (SQLException e) {
             HttpError.internal(exchange, "Database error");
         }

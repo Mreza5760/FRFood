@@ -17,7 +17,7 @@ import java.util.Map;
 import java.util.Optional;
 
 import static org.FRFood.util.Authenticate.authenticate;
-import static org.FRFood.util.Role.admin;
+import static org.FRFood.entity.Role.admin;
 
 public class AdminHandler implements HttpHandler {
     private final UserDAO userDAO;
