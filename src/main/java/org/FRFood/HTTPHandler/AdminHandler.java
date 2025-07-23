@@ -133,7 +133,7 @@ public class AdminHandler implements HttpHandler {
         Optional<User> optionalUser = authenticate(exchange);
         if (optionalUser.isEmpty()) return;
         User user = optionalUser.get();
-        if (user.getRole().equals(admin)) {
+        if (!user.getRole().equals(admin)) {
             HttpError.forbidden(exchange, "Only Admin Allowed");
             return;
         }

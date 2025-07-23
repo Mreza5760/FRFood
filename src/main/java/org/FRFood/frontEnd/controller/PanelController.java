@@ -61,7 +61,7 @@ public class PanelController {
         // Admin placeholders
         usersButton.setOnAction(e -> System.out.println("Users clicked"));
         ordersButton.setOnAction(e -> System.out.println("Orders clicked"));
-        transactionsButton.setOnAction(e -> System.out.println("Transactions clicked"));
+        transactionsButton.setOnAction(e -> handleTransactions());
     }
 
     private void setRoleBasedButtons() {
@@ -144,5 +144,9 @@ public class PanelController {
 
     private void handleRestaurants() {
         SceneNavigator.switchTo("/frontend/myRestaurants.fxml", restaurantButton);
+    }
+
+    private  void handleTransactions() {
+        SceneNavigator.switchTo("/frontEnd/adminTransactions.fxml", transactionsButton);
     }
 }

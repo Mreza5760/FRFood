@@ -32,12 +32,10 @@ public class TransactionsController {
 
     @FXML
     public void initialize() {
-        // Setup columns
         orderIdColumn.setCellValueFactory(new PropertyValueFactory<>("orderID"));
         methodColumn.setCellValueFactory(new PropertyValueFactory<>("method"));
         amountColumn.setCellValueFactory(new PropertyValueFactory<>("amount"));
 
-        // Customize Order ID column to show "Wallet Charge" for 0
         orderIdColumn.setCellFactory(new Callback<>() {
             @Override
             public TableCell<Transaction, Integer> call(TableColumn<Transaction, Integer> param) {
@@ -48,7 +46,37 @@ public class TransactionsController {
                         if (empty || item == null) {
                             setText(null);
                         } else {
-                            setText(item == 0 ? "Wallet Charge" : String.valueOf(item));
+                            Transaction tx = getTableView().getItems().get(getIndex());
+                            int amt = tx.getAmount() != null ? tx.getAmount() : 0;
+
+                            if (item == 0) {
+                                if (amt > 0) {
+                                    setText("Deposit");
+                                } else if (amt < 0) {
+                                    setText("Withdraw");
+                                } else {
+                                    setText("Wallet Update");
+                                }
+                            } else {
+                                setText(String.valueOf(item));
+                            }
+                        }
+                    }
+                };
+            }
+        });
+
+        amountColumn.setCellFactory(new Callback<>() {
+            @Override
+            public TableCell<Transaction, Integer> call(TableColumn<Transaction, Integer> param) {
+                return new TableCell<>() {
+                    @Override
+                    protected void updateItem(Integer item, boolean empty) {
+                        super.updateItem(item, empty);
+                        if (empty || item == null) {
+                            setText(null);
+                        } else {
+                            setText(String.valueOf(Math.abs(item)));
                         }
                     }
                 };
@@ -57,7 +85,6 @@ public class TransactionsController {
 
         loadTransactions();
 
-        // Back button goes to wallet page
         backButton.setOnAction(e -> SceneNavigator.switchTo("/frontend/wallet.fxml", backButton));
     }
 
@@ -72,7 +99,6 @@ public class TransactionsController {
                 try (InputStream responseStream = conn.getInputStream()) {
                     ObjectMapper mapper = new ObjectMapper();
                     List<Transaction> transactions = mapper.readValue(responseStream, new TypeReference<>() {});
-
                     Platform.runLater(() ->
                             transactionsTable.setItems(FXCollections.observableArrayList(transactions))
                     );
