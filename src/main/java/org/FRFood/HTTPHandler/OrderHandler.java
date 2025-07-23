@@ -145,7 +145,7 @@ public class OrderHandler implements HttpHandler {
                     HttpError.unauthorized(exchange, "Not enough money");
                     return;
                 } else {
-                    user.setWallet(user.getWallet() - transaction.getAmount());
+                    userDAO.setWallet(user.getId(), user.getWallet() - transaction.getAmount());
                 }
             }
             order.setId(orderDAO.insert(order));
