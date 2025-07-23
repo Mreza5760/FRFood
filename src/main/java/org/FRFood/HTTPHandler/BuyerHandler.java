@@ -12,11 +12,8 @@ import com.sun.net.httpserver.HttpExchange;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import static org.FRFood.util.Authenticate.authenticate;
 
-import java.util.List;
-import java.util.Random;
-import java.util.Optional;
+import java.util.*;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.sql.SQLException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
@@ -300,7 +297,6 @@ public class BuyerHandler implements HttpHandler {
         }
     }
 
-    // TODO has query
     private void handleOrdersHistory(HttpExchange exchange) throws IOException {
         var userOpt = Authenticate.authenticate(exchange);
         if (userOpt.isEmpty()) return;
@@ -311,8 +307,47 @@ public class BuyerHandler implements HttpHandler {
             return;
         }
 
+        String query = exchange.getRequestURI().getQuery();
+
         try {
             List<Order> orders = orderDAO.getUserOrders(user.getId());
+            if (query != null && !query.isEmpty()) {
+                String[] parts = query.split("&");
+                Map<String, String> params = new HashMap<>();
+                for (String part : parts) {
+                    String[] keyValue = part.split("=");
+                    params.put(keyValue[0], keyValue[1]);
+                }
+                for (Order order : orders) {
+                    Optional<Restaurant> optionalRestaurant = restaurantDAO.getById(order.getRestaurantId());
+                    if (optionalRestaurant.isEmpty()) {
+                        HttpError.notFound(exchange, "Restaurant not found");
+                        return;
+                    }
+                    Restaurant restaurant = optionalRestaurant.get();
+                    if (params.containsKey("vendor") && !restaurant.getName().contains(params.get("vendor"))) {
+                        orders.remove(order);
+                    } else if (params.containsKey("search")) {
+                        List<OrderItem> items = order.getItems();
+                        boolean found = false;
+                        for (OrderItem item : items) {
+                            Optional<Food> optionalFood = foodDAO.getById(item.getItemId());
+                            if (optionalFood.isEmpty()) {
+                                HttpError.notFound(exchange, "Food not found");
+                                return;
+                            }
+                            Food food = optionalFood.get();
+                            if (food.getName().contains(params.get("search"))) {
+                                found = true;
+                                break;
+                            }
+                        }
+                        if (!found) {
+                            orders.remove(order);
+                        }
+                    }
+                }
+            }
             String json = objectMapper.writeValueAsString(orders);
             JsonResponse.sendJsonResponse(exchange, 200, json);
         } catch (Exception e) {
