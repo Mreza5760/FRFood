@@ -4,15 +4,15 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
 import org.FRFood.DAO.*;
-import org.FRFood.entity.Order;
-import org.FRFood.entity.Transaction;
-import org.FRFood.entity.User;
+import org.FRFood.entity.*;
 import org.FRFood.util.HttpError;
 import org.FRFood.util.JsonResponse;
 
 import java.io.IOException;
 import java.sql.SQLException;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 import static org.FRFood.util.Authenticate.authenticate;
@@ -110,19 +110,66 @@ public class AdminHandler implements HttpHandler {
         }
     }
 
-    // TODO has query
     private void handleGetOrders(HttpExchange exchange) throws IOException {
         Optional<User> optionalUser = authenticate(exchange);
         if (optionalUser.isEmpty()) return;
         User user = optionalUser.get();
-
         if (user.getRole().equals(admin)) {
             HttpError.forbidden(exchange, "Only Admin Allowed");
             return;
         }
 
+        String query = exchange.getRequestURI().getQuery();
+        FoodDAO foodDAO = new FoodDAOImp();
+        RestaurantDAO restaurantDAO = new RestaurantDAOImp();
+
         try {
             List<Order> orders = orderDAO.getAllOrders();
+
+            if (query != null && !query.isEmpty()) {
+                String[] parts = query.split("&");
+                Map<String, String> params = new HashMap<>();
+                for (String part : parts) {
+                    String[] keyValue = part.split("=");
+                    params.put(keyValue[0], keyValue[1]);
+                }
+                for (Order order : orders) {
+                    Optional<Restaurant> optionalRestaurant = restaurantDAO.getById(order.getRestaurantId());
+                    if (optionalRestaurant.isEmpty()) {
+                        HttpError.notFound(exchange, "Restaurant not found");
+                        return;
+                    }
+                    Restaurant restaurant = optionalRestaurant.get();
+                    if (params.containsKey("vendor") && !restaurant.getName().contains(params.get("vendor"))) {
+                        orders.remove(order);
+                    } else if (params.containsKey("customer") && order.getCustomerId() != Integer.parseInt(params.get("customer"))) {
+                        orders.remove(order);
+                    } else if (params.containsKey("courier") && order.getCourierId() != Integer.parseInt(params.get("courier"))) {
+                        orders.remove(order);
+                    } else if (params.containsKey("status") && !order.getStatus().toString().equals(params.get("status"))) {
+                        orders.remove(order);
+                    } else if (params.containsKey("search")) {
+                        List<OrderItem> items = order.getItems();
+                        boolean found = false;
+                        for (OrderItem item : items) {
+                            Optional<Food> optionalFood = foodDAO.getById(item.getItemId());
+                            if (optionalFood.isEmpty()) {
+                                HttpError.notFound(exchange, "Food not found");
+                                return;
+                            }
+                            Food food = optionalFood.get();
+                            if (food.getName().contains(params.get("search"))) {
+                                found = true;
+                                break;
+                            }
+                        }
+                        if (!found) {
+                            orders.remove(order);
+                        }
+                    }
+                }
+            }
+
             JsonResponse.sendJsonResponse(exchange, 200, objectMapper.writeValueAsString(orders));
         } catch (SQLException e) {
             HttpError.internal(exchange, "Internal server error while updating profile");
