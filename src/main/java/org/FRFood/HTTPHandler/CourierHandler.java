@@ -1,9 +1,6 @@
 package org.FRFood.HTTPHandler;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 import java.io.IOException;
 import java.sql.SQLException;
 
@@ -40,6 +37,7 @@ public class CourierHandler implements HttpHandler {
                     switch (path) {
                         case "/deliveries/available" -> handleGetOrders(exchange);
                         case "/deliveries/history" -> handleGetHistory(exchange);
+                        case "/deliveries/order" -> handleActiveOrder(exchange);
                     }
                 }
                 case "PATCH" -> {
@@ -111,6 +109,18 @@ public class CourierHandler implements HttpHandler {
 
             if (status == Status.completed) {
                 new UserDAOImp().setWallet(user.getId(), user.getWallet() + order.getCourierFee());
+            } else {
+                int activeOrder = 0;
+                List<Order> orders = orderDAO.getCourierOrders(user.getId());
+                for (Order tempOrder : orders) {
+                    if (tempOrder.getStatus() == Status.onTheWay) {
+                        activeOrder++;
+                    }
+                }
+                if (activeOrder >= 1) {
+                    HttpError.forbidden(exchange, "There is a active order");
+                    return;
+                }
             }
 
             orderDAO.changeStatus(orderId, status);
@@ -178,6 +188,33 @@ public class CourierHandler implements HttpHandler {
 
             JsonResponse.sendJsonResponse(exchange, 200, objectMapper.writeValueAsString(orders));
         }  catch (SQLException e) {
+            HttpError.internal(exchange, "Internal server error while updating profile");
+        }
+    }
+
+    private void handleActiveOrder(HttpExchange exchange) throws IOException {
+        Optional<User> authenticatedUserOptional = authenticate(exchange);
+        if (authenticatedUserOptional.isEmpty()) return;
+        User user = authenticatedUserOptional.get();
+        if (!user.getRole().equals(courier)) {
+            HttpError.forbidden(exchange, "Only for Courier");
+            return;
+        }
+
+        try {
+            List<Order> orders = orderDAO.getCourierOrders(user.getId());
+            List<Order> activeOrder =  new ArrayList<>();
+            for (Order order : orders) {
+                if (order.getStatus() == Status.onTheWay) {
+                    activeOrder.add(order);
+                }
+            }
+            if (activeOrder.size() > 1) {
+                HttpError.badRequest(exchange, "There are more than one active order");
+                return;
+            }
+            JsonResponse.sendJsonResponse(exchange, 200, objectMapper.writeValueAsString(activeOrder));
+        } catch (SQLException e) {
             HttpError.internal(exchange, "Internal server error while updating profile");
         }
     }
