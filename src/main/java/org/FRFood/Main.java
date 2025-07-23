@@ -1,10 +1,7 @@
 package org.FRFood;
 
 import com.sun.net.httpserver.HttpServer;
-import org.FRFood.HTTPHandler.AuthHandler;
-import org.FRFood.HTTPHandler.BuyerHandler;
-import org.FRFood.HTTPHandler.OrderHandler;
-import org.FRFood.HTTPHandler.RestaurantHandler;
+import org.FRFood.HTTPHandler.*;
 
 import java.net.InetSocketAddress;
 import java.util.concurrent.Executors;
@@ -23,6 +20,7 @@ public class Main {
          server.createContext("/wallet", new OrderHandler());
          server.createContext("/transactions", new OrderHandler());
          server.createContext("/payment", new OrderHandler());
+         server.createContext("/admin", new AdminHandler());
          server.createContext("/",new BuyerHandler());
          server.setExecutor(Executors.newFixedThreadPool(4));
          server.start();
