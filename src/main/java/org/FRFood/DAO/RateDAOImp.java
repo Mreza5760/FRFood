@@ -46,7 +46,7 @@ public class RateDAOImp implements RateDAO {
     }
 
     @Override
-    public boolean deleteById(int id) throws SQLException {
+    public void deleteById(int id) throws SQLException {
         String sql = "DELETE FROM ratings WHERE id = ?";
         try(
                 Connection connection = DBConnector.gConnection();
@@ -62,7 +62,7 @@ public class RateDAOImp implements RateDAO {
     }
 
     @Override
-    public boolean updateById(int id, Rate rate) throws SQLException {
+    public void updateById(int id, Rate rate) throws SQLException {
         String sql = "UPDATE ratings SET  rating = ?, comment = ? WHERE id = ?";
         try(
                 Connection connection = DBConnector.gConnection();
