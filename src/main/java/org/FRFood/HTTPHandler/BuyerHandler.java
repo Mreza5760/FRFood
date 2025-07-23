@@ -311,6 +311,7 @@ public class BuyerHandler implements HttpHandler {
 
         try {
             List<Order> orders = orderDAO.getUserOrders(user.getId());
+
             if (query != null && !query.isEmpty()) {
                 String[] parts = query.split("&");
                 Map<String, String> params = new HashMap<>();

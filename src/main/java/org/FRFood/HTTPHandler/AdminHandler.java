@@ -129,6 +129,7 @@ public class AdminHandler implements HttpHandler {
         }
     }
 
+    // TODO has query
     private void handleGetTransactions(HttpExchange exchange) throws IOException {
         Optional<User> optionalUser = authenticate(exchange);
         if (optionalUser.isEmpty()) return;
