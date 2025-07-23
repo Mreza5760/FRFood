@@ -34,14 +34,13 @@ public class AdminTransactionsController {
 
     @FXML
     public void initialize() {
-        // Standard property bindings
+        // Bind properties
         idColumn.setCellValueFactory(new PropertyValueFactory<>("id"));
         userIdColumn.setCellValueFactory(new PropertyValueFactory<>("userID"));
         methodColumn.setCellValueFactory(new PropertyValueFactory<>("method"));
         amountColumn.setCellValueFactory(new PropertyValueFactory<>("amount"));
-
-        // Custom cell factory for orderId to show "Wallet Charge"
         orderIdColumn.setCellValueFactory(new PropertyValueFactory<>("orderID"));
+
         orderIdColumn.setCellFactory(column -> new TableCell<>() {
             @Override
             protected void updateItem(Integer orderId, boolean empty) {
@@ -49,7 +48,32 @@ public class AdminTransactionsController {
                 if (empty || orderId == null) {
                     setText(null);
                 } else {
-                    setText(orderId == 0 ? "Wallet Charge" : orderId.toString());
+                    Transaction tx = getTableView().getItems().get(getIndex());
+                    int amt = tx.getAmount() != null ? tx.getAmount() : 0;
+
+                    if (orderId == 0) {
+                        if (amt > 0) {
+                            setText("Deposit");
+                        } else if (amt < 0) {
+                            setText("Withdraw");
+                        } else {
+                            setText("Wallet Update");
+                        }
+                    } else {
+                        setText(orderId.toString());
+                    }
+                }
+            }
+        });
+
+        amountColumn.setCellFactory(column -> new TableCell<>() {
+            @Override
+            protected void updateItem(Integer amount, boolean empty) {
+                super.updateItem(amount, empty);
+                if (empty || amount == null) {
+                    setText(null);
+                } else {
+                    setText(String.valueOf(Math.abs(amount)));
                 }
             }
         });
@@ -67,14 +91,13 @@ public class AdminTransactionsController {
                 conn.setRequestMethod("GET");
                 conn.setRequestProperty("Authorization", "Bearer " + token);
 
-                InputStream responseStream = conn.getInputStream();
-                ObjectMapper mapper = new ObjectMapper();
-                List<Transaction> transactions = mapper.readValue(responseStream, new TypeReference<>() {});
+                try (InputStream responseStream = conn.getInputStream()) {
+                    ObjectMapper mapper = new ObjectMapper();
+                    List<Transaction> transactions = mapper.readValue(responseStream, new TypeReference<>() {});
+                    ObservableList<Transaction> observableList = FXCollections.observableArrayList(transactions);
 
-                ObservableList<Transaction> observableList = FXCollections.observableArrayList(transactions);
-
-                Platform.runLater(() -> transactionsTable.setItems(observableList));
-
+                    Platform.runLater(() -> transactionsTable.setItems(observableList));
+                }
             } catch (Exception e) {
                 e.printStackTrace();
             }
