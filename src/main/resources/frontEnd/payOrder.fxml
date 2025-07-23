@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.geometry.Insets?>
+<?import javafx.geometry.Pos?>
+
+<VBox xmlns="http://javafx.com/javafx"
+      xmlns:fx="http://javafx.com/fxml"
+      fx:controller="org.FRFood.frontEnd.controller.PayOrderController"
+      spacing="20" alignment="TOP_CENTER"
+      style="-fx-background-color: linear-gradient(to bottom, #eef3f9, #dbe5f1);"
+      prefWidth="800" prefHeight="600">
+
+    <HBox alignment="TOP_LEFT">
+        <Button text="⬅ Back"
+                onAction="#handleBack"
+                style="-fx-background-color: #d9534f; -fx-text-fill: white; -fx-font-weight: bold; -fx-background-radius: 8;"
+                prefWidth="100" prefHeight="30"/>
+    </HBox>
+
+    <padding>
+        <Insets top="40" left="40" right="40" bottom="40"/>
+    </padding>
+
+    <Label text="📝 Order Details"
+           style="-fx-font-size: 28px; -fx-font-weight: bold; -fx-text-fill: #1e2a38;"/>
+
+    <VBox fx:id="detailsBox" spacing="10"/>
+
+    <Label text="🍽 Ordered Items:"
+           style="-fx-font-size: 20px; -fx-font-weight: bold;"/>
+
+    <VBox fx:id="itemsBox" spacing="10" style="-fx-background-color: #ffffff; -fx-padding: 15; -fx-background-radius: 12;"/>
+
+    <HBox spacing="20" alignment="CENTER">
+        <Button fx:id="payCardButton" text="💳 Pay with Card"
+                onAction="#handlePayWithCard"
+                style="-fx-background-color: #0077cc; -fx-text-fill: white; -fx-font-size: 14px; -fx-font-weight: bold; -fx-background-radius: 10;"
+                prefWidth="180" prefHeight="40"/>
+
+        <Button fx:id="payWalletButton" text="👛 Pay with Wallet"
+                onAction="#handlePayWithWallet"
+                style="-fx-background-color: #00aa88; -fx-text-fill: white; -fx-font-size: 14px; -fx-font-weight: bold; -fx-background-radius: 10;"
+                prefWidth="180" prefHeight="40"/>
+    </HBox>
+</VBox>

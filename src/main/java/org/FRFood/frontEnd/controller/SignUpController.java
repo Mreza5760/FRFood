@@ -118,14 +118,18 @@ public class SignUpController {
         String phone = phoneNumberField.getText().trim();
         String role = roleField.getText().trim();
         String address = addressField.getText().trim();
+        String bankAccount = bankAccountField.getText().trim();
+        String bankName = bankNameField.getText().trim();
 
         phoneNumberField.setStyle(phone.isEmpty() ? "-fx-border-color: red;" : null);
         passwordField.setStyle(phone.isEmpty() ? "-fx-border-color: red;" : null);
         fullNameField.setStyle(phone.isEmpty() ? "-fx-border-color: red;" : null);
         roleField.setStyle(phone.isEmpty() ? "-fx-border-color: red;" : null);
         addressField.setStyle(phone.isEmpty() ? "-fx-border-color: red;" : null);
+        bankAccountField.setStyle(phone.isEmpty() ? "-fx-border-color: red;" : null);
+        bankNameField.setStyle(phone.isEmpty() ? "-fx-border-color: red;" : null);
 
-        if (phone.isEmpty() || password.isEmpty() || name.isEmpty() || role.isEmpty() || address.isEmpty()) {
+        if (phone.isEmpty() || password.isEmpty() || name.isEmpty() || role.isEmpty() || address.isEmpty() || bankAccount.isEmpty() || bankName.isEmpty()){
             messageLabel.setText("Please fill in all fields.");
             return false;
         }

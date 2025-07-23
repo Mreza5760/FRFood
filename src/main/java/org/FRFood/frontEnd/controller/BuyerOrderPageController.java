@@ -29,15 +29,13 @@ public class BuyerOrderPageController {
                 System.out.println("Order History clicked (not implemented)")
         );
         myOrdersButton.setOnAction(event ->
-                System.out.println("My Orders clicked (not implemented)")
+                SceneNavigator.switchTo("/frontEnd/cart.fxml", myOrdersButton)
         );
         restaurantButton.setOnAction(event ->
-                restaurantsHandle()
+                SceneNavigator.switchTo("/frontEnd/allRestaurants.fxml", restaurantButton)
         );
 
     }
 
-    private void restaurantsHandle() {
-        SceneNavigator.switchTo("/frontEnd/allRestaurants.fxml", restaurantButton);
-    }
+
 }
