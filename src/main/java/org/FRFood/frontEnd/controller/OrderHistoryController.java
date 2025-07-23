@@ -47,9 +47,11 @@ public class OrderHistoryController {
     }
 
     private void fetchOrders() {
-        String uri ="http://localhost:8080/orders/history";
-        if(mode == 2){
+        String uri = "http://localhost:8080/orders/history";
+        if (mode == 2) {
             uri = "http://localhost:8080/deliveries/available";
+        }else if(mode == 3){
+            uri = "http://localhost:8080/deliveries/order";
         }
         HttpRequest request = HttpRequest.newBuilder()
                 .uri(URI.create(uri))
@@ -62,7 +64,7 @@ public class OrderHistoryController {
                     if (response.statusCode() == 200) {
                         displayRestaurants(response.body());
                     } else {
-                        System.err.println("Failed to fetch orders: HTTP " + response.statusCode()+response.body());
+                        System.err.println("Failed to fetch orders: HTTP " + response.statusCode() + response.body());
                     }
                 })
                 .exceptionally(e -> {
@@ -73,10 +75,11 @@ public class OrderHistoryController {
 
     private void displayRestaurants(String body) {
         try {
-            List<Order> orders = mapper.readValue(body, new TypeReference<>() {});
+            List<Order> orders = mapper.readValue(body, new TypeReference<>() {
+            });
             List<java.util.concurrent.CompletableFuture<Restaurant>> futures = new ArrayList<>();
 
-            for(Order order : orders) {
+            for (Order order : orders) {
                 int restaurantId = order.getRestaurantId();
                 futures.add(fetchRestaurant(restaurantId));
             }
@@ -98,7 +101,7 @@ public class OrderHistoryController {
                         Platform.runLater(() -> {
                             restaurantList.getChildren().clear();
                             for (Restaurant r : restaurants) {
-                                restaurantList.getChildren().add(createRestaurantCard(r,getOrderWithRestaurant(r,orders)));
+                                restaurantList.getChildren().add(createRestaurantCard(r, getOrderWithRestaurant(r, orders)));
                             }
                         });
                     });
@@ -108,9 +111,9 @@ public class OrderHistoryController {
         }
     }
 
-    private Order getOrderWithRestaurant(Restaurant r,List<Order> orders) {
-        for(Order o : orders) {
-            if(o.getRestaurantId().equals(r.getId())) {
+    private Order getOrderWithRestaurant(Restaurant r, List<Order> orders) {
+        for (Order o : orders) {
+            if (o.getRestaurantId().equals(r.getId())) {
                 orders.remove(o);
                 return o;
             }
@@ -138,7 +141,7 @@ public class OrderHistoryController {
                             e.printStackTrace();
                         }
                     } else {
-                        System.err.println("Failed to fetch restaurant: HTTP " + response.statusCode()+response.body());
+                        System.err.println("Failed to fetch restaurant: HTTP " + response.statusCode() + response.body());
                     }
                     return null;
                 });
@@ -184,10 +187,10 @@ public class OrderHistoryController {
         Region spacer = new Region();
         HBox.setHgrow(spacer, Priority.ALWAYS);
 
-        card.setOnMouseClicked(e -> handleClick(r,order)); // full card click
+        card.setOnMouseClicked(e -> handleClick(r, order)); // full card click
 
 
-        Label temp = new Label("💰 raw price: " + order.getRawPrice() + " | Total: " + order.getPayPrice()+" | Status: " +order.getStatus());
+        Label temp = new Label("💰 raw price: " + order.getRawPrice() + " | Total: " + order.getPayPrice() + " | Status: " + order.getStatus());
         temp.setStyle("-fx-font-size: 14px; -fx-text-fill: #3a3a3a;");
         HBox rightBox = new HBox(10, temp);
         rightBox.setAlignment(Pos.CENTER_RIGHT);
@@ -197,7 +200,7 @@ public class OrderHistoryController {
         return card;
     }
 
-    private void handleClick(Restaurant r,Order theOrder) {
+    private void handleClick(Restaurant r, Order theOrder) {
         PayOrderController controller = SceneNavigator.switchToWithController(
                 "/frontend/payOrder.fxml",
                 restaurantList,
@@ -206,9 +209,9 @@ public class OrderHistoryController {
 
 
         if (controller != null) {
-            if(mode == 2){
-                controller.setOrder(theOrder, r,4);
-            }else {
+            if (mode == 2) {
+                controller.setOrder(theOrder, r, 4);
+            } else {
                 controller.setOrder(theOrder, r, 2);
             }
         }
@@ -216,6 +219,10 @@ public class OrderHistoryController {
 
     @FXML
     private void goBack() {
-        SceneNavigator.switchTo("/frontend/buyerOrderPage.fxml", restaurantList);
+        if (mode == 2 || mode == 3) {
+            SceneNavigator.switchTo("/frontend/panel.fxml", restaurantList);
+        } else {
+            SceneNavigator.switchTo("/frontend/buyerOrderPage.fxml", restaurantList);
+        }
     }
 }

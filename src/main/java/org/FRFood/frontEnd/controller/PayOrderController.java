@@ -59,14 +59,15 @@ public class PayOrderController {
         } else if (mode == 3 && currentOrder.getStatus() == Status.preparing) {
             foodIsReadyButton.setVisible(true);
             foodIsReadyButton.setManaged(true);
-        } else if (mode == 4) {
+        } else if (mode == 4 &&  currentOrder.getStatus() == Status.findingCourier) {
             acceptButton.setVisible(true);
             acceptButton.setManaged(true);
         }
         // Populate details
         detailsBox.getChildren().addAll(
-                new Label("📦 Status: " + order.getStatus()),
                 new Label("📍 Delivery Address: " + order.getDeliveryAddress()),
+                new Label("📍 Restaurant Address: " + restaurant.getAddress()),
+                new Label("📦 Status: " + order.getStatus()),
                 new Label("👤 Customer ID: " + order.getCustomerId()),
                 new Label("🍽 Restaurant : " + restaurant.getName()),
                 new Label("🎟 Coupon ID: " + (order.getCouponId() != null ? order.getCouponId() : "None")),
@@ -109,6 +110,8 @@ public class PayOrderController {
             SceneNavigator.switchTo("/frontend/cart.fxml", payCardButton);
         } else if (mode == 3) {
             SceneNavigator.switchTo("/frontend/restaurantOrders.fxml", payWalletButton);
+        }else if(mode == 4){
+            SceneNavigator.switchTo("/frontend/orderHistory.fxml", payWalletButton);
         }
     }
 
