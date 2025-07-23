@@ -57,7 +57,6 @@ public class RateDAOImp implements RateDAO {
             if(rows == 0){
                 throw new SQLException("no rows changed !");
             }
-            return true;
         }
     }
 
@@ -99,7 +98,6 @@ public class RateDAOImp implements RateDAO {
                 }
             }
         }
-        return false;
     }
 
     @Override
