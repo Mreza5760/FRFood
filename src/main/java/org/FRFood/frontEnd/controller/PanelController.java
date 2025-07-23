@@ -57,11 +57,17 @@ public class PanelController {
         restaurantButton.setOnAction(e -> handleRestaurants());
         walletButton.setOnAction(e -> handleWallet());
         profileButton.setOnAction(e -> handleProfile());
+        deliveriesButton.setOnAction(e -> handleDeliveriesButton());
 
         // Admin placeholders
         usersButton.setOnAction(e -> handleAllUsers());
         ordersButton.setOnAction(e -> System.out.println("Orders clicked"));
         transactionsButton.setOnAction(e -> handleTransactions());
+    }
+
+    private void handleDeliveriesButton() {
+        OrderHistoryController.setMode(2);
+        SceneNavigator.switchTo("/frontend/orderHistory.fxml",restaurantButton);
     }
 
     private void setRoleBasedButtons() {

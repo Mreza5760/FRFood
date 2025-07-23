@@ -177,7 +177,7 @@ public class CartController {
     }
 
     private void handleOrder(Restaurant r) {
-        RestaurantOrdersController.setRestaurantId(r.getId());
+        RestaurantOrdersController.setRestaurant(r);
         SceneNavigator.switchTo("/frontend/restaurantOrders.fxml", restaurantList);
     }
 

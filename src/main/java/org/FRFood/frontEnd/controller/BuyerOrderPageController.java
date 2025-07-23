@@ -26,7 +26,7 @@ public class BuyerOrderPageController {
 
         // Placeholder actions
         orderHistoryButton.setOnAction(event ->
-                SceneNavigator.switchTo("/frontEnd/orderHistory.fxml", orderHistoryButton)
+                handleOrderHistoryButtonClick()
         );
         myOrdersButton.setOnAction(event ->
                 SceneNavigator.switchTo("/frontEnd/cart.fxml", myOrdersButton)
@@ -37,5 +37,9 @@ public class BuyerOrderPageController {
 
     }
 
+    private void handleOrderHistoryButtonClick() {
+        OrderHistoryController.setMode(1);
+        SceneNavigator.switchTo("/frontEnd/orderHistory.fxml", orderHistoryButton);
+    }
 
 }

@@ -31,6 +31,13 @@ public class CourierHandler implements HttpHandler {
     public void handle(HttpExchange exchange) throws IOException {
         String method = exchange.getRequestMethod();
         String path = exchange.getRequestURI().getPath();
+
+        String overrideMethod = exchange.getRequestHeaders().getFirst("X-HTTP-Method-Override");
+
+        if ("POST".equalsIgnoreCase(method) && overrideMethod != null) {
+            method = overrideMethod.toUpperCase(); // Treat POST+Override as that method
+        }
+
         try {
             switch (method) {
                 case "GET" -> {

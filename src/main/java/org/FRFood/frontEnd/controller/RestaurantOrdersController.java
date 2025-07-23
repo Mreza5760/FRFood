@@ -4,30 +4,42 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
+import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.control.*;
 import javafx.scene.layout.*;
 import javafx.scene.Node;
 import javafx.event.ActionEvent;
+import org.FRFood.entity.Order;
+import org.FRFood.entity.OrderItem;
+import org.FRFood.entity.Restaurant;
 import org.FRFood.frontEnd.Util.SceneNavigator;
 import org.FRFood.frontEnd.Util.SessionManager;
+import org.FRFood.util.Status;
 
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.util.Arrays;
 import java.util.Base64;
 import java.util.Iterator;
+import java.util.List;
+
+import static io.jsonwebtoken.lang.Strings.capitalize;
 
 public class RestaurantOrdersController {
 
-    @FXML private VBox ordersContainer;
+    @FXML
+    private VBox ordersContainer;
 
     private final ObjectMapper mapper = new ObjectMapper();
-    private static int restaurantId;
+    private static Restaurant restaurant;
 
-    /** Call this after loading FXML to set the restaurant context **/
-    public static void setRestaurantId(int id) {
-        restaurantId = id;
+    /**
+     * Call this after loading FXML to set the restaurant context
+     **/
+    public static void setRestaurant(Restaurant inRestaurant) {
+        restaurant = inRestaurant;
     }
 
     @FXML
@@ -35,17 +47,19 @@ public class RestaurantOrdersController {
         fetchOrders();
     }
 
-    /** Fetch list of orders from backend **/
+    /**
+     * Fetch list of orders from backend
+     **/
     private void fetchOrders() {
         new Thread(() -> {
             try {
-                URL url = new URL("http://localhost:8080/restaurants/" + restaurantId + "/orders");
+                URL url = new URL("http://localhost:8080/restaurants/" + restaurant.getId() + "/orders");
                 HttpURLConnection conn = (HttpURLConnection) url.openConnection();
                 conn.setRequestMethod("GET");
                 conn.setRequestProperty("Authorization", "Bearer " + SessionManager.getAuthToken());
 
-                JsonNode root = mapper.readTree(conn.getInputStream());
-                Platform.runLater(() -> displayOrders(root));
+                List<Order> orders = Arrays.asList(mapper.readValue(conn.getInputStream(), Order[].class));
+                Platform.runLater(() -> displayOrders(orders));
 
             } catch (Exception e) {
                 e.printStackTrace();
@@ -53,90 +67,59 @@ public class RestaurantOrdersController {
         }).start();
     }
 
-    /** Render each order as a card in the VBox **/
-    private void displayOrders(JsonNode ordersArray) {
+    private void displayOrders(List<Order> orders) {
         ordersContainer.getChildren().clear();
 
-        for (JsonNode order : ordersArray) {
+        for (Order order : orders) {
             VBox card = new VBox(8);
             card.setStyle("""
-                -fx-background-color: white;
-                -fx-padding: 16;
-                -fx-background-radius: 10;
-                -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.1), 6, 0, 0, 2);
-            """);
-            card.setMaxWidth(800);
+                        -fx-background-color: white;
+                        -fx-padding: 20;
+                        -fx-background-radius: 12;
+                        -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.08), 8, 0, 0, 2);
+                        -fx-cursor: hand;
+                    """);
+            card.setMaxWidth(600);
+            card.setOnMouseClicked(e -> handleOrderClick(order));
 
-            Label idLabel = new Label("Order ID: " + order.get("id").asInt());
-            idLabel.setStyle("-fx-font-weight: bold; -fx-text-fill: #1e2a38;");
+            Label idLabel = new Label("🧾 Order #" + order.getId());
+            idLabel.setStyle("-fx-font-size: 16px; -fx-font-weight: bold; -fx-text-fill: #1e2a38;");
 
-            Label addrLabel = new Label("📍 " + order.get("delivery_address").asText());
-            Label priceLabel = new Label("💰 Pay: " + order.get("pay_price").asDouble());
-            Label statusLabel = new Label("⏱ Status: " + order.get("status").asText());
-            statusLabel.setStyle("-fx-text-fill: #34495e;");
+            Label priceLabel = new Label("💰 Pay Price: " + order.getPayPrice() );
+            priceLabel.setStyle("-fx-font-size: 14px; -fx-text-fill: #34495e;");
 
-            // Show item IDs
-            StringBuilder items = new StringBuilder();
-            Iterator<JsonNode> it = order.get("item_ids").iterator();
-            while (it.hasNext()) {
-                items.append(it.next().asInt());
-                if (it.hasNext()) items.append(", ");
-            }
-            Label itemsLabel = new Label("🛒 Items: [" + items + "]");
+            Label statusLabel = new Label("⏱ Status: " + capitalize(order.getStatus().name()));
+            statusLabel.setStyle("-fx-font-size: 13px; -fx-text-fill: #2980b9;");
 
-            card.getChildren().addAll(idLabel, addrLabel, priceLabel, itemsLabel, statusLabel);
+            Label createdLabel = new Label("📅 Placed: " + order.getCreatedAt());
+            createdLabel.setStyle("-fx-font-size: 12px; -fx-text-fill: #7f8c8d;");
 
-            String status = order.get("status").asText();
-            if ("waiting".equalsIgnoreCase(status)) {
-                HBox btnBox = new HBox(10);
-                btnBox.setAlignment(Pos.CENTER_RIGHT);
+            Label feeLabel = new Label("📦 Fees: " + (order.getTaxFee() + order.getAdditionalFee() + order.getCourierFee()) );
+            feeLabel.setStyle("-fx-font-size: 13px; -fx-text-fill: #2c3e50;");
 
-                Button accept = new Button("Accept");
-                accept.setStyle("-fx-background-color: #27ae60; -fx-text-fill: white; -fx-background-radius: 6;");
-                accept.setOnAction(e -> updateOrderStatus(order.get("id").asInt(), "preparing"));
-
-                Button decline = new Button("Decline");
-                decline.setStyle("-fx-background-color: #c0392b; -fx-text-fill: white; -fx-background-radius: 6;");
-                decline.setOnAction(e -> updateOrderStatus(order.get("id").asInt(), "cancelled"));
-
-                btnBox.getChildren().addAll(accept, decline);
-                card.getChildren().add(btnBox);
-            }
-
+            VBox.setMargin(idLabel, new Insets(0, 0, 5, 0));
+            card.getChildren().addAll(idLabel, priceLabel, feeLabel, statusLabel, createdLabel);
             ordersContainer.getChildren().add(card);
         }
     }
 
-    /** Send PATCH to update order status, then refresh list **/
-    private void updateOrderStatus(int orderId, String newStatus) {
-        new Thread(() -> {
-            try {
-                URL url = new URL("http://localhost:8080/restaurants/orders/" + orderId);
-                HttpURLConnection conn = (HttpURLConnection) url.openConnection();
-                conn.setRequestMethod("PATCH");
-                conn.setRequestProperty("Authorization", "Bearer " + SessionManager.getAuthToken());
-                conn.setRequestProperty("Content-Type", "application/json");
-                conn.setDoOutput(true);
+    private void handleOrderClick(Order order) {
+        PayOrderController controller = SceneNavigator.switchToWithController(
+                "/frontend/payOrder.fxml",
+                ordersContainer,
+                PayOrderController.class
+        );
 
-                String body = "{\"status\":\"" + newStatus + "\"}";
-                try (OutputStream os = conn.getOutputStream()) {
-                    os.write(body.getBytes());
-                }
-                int code = conn.getResponseCode();
-                System.out.println("PATCH status code: " + code);
 
-                // Refresh on success
-                if (code >= 200 && code < 300) {
-                    Platform.runLater(this::fetchOrders);
-                }
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        }).start();
+        if (controller != null) {
+            controller.setOrder(order,restaurant ,3);
+        }
     }
+
+
 
     @FXML
     private void handleBack(ActionEvent event) {
-        SceneNavigator.switchTo("/frontend/MyRestaurants.fxml",ordersContainer);
+        SceneNavigator.switchTo("/frontend/MyRestaurants.fxml", ordersContainer);
     }
 }
