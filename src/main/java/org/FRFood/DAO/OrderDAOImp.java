@@ -195,7 +195,7 @@ public class OrderDAOImp implements OrderDAO {
         order.setPayPrice(rs.getInt("pay_price"));
 
         // Normalize status enum (handles spaces like "unpaid and cancelled")
-        String statusStr = rs.getString("status").replace(" ", "_").toUpperCase();
+        String statusStr = rs.getString("status").replace(" ", "_");
         order.setStatus(Status.valueOf(statusStr));
 
         order.setCreatedAt(rs.getString("created_at"));
