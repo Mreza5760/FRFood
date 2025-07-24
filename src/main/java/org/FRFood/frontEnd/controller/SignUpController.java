@@ -1,13 +1,17 @@
 package org.FRFood.frontEnd.controller;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.stage.FileChooser;
 import javafx.event.ActionEvent;
+import org.FRFood.entity.Role;
+import org.FRFood.entity.User;
 import org.FRFood.frontEnd.Util.SceneNavigator;
+import org.FRFood.frontEnd.Util.SessionManager;
 
 import java.io.*;
 import java.net.HttpURLConnection;
@@ -19,16 +23,26 @@ import java.util.Map;
 
 public class SignUpController {
 
-    @FXML private TextField fullNameField;
-    @FXML private PasswordField passwordField;
-    @FXML private TextField phoneNumberField;
-    @FXML private ComboBox<String> roleField;
-    @FXML private TextField bankNameField;
-    @FXML private TextField bankAccountField;
-    @FXML private TextField emailField;
-    @FXML private TextField addressField;
-    @FXML private TextField profileField;
-    @FXML private Label messageLabel;
+    @FXML
+    private TextField fullNameField;
+    @FXML
+    private PasswordField passwordField;
+    @FXML
+    private TextField phoneNumberField;
+    @FXML
+    private ComboBox<String> roleField;
+    @FXML
+    private TextField bankNameField;
+    @FXML
+    private TextField bankAccountField;
+    @FXML
+    private TextField emailField;
+    @FXML
+    private TextField addressField;
+    @FXML
+    private TextField profileField;
+    @FXML
+    private Label messageLabel;
 
     private String base64ProfileImage = null;
 
@@ -61,11 +75,23 @@ public class SignUpController {
             if (responseCode == 200) {
                 showAlert(Alert.AlertType.INFORMATION, "Registration Successful",
                         "Successfully signed up");
-                SceneNavigator.switchTo("/frontend/panel.fxml", messageLabel);
+                ObjectMapper mapper = new ObjectMapper();
+                Map<String, Object> map = mapper.readValue(conn.getInputStream(), new TypeReference<Map<String, Object>>() {
+                });
+
+                User user = mapper.convertValue(map.get("user"), User.class);
+                String token = (String) map.get("token");
+
+                SessionManager.setCurrentUser(user);
+                SessionManager.setAuthToken(token);
+                if (user.getRole() == Role.buyer) {
+                    SceneNavigator.switchTo("/frontend/panel.fxml", messageLabel);
+                } else {
+                    SceneNavigator.switchTo("/frontend/login.fxml", messageLabel);
+                }
             } else {
                 handleError(conn);
             }
-
             conn.disconnect();
         } catch (Exception e) {
             messageLabel.setStyle("-fx-text-fill: red;");

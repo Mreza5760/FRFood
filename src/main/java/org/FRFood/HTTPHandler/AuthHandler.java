@@ -89,12 +89,12 @@ public class AuthHandler implements HttpHandler {
             }
 
             int userId = userDAO.insert(user);
-
+            user.setId(userId);
             String token = JwtUtil.generateToken(user);
 
             Map<String, Object> responseBody = new HashMap<>();
             responseBody.put("message", "User registered successfully");
-            responseBody.put("user_id", userId);
+            responseBody.put("user", user);
             responseBody.put("token", token);
             String jsonResponse = objectMapper.writeValueAsString(responseBody);
             JsonResponse.sendJsonResponse(exchange, 200, jsonResponse);
