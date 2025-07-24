@@ -19,7 +19,7 @@ public class App extends Application {
         FXMLLoader loader = new FXMLLoader(getClass().getResource("/frontEnd/home.fxml"));
         Scene scene = new Scene(loader.load(), 900, 700);
 
-        primaryStage.setTitle("Frfood");
+        primaryStage.setTitle("FRFood");
         primaryStage.setScene(scene);
 
         primaryStage.show();
