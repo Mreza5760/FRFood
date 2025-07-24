@@ -96,6 +96,14 @@ CREATE TABLE IF NOT EXISTS Coupons
     created_at  TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
+CREATE TABLE IF NOT EXISTS Coupon_User (
+    coupon_id   INTEGER,
+    user_id     INTEGER,
+    used_time   INTEGER,
+    FOREIGN KEY (coupon_id) REFERENCES Coupons (id) ON DELETE CASCADE,
+    FOREIGN KEY (user_id) REFERENCES Users (id) ON DELETE CASCADE
+);
+
 CREATE TABLE IF NOT EXISTS Orders
 (
     id               INTEGER AUTO_INCREMENT PRIMARY KEY,
