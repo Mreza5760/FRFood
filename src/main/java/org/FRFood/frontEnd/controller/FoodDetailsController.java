@@ -138,7 +138,7 @@ public class FoodDetailsController {
         Button updateButton = new Button("Update");
         updateButton.setStyle("-fx-background-color: #00aa88; -fx-text-fill: white; -fx-font-weight: bold; -fx-background-radius: 8;");
         updateButton.setOnAction(e -> {
-            // TODO: Navigate to update page
+            handleUpdateButton(rate);
         });
 
         Button deleteButton = new Button("Delete");
@@ -194,6 +194,18 @@ public class FoodDetailsController {
 
         // Add to container
         rateListContainer.getChildren().add(card);
+    }
+
+    private void handleUpdateButton(Rate rating) {
+        UpdateRatingController.RatingData data = new UpdateRatingController.RatingData();
+        data.id = rating.getId();
+        data.order_id = rating.getOrderId();
+        data.rating = rating.getRating();
+        data.comment = rating.getComment();
+        data.imageBase64 = rating.getImages();
+
+        UpdateRatingController.setRatingData(data);
+        SceneNavigator.switchTo("/frontend/updateRating.fxml",itemDescriptionLabel);
     }
 
     private void handleDeleteButton(Rate rate) {

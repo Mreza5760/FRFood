@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.geometry.Insets?>
+<?import javafx.geometry.Pos?>
+
+<VBox xmlns="http://javafx.com/javafx"
+      xmlns:fx="http://javafx.com/fxml"
+      fx:controller="org.FRFood.frontEnd.controller.UpdateRatingController"
+      alignment="CENTER" spacing="20"
+      style="-fx-background-color: linear-gradient(to bottom, #eef3f9, #dbe5f1); -fx-padding: 40;">
+
+    <Label text="✏️ Update Your Review"
+           style="-fx-font-size: 26px; -fx-font-weight: bold; -fx-text-fill: #1e2a38;"/>
+
+    <HBox fx:id="starBox" alignment="CENTER" spacing="10"/>
+
+    <TextArea fx:id="commentArea" prefHeight="100" prefWidth="400"
+              promptText="Update your comment..."
+              style="-fx-font-size: 14px; -fx-padding: 10; -fx-background-radius: 6;"/>
+
+    <FlowPane fx:id="imagePreviewPane" hgap="10" vgap="10" prefWrapLength="400"/>
+
+    <HBox alignment="CENTER" spacing="15">
+        <Button text="Add Images" onAction="#handleAddImages"
+                style="-fx-background-color: #00aa88; -fx-text-fill: white; -fx-font-weight: bold; -fx-background-radius: 8;"/>
+        <Button text="Update Review" onAction="#handleSubmitUpdate"
+                style="-fx-background-color: #0077cc; -fx-text-fill: white; -fx-font-weight: bold; -fx-background-radius: 8;"/>
+    </HBox>
+
+</VBox>

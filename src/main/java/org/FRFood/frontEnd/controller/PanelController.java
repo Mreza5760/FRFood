@@ -142,7 +142,8 @@ public class PanelController {
     }
 
     private void handleFavorites() {
-        SceneNavigator.switchTo("/frontEnd/favorites.fxml", favoriteRestaurantsButton);
+        AllRestaurantsController.setMode(2);
+        SceneNavigator.switchTo("/frontEnd/allRestaurants.fxml", favoriteRestaurantsButton);
         System.out.println("Navigated to Favorite Restaurants");
     }
 

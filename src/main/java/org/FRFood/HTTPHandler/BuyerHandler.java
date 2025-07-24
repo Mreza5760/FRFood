@@ -400,7 +400,7 @@ public class BuyerHandler implements HttpHandler {
             userDAO.insertFavorite(user.getId(), restaurantOpt.get());
             JsonResponse.sendJsonResponse(exchange, 200, "{\"message\":\"Added to favorites\"}");
         } catch (Exception e) {
-            HttpError.internal(exchange, "Internal server error");
+            HttpError.internal(exchange, "Internal server error"+e.getMessage());
         }
     }
 
@@ -433,7 +433,7 @@ public class BuyerHandler implements HttpHandler {
             userDAO.deleteFavorite(user.getId(), restaurant);
             JsonResponse.sendJsonResponse(exchange, 200, "{\"message\":\"Removed from favorites\"}");
         } catch (Exception e) {
-            HttpError.internal(exchange, "Internal server error");
+            HttpError.internal(exchange, "Internal server error" + e.getMessage());
         }
     }
 

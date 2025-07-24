@@ -92,5 +92,12 @@ public class Restaurant {
     public void setTaxFee(Integer taxFee) {
         this.taxFee = taxFee;
     }
-}
 
+    @Override
+    public boolean equals(Object obj) {
+        if(!(obj instanceof Restaurant)) {
+            return false;
+        }
+        return this.getId().equals(((Restaurant)obj).getId());
+    }
+}

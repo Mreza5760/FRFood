@@ -32,9 +32,14 @@ public class BuyerOrderPageController {
                 SceneNavigator.switchTo("/frontEnd/cart.fxml", myOrdersButton)
         );
         restaurantButton.setOnAction(event ->
-                SceneNavigator.switchTo("/frontEnd/allRestaurants.fxml", restaurantButton)
+                handleRestaurantButton()
         );
 
+    }
+
+    private void handleRestaurantButton() {
+        AllRestaurantsController.setMode(1);
+        SceneNavigator.switchTo("/frontEnd/allRestaurants.fxml", restaurantButton);
     }
 
     private void handleOrderHistoryButtonClick() {
