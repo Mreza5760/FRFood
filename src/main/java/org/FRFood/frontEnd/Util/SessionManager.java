@@ -40,5 +40,4 @@ public class SessionManager {
     public static Map<Integer, Order> getOrderList() {
         return orderList;
     }
-
 }

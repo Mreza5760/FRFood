@@ -3,7 +3,6 @@
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
-<?import javafx.geometry.Pos?>
 
 <ScrollPane xmlns="http://javafx.com/javafx"
             xmlns:fx="http://javafx.com/fxml"
@@ -35,8 +34,8 @@
 
         <Button text="Log In"
                 onAction="#handleLogin"
-                prefWidth="140" prefHeight="40"
-                style="-fx-background-color: #0077cc; -fx-text-fill: white; -fx-font-size: 14px; -fx-font-weight: bold; -fx-background-radius: 8; fx-cursor: hand;"/>
+                prefWidth="160" prefHeight="45"
+                style="-fx-background-color: #0077cc; -fx-text-fill: white; -fx-font-size: 15px; -fx-font-weight: bold; -fx-background-radius: 10; -fx-padding: 10 30;"/>
 
         <Hyperlink text="Don't have an account? Sign up"
                    onAction="#goToSignUp"

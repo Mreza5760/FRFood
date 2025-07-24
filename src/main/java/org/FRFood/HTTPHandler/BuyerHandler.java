@@ -644,8 +644,95 @@ public class BuyerHandler implements HttpHandler {
         }
     }
 
-    // TODO
     private void checkCoupon(HttpExchange exchange) throws IOException {
+        var userOpt = Authenticate.authenticate(exchange);
+        if (userOpt.isEmpty()) return;
+        User user = userOpt.get();
+        if (!user.getRole().equals(buyer)) {
+            HttpError.unauthorized(exchange, "Only buyers can check coupons");
+            return;
+        }
 
+        String couponCode;
+        String query = exchange.getRequestURI().getQuery();
+        if (query != null && !query.isEmpty()) {
+            String[] parts = query.split("&");
+            Map<String, String> params = new HashMap<>();
+            for (String part : parts) {
+                String[] keyValue = part.split("=");
+                params.put(keyValue[0], keyValue[1]);
+            }
+            if (!params.containsKey("coupon_code")) {
+                HttpError.badRequest(exchange, "Coupon code not found");
+                return;
+            }
+            couponCode = params.get("coupon_code");
+        } else {
+            HttpError.badRequest(exchange, "Coupon code not found");
+            return;
+        }
+        try {
+            CouponDAO couponDAO = new CouponDAOImp();
+            Optional<Coupon> optionalCoupon = couponDAO.getByCode(couponCode);
+            if (optionalCoupon.isEmpty()) {
+                HttpError.notFound(exchange, "Coupon not found");
+                return;
+            }
+            Coupon coupon = optionalCoupon.get();
+            coupon.setUserCount(couponDAO.getUserCount(coupon.getId(), user.getId()));
+
+            String json =  objectMapper.writeValueAsString(coupon);
+            JsonResponse.sendJsonResponse(exchange, 200, json);
+        } catch (SQLException e) {
+            HttpError.internal(exchange, "Internal server error");
+        }
+    }
+
+    private void topRestaurants(HttpExchange exchange) throws IOException {
+        var userOpt = Authenticate.authenticate(exchange);
+        if (userOpt.isEmpty()) return;
+        User user = userOpt.get();
+        if (!user.getRole().equals(buyer)) {
+            HttpError.unauthorized(exchange, "Only buyers can top restaurants");
+            return;
+        }
+
+        try {
+            List<Restaurant> allRestaurants = restaurantDAO.searchByString("");
+            List<Restaurant> topRestaurants = new ArrayList<>();
+//            for (Restaurant restaurant : allRestaurants) {
+//                List<Order> orders = orderDAO.getRestaurantOrders(restaurant.getId());
+//                int avg = 0;
+//                for (Order order : orders) {
+//                    List<Rate> rates = rate
+//                }
+//            }
+        } catch (SQLException e) {
+            HttpError.internal(exchange, "Internal server error");
+        }
+    }
+
+    private void topFoods(HttpExchange exchange) throws IOException {
+        var userOpt = Authenticate.authenticate(exchange);
+        if (userOpt.isEmpty()) return;
+        User user = userOpt.get();
+        if (!user.getRole().equals(buyer)) {
+            HttpError.unauthorized(exchange, "Only buyers can top restaurants");
+            return;
+        }
+
+        try {
+            List<Restaurant> allRestaurants = restaurantDAO.searchByString("");
+            List<Restaurant> topRestaurants = new ArrayList<>();
+//            for (Restaurant restaurant : allRestaurants) {
+//                List<Order> orders = orderDAO.getRestaurantOrders(restaurant.getId());
+//                int avg = 0;
+//                for (Order order : orders) {
+//                    List<Rate> rates = rate
+//                }
+//            }
+        } catch (SQLException e) {
+            HttpError.internal(exchange, "Internal server error");
+        }
     }
 }

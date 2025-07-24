@@ -4,7 +4,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 
 public class Coupon {
     @JsonProperty("coupon_id")
-    private Integer couponId;
+    private Integer id;
     @JsonProperty("coupon_code")
     private String couponCode;
     private CouponType type;
@@ -18,12 +18,12 @@ public class Coupon {
     @JsonProperty("end_date")
     private String endDate;
 
-    public Integer getCouponId() {
-        return couponId;
+    public Integer getId() {
+        return id;
     }
 
-    public void setCouponId(Integer couponId) {
-        this.couponId = couponId;
+    public void setId(Integer id) {
+        this.id = id;
     }
 
     public String getCouponCode() {
