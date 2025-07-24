@@ -1,23 +1,23 @@
 package org.FRFood.frontEnd.controller;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.stage.FileChooser;
-import java.io.*;
-import java.nio.file.Files;
-import java.util.Base64;
-import javafx.application.Platform;
 import org.FRFood.entity.Restaurant;
 import org.FRFood.frontEnd.Util.SceneNavigator;
 import org.FRFood.frontEnd.Util.SessionManager;
 
+import java.io.*;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.nio.file.Files;
+import java.util.Base64;
 
 public class CreateRestaurantController {
 
-    public Button backButton;
     @FXML private TextField nameField;
     @FXML private TextField addressField;
     @FXML private TextField phoneField;
@@ -27,6 +27,7 @@ public class CreateRestaurantController {
     @FXML private Label logoStatusLabel;
     @FXML private Button submitButton;
     @FXML private Label responseLabel;
+    @FXML private Button backButton;
 
     private String logoBase64 = "";
 
@@ -34,6 +35,7 @@ public class CreateRestaurantController {
     public void initialize() {
         uploadLogoButton.setOnAction(e -> handleLogoUpload());
         submitButton.setOnAction(e -> handleSubmit());
+        backButton.setOnAction(e -> goBack());
     }
 
     private void handleLogoUpload() {
@@ -44,33 +46,50 @@ public class CreateRestaurantController {
             try {
                 byte[] bytes = Files.readAllBytes(file.toPath());
                 logoBase64 = Base64.getEncoder().encodeToString(bytes);
-                logoStatusLabel.setText("✔ Image selected");
+                Platform.runLater(() -> logoStatusLabel.setText("✔ Image selected"));
             } catch (IOException ex) {
-                logoStatusLabel.setText("✘ Error reading file");
+                Platform.runLater(() -> logoStatusLabel.setText("✘ Error reading file"));
             }
         }
     }
 
     private void handleSubmit() {
-        String name = nameField.getText();
-        String address = addressField.getText();
-        String phone = phoneField.getText();
-        double taxFee = parseDoubleSafe(taxFeeField.getText());
-        double additionalFee = parseDoubleSafe(additionalFeeField.getText());
+        String name = nameField.getText().trim();
+        String address = addressField.getText().trim();
+        String phone = phoneField.getText().trim();
+        String taxFeeStr = taxFeeField.getText().trim();
+        String additionalFeeStr = additionalFeeField.getText().trim();
 
-        // Create a request object
-        Restaurant request = new Restaurant();
-        request.setName(name);
-        request.setAddress(address);
-        request.setPhone(phone);
-        request.setLogo(logoBase64);
-        request.setTaxFee((int)taxFee);
-        request.setAdditionalFee((int)additionalFee);
+        if (name.isEmpty() || address.isEmpty() || phone.isEmpty() || taxFeeStr.isEmpty() || additionalFeeStr.isEmpty()) {
+            showError("⚠ Please fill in all fields.");
+            return;
+        }
+
+        if (!phone.matches("^\\+?\\d{10,15}$")) {
+            showError("Invalid phone number");
+            return;
+        }
+
+        int taxFee = parseIntSafe(taxFeeStr);
+        int additionalFee = parseIntSafe(additionalFeeStr);
+        if (taxFee < 0 || additionalFee < 0) {
+            showError("⚠ Tax Fee and Additional Fee must be valid integers (≥ 0).");
+            return;
+        }
+
+        Restaurant restaurant = new Restaurant();
+        restaurant.setName(name);
+        restaurant.setAddress(address);
+        restaurant.setPhone(phone);
+        restaurant.setLogo(logoBase64);
+        restaurant.setTaxFee(taxFee);
+        restaurant.setAdditionalFee(additionalFee);
 
         new Thread(() -> {
             try {
-                ObjectMapper objectMapper = new ObjectMapper();
-                String json = objectMapper.writeValueAsString(request);
+                ObjectMapper mapper = new ObjectMapper();
+                String json = mapper.writeValueAsString(restaurant);
+
                 URL url = new URL("http://localhost:8080/restaurants");
                 HttpURLConnection conn = (HttpURLConnection) url.openConnection();
                 conn.setRequestMethod("POST");
@@ -79,37 +98,61 @@ public class CreateRestaurantController {
                 conn.setDoOutput(true);
 
                 try (OutputStream os = conn.getOutputStream()) {
-                    byte[] input = json.getBytes("utf-8");
-                    os.write(input, 0, input.length);
+                    os.write(json.getBytes());
                 }
 
-                int responseCode = conn.getResponseCode();
-                String mess = conn.getResponseMessage();
-                Platform.runLater(() -> {
-                    if (responseCode == 200 || responseCode == 201) {
+                int status = conn.getResponseCode();
+
+                if (status == 200 || status == 201) {
+                    Platform.runLater(() -> {
                         responseLabel.setStyle("-fx-text-fill: #00aa88;");
                         responseLabel.setText("✅ Restaurant created successfully!");
-                    } else {
-                        responseLabel.setText("❌ Failed to create restaurant (Code " + responseCode+ ")" + mess);
+                        clearFields();
+                    });
+                } else {
+                    String backendError = "Failed to create restaurant";
+                    InputStream errorStream = conn.getErrorStream();
+                    if (errorStream != null) {
+                        JsonNode errorNode = mapper.readTree(errorStream);
+                        if (errorNode.has("error")) {
+                            backendError = errorNode.get("error").asText();
+                        }
                     }
-                });
+                    String finalError = backendError;
+                    Platform.runLater(() -> showError(finalError));
+                }
 
             } catch (IOException e) {
-                Platform.runLater(() -> responseLabel.setText("❌ Error: " + e.getMessage()));
+                Platform.runLater(() -> showError("Error: " + e.getMessage()));
             }
         }).start();
     }
 
-
-    private double parseDoubleSafe(String text) {
+    private int parseIntSafe(String text) {
         try {
-            return Double.parseDouble(text);
+            return Integer.parseInt(text);
         } catch (NumberFormatException e) {
-            return 0;
+            return -1;
         }
     }
+
+    private void showError(String message) {
+        responseLabel.setStyle("-fx-text-fill: red;");
+        responseLabel.setText("❌ " + message);
+    }
+
+    private void clearFields() {
+        nameField.clear();
+        addressField.clear();
+        phoneField.clear();
+        taxFeeField.clear();
+        additionalFeeField.clear();
+        logoStatusLabel.setText("");
+        logoBase64 = "";
+    }
+
     @FXML
     private void goBack() {
-        SceneNavigator.switchTo("/frontEnd/panel.fxml",nameField);
+        SceneNavigator.switchTo("/frontend/panel.fxml", nameField);
     }
 }

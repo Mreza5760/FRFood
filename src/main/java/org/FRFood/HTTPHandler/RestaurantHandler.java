@@ -93,7 +93,7 @@ public class RestaurantHandler implements HttpHandler {
                 return;
             }
             if (!validatePhone(restaurant.getPhone())) {
-                HttpError.unsupported(exchange, "Invalid phone number");
+                HttpError.badRequest(exchange, "Invalid phone number");
                 return;
             }
             restaurant.setId(restaurantDAO.insert(restaurant, user.getId()));
