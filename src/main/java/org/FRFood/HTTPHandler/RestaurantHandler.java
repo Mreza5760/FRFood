@@ -169,7 +169,7 @@ public class RestaurantHandler implements HttpHandler {
             List<Order> orders = orderDAO.getRestaurantOrders(restaurantId);
             for (Order order : orders) {
                 if (order.getStatus() != Status.cancelled && order.getStatus() != Status.completed) {
-                    HttpError.badRequest(exchange, "Invalid order status");
+                    HttpError.badRequest(exchange, "This Restraint have active orders");
                     return;
                 }
             }

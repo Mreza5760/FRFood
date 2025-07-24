@@ -9,6 +9,7 @@ import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.image.Image;
@@ -82,19 +83,17 @@ public class MyRestaurantsController {
         card.setStyle("-fx-background-color: white; -fx-background-radius: 12; -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.1), 10, 0, 0, 6);");
         card.setPrefWidth(600);
 
-        // Logo
         ImageView logo = new ImageView();
         try {
             byte[] imageData = Base64.getDecoder().decode(r.getLogo());
             logo.setImage(new Image(new ByteArrayInputStream(imageData)));
         } catch (Exception e) {
-            logo.setImage(null); // fallback if needed
+            logo.setImage(null);
         }
         logo.setFitWidth(80);
         logo.setFitHeight(80);
         logo.setPreserveRatio(true);
 
-        // Info
         VBox info = new VBox(8);
         info.setAlignment(Pos.CENTER_LEFT);
 
@@ -115,7 +114,6 @@ public class MyRestaurantsController {
         Region spacer = new Region();
         HBox.setHgrow(spacer, Priority.ALWAYS);
 
-        // order button
         Button orderBtn = new Button("Orders");
         orderBtn.setPrefWidth(100);
         orderBtn.setPrefHeight(36);
@@ -129,7 +127,6 @@ public class MyRestaurantsController {
                 """);
         orderBtn.setOnAction(e -> handleOrder(r));
 
-        // Update Button
         Button updateBtn = new Button("Update");
         updateBtn.setPrefWidth(100);
         updateBtn.setPrefHeight(36);
@@ -143,7 +140,6 @@ public class MyRestaurantsController {
                 """);
         updateBtn.setOnAction(e -> handleUpdate(r));
 
-// Delete Button
         Button deleteBtn = new Button("Delete");
         deleteBtn.setPrefWidth(100);
         deleteBtn.setPrefHeight(36);
@@ -157,12 +153,11 @@ public class MyRestaurantsController {
                 """);
         deleteBtn.setOnAction(e -> handleDelete(r));
 
-// Add both buttons to VBox
         HBox rightBox = new HBox(10,orderBtn, updateBtn, deleteBtn);
         rightBox.setAlignment(Pos.CENTER_RIGHT);
 
 
-        card.setOnMouseClicked(e -> handleClick(r)); // full card click
+        card.setOnMouseClicked(e -> handleClick(r));
 
         card.getChildren().addAll(logo, info, spacer, rightBox);
         return card;
@@ -240,10 +235,18 @@ public class MyRestaurantsController {
                     fetchRestaurants();
                     if (response.statusCode() == 200 || response.statusCode() == 204) {
                         System.out.println("Deleted restaurant: " + r.getName());
-                        // Optionally refresh the list on UI thread
                         Platform.runLater(this::fetchRestaurants);
                     } else {
                         System.err.println("Failed to delete restaurant: HTTP " + response.statusCode());
+                        String errorMessage = response.body(); // assuming 'response' is HttpResponse<String>
+                        Platform.runLater(() -> {
+                            Alert alert = new Alert(Alert.AlertType.ERROR);
+                            alert.setTitle("Delete Failed");
+                            alert.setHeaderText("Restaurant Deletion Error");
+                            alert.setContentText("Failed to delete restaurant.\nError " + response.statusCode() + "\nDetails: " + errorMessage);
+                            alert.showAndWait();
+                        });
+
                     }
                 })
                 .exceptionally(e -> {
