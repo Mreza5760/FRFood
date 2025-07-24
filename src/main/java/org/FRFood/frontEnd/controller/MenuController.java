@@ -46,13 +46,11 @@ public class MenuController {
 
     private static Role userRole;
     private static User currentUser;
-    private static int menuId;
     private static String menuTitle;
     private static Restaurant restaurant;
     public Button addFoodsButton;
 
-    public static void setData(int menuId, String menuTitle, Restaurant inRestaurant) {
-        MenuController.menuId = menuId;
+    public static void setData(String menuTitle, Restaurant inRestaurant) {
         MenuController.menuTitle = menuTitle;
         MenuController.restaurant = inRestaurant;
     }
@@ -64,7 +62,7 @@ public class MenuController {
 
     @FXML
     public void addFood(ActionEvent actionEvent) {
-        AddFoodToMenuController.setData(menuId, menuTitle, restaurant.getId());
+        AddFoodToMenuController.setData( menuTitle, restaurant.getId());
         SceneNavigator.switchTo("/frontend/addFoodToMenu.fxml", menu_name_label);
     }
 

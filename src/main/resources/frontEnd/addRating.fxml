@@ -12,6 +12,13 @@
       alignment="CENTER" spacing="30"
       style="-fx-background-color: linear-gradient(to bottom, #eef3f9, #dbe5f1);">
 
+    <HBox alignment="TOP_LEFT">
+        <Button text="⬅ Back"
+                onAction="#handleBack"
+                style="-fx-background-color: #d9534f; -fx-text-fill: white; -fx-font-weight: bold; -fx-background-radius: 8;"
+                prefWidth="100" prefHeight="30"/>
+    </HBox>
+
     <padding>
         <Insets top="60" right="50" bottom="60" left="50"/>
     </padding>

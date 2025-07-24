@@ -54,7 +54,7 @@ public class MenuBuyerController {
 
     @FXML
     public void addFood(ActionEvent actionEvent) {
-        AddFoodToMenuController.setData(menuId,menuTitle,restaurantId);
+        AddFoodToMenuController.setData(menuTitle,restaurantId);
         SceneNavigator.switchTo("/frontend/addFoodToMenu.fxml",menu_name_label);
     }
 

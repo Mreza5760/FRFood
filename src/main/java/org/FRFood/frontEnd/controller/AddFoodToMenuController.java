@@ -43,12 +43,10 @@ public class AddFoodToMenuController {
 
     private final ObjectMapper mapper = new ObjectMapper();
 
-    private static int menuId;
     private static String menuTitle;
     private static int restaurantId;
 
-    public static void setData(int menu_id, String menu_Title, int restaurant_Id) {
-        menuId = menu_id;
+    public static void setData( String menu_Title, int restaurant_Id) {
         menuTitle = menu_Title;
         restaurantId = restaurant_Id;
     }

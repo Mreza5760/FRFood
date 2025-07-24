@@ -62,8 +62,13 @@ public class PanelController {
 
         // Admin placeholders
         usersButton.setOnAction(e -> handleAllUsers());
-        ordersButton.setOnAction(e -> System.out.println("Orders clicked"));
+        ordersButton.setOnAction(e -> adminOrderButtonClick());
         transactionsButton.setOnAction(e -> handleTransactions());
+    }
+
+    private void adminOrderButtonClick() {
+        OrderHistoryController.setMode(5);
+        SceneNavigator.switchTo("/frontend/orderHistory.fxml",restaurantButton);
     }
 
     private void handleDeliveriesHistory() {

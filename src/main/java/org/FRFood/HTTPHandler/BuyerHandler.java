@@ -444,33 +444,24 @@ public class BuyerHandler implements HttpHandler {
             HttpError.unauthorized(exchange, "Only buyers can submit rate");
             return;
         }
-
         Rate rate = objectMapper.readValue(exchange.getRequestBody(), Rate.class);
 
         if (rate.getRating() == null || rate.getComment() == null || rate.getRating() < 0 || rate.getRating() > 5) {
             HttpError.badRequest(exchange, "Invalid rate");
             return;
         }
-
         try {
             rate.setUserId(user.getId());
             rate.setId(rateDAO.insert(rate));
             String json = objectMapper.writeValueAsString(rate);
             JsonResponse.sendJsonResponse(exchange, 200, json);
+
         } catch (Exception e) {
-              HttpError.internal(exchange, "Internal server error");
+              HttpError.internal(exchange, "Internal server error" + e.getMessage());
         }
     }
 
     private void handeGetFoodRates(HttpExchange exchange) throws IOException {
-        var userOpt = Authenticate.authenticate(exchange);
-        if (userOpt.isEmpty()) return;
-        User user = userOpt.get();
-        if (!user.getRole().equals(buyer)) {
-            HttpError.unauthorized(exchange, "Only buyers can get food rates");
-            return;
-        }
-
         String path = exchange.getRequestURI().getPath();
         String[] parts = path.split("/");
         int foodId = Integer.parseInt(parts[3]);
