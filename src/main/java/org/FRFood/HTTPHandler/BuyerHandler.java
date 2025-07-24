@@ -57,7 +57,7 @@ public class BuyerHandler implements HttpHandler {
                     else if (path.equals("/orders/history")) handleOrdersHistory(exchange);
                     else if (path.equals("/favorites")) handleGetFavorites(exchange);
                     else if (path.matches("^/ratings/items/\\d+$")) handeGetFoodRates(exchange);
-                    else if (path.matches("^/ratings/user/\\d+/\\d+$")) doesHaveRate(exchange);
+                    else if (path.matches("^/ratings/user/\\d+$")) doesHaveRate(exchange);
                     else if (path.matches("^/orders/\\d+$")) handleGetOrder(exchange);
                     else if (path.matches("^/ratings/\\d+$")) handleGetRate(exchange);
                     else if (path.equals("/coupons")) checkCoupon(exchange);
@@ -616,8 +616,7 @@ public class BuyerHandler implements HttpHandler {
 
         String path = exchange.getRequestURI().getPath();
         String[] parts = path.split("/");
-        int id = Integer.parseInt(parts[3]);
-        int orderID = Integer.parseInt(parts[4]);
+        int orderID = Integer.parseInt(parts[3]);
 
         try {
             List<Rate> rates = rateDAO.getUserRateOnOrder(user.getId(),  orderID);
