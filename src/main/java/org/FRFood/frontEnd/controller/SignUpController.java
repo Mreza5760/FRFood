@@ -2,56 +2,55 @@ package org.FRFood.frontEnd.controller;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
+import javafx.stage.FileChooser;
 import javafx.event.ActionEvent;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.FRFood.frontEnd.Util.SceneNavigator;
-import org.FRFood.frontEnd.Util.SessionManager;
 
+import java.io.*;
 import java.net.HttpURLConnection;
 import java.net.URL;
-import java.io.OutputStream;
+import java.nio.file.Files;
+import java.util.Base64;
 import java.util.HashMap;
 import java.util.Map;
 
 public class SignUpController {
 
-    @FXML
-    private TextField fullNameField;
-    @FXML
-    private PasswordField passwordField;
-    @FXML
-    private TextField phoneNumberField;
-    @FXML
-    private TextField roleField;
-    @FXML
-    private TextField bankNameField;
-    @FXML
-    private TextField bankAccountField;
-    @FXML
-    private TextField emailField;
-    @FXML
-    private TextField addressField;
-    @FXML
-    private TextField profileField;
-    @FXML
-    private Label messageLabel;
+    @FXML private TextField fullNameField;
+    @FXML private PasswordField passwordField;
+    @FXML private TextField phoneNumberField;
+    @FXML private ComboBox<String> roleField;
+    @FXML private TextField bankNameField;
+    @FXML private TextField bankAccountField;
+    @FXML private TextField emailField;
+    @FXML private TextField addressField;
+    @FXML private TextField profileField;
+    @FXML private Label messageLabel;
+
+    private String base64ProfileImage = null;
 
     private static final String REGISTER_URL = "http://localhost:8080/auth/register";
 
     @FXML
+    public void initialize() {
+        roleField.getItems().addAll("buyer", "seller", "courier");
+    }
+
+    @FXML
     private void handleRegister(ActionEvent event) {
         try {
-            String jsonRequest = getString();
-            // Send HTTP POST
-            if (!chek()) return;
+            if (!validateFields()) return;
+
+            String jsonRequest = buildRequestJson();
+
             URL url = new URL(REGISTER_URL);
             HttpURLConnection conn = (HttpURLConnection) url.openConnection();
             conn.setRequestMethod("POST");
             conn.setDoOutput(true);
             conn.setRequestProperty("Content-Type", "application/json");
-
 
             try (OutputStream os = conn.getOutputStream()) {
                 os.write(jsonRequest.getBytes());
@@ -60,21 +59,17 @@ public class SignUpController {
 
             int responseCode = conn.getResponseCode();
             if (responseCode == 200) {
-                showAlert(Alert.AlertType.INFORMATION, "Registration Successful", "Successfully signed up\n please login to get to your panel");
-                SceneNavigator.switchTo("/frontend/login.fxml", messageLabel);
+                showAlert(Alert.AlertType.INFORMATION, "Registration Successful",
+                        "Successfully signed up");
+                SceneNavigator.switchTo("/frontend/panel.fxml", messageLabel);
             } else {
-                ObjectMapper mapper = new ObjectMapper();
-                JsonNode node = mapper.readTree(conn.getErrorStream());
-                messageLabel.setStyle("-fx-text-fill: red;");
-                messageLabel.setText("Login failed: " + node.get("error").asText());
+                handleError(conn);
             }
 
             conn.disconnect();
-
         } catch (Exception e) {
-            System.out.println(e.getMessage());
             messageLabel.setStyle("-fx-text-fill: red;");
-            messageLabel.setText("Login failed: " + e);
+            messageLabel.setText("Registration failed: " + e.getMessage());
         }
     }
 
@@ -83,15 +78,33 @@ public class SignUpController {
         SceneNavigator.switchTo("/frontend/Login.fxml", messageLabel);
     }
 
-    private String getString() throws JsonProcessingException {
+    @FXML
+    private void chooseProfileImage() {
+        FileChooser fileChooser = new FileChooser();
+        fileChooser.setTitle("Choose Profile Picture");
+        fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("Image Files", "*.png", "*.jpg", "*.jpeg"));
+
+        File file = fileChooser.showOpenDialog(null);
+        if (file != null) {
+            try {
+                byte[] fileBytes = Files.readAllBytes(file.toPath());
+                base64ProfileImage = Base64.getEncoder().encodeToString(fileBytes);
+                profileField.setText(file.getName() + " (Image Selected)");
+            } catch (IOException e) {
+                profileField.setText("Failed to load image");
+            }
+        }
+    }
+
+    private String buildRequestJson() throws JsonProcessingException {
         Map<String, Object> userData = new HashMap<>();
         userData.put("full_name", fullNameField.getText());
         userData.put("password", passwordField.getText());
-        userData.put("email", emailField.getText());
+        userData.put("email", emailField.getText().isBlank() ? null : emailField.getText());
         userData.put("phone", phoneNumberField.getText());
-        userData.put("role", roleField.getText());
+        userData.put("role", roleField.getValue());
         userData.put("address", addressField.getText());
-        userData.put("profileImageBase64", profileField.getText());
+        userData.put("profileImageBase64", base64ProfileImage);
 
         Map<String, String> bank = new HashMap<>();
         bank.put("bank_name", bankNameField.getText());
@@ -103,28 +116,81 @@ public class SignUpController {
         return mapper.writeValueAsString(userData);
     }
 
-    private boolean chek() {
+    private boolean validateFields() {
         String name = fullNameField.getText().trim();
         String password = passwordField.getText().trim();
         String phone = phoneNumberField.getText().trim();
-        String role = roleField.getText().trim();
+        String role = roleField.getValue();
         String address = addressField.getText().trim();
         String bankAccount = bankAccountField.getText().trim();
         String bankName = bankNameField.getText().trim();
 
-        phoneNumberField.setStyle(phone.isEmpty() ? "-fx-border-color: red;" : null);
-        passwordField.setStyle(phone.isEmpty() ? "-fx-border-color: red;" : null);
-        fullNameField.setStyle(phone.isEmpty() ? "-fx-border-color: red;" : null);
-        roleField.setStyle(phone.isEmpty() ? "-fx-border-color: red;" : null);
-        addressField.setStyle(phone.isEmpty() ? "-fx-border-color: red;" : null);
-        bankAccountField.setStyle(phone.isEmpty() ? "-fx-border-color: red;" : null);
-        bankNameField.setStyle(phone.isEmpty() ? "-fx-border-color: red;" : null);
+        resetFieldStyles();
 
-        if (phone.isEmpty() || password.isEmpty() || name.isEmpty() || role.isEmpty() || address.isEmpty() || bankAccount.isEmpty() || bankName.isEmpty()) {
-            messageLabel.setText("Please fill in all fields.");
+        boolean valid = true;
+
+        if (name.isEmpty()) {
+            fullNameField.setStyle("-fx-border-color: red;");
+            valid = false;
+        }
+        if (password.isEmpty()) {
+            passwordField.setStyle("-fx-border-color: red;");
+            valid = false;
+        }
+        if (phone.isEmpty() || !phone.matches("^\\+?\\d{10,15}$")) {
+            phoneNumberField.setStyle("-fx-border-color: red;");
+            valid = false;
+        }
+        if (role == null) {
+            roleField.setStyle("-fx-border-color: red;");
+            valid = false;
+        }
+        if (address.isEmpty()) {
+            addressField.setStyle("-fx-border-color: red;");
+            valid = false;
+        }
+        if (bankAccount.isEmpty()) {
+            bankAccountField.setStyle("-fx-border-color: red;");
+            valid = false;
+        }
+        if (bankName.isEmpty()) {
+            bankNameField.setStyle("-fx-border-color: red;");
+            valid = false;
+        }
+
+        if (!valid) {
+            messageLabel.setText("Please fix highlighted fields.");
             return false;
         }
+
         return true;
+    }
+
+    private void handleError(HttpURLConnection conn) {
+        try {
+            ObjectMapper mapper = new ObjectMapper();
+            JsonNode node = mapper.readTree(conn.getErrorStream());
+            String error = node.has("error") ? node.get("error").asText() : "Unknown error";
+
+            if (error.toLowerCase().contains("phone")) {
+                phoneNumberField.setStyle("-fx-border-color: red;");
+            }
+
+            messageLabel.setStyle("-fx-text-fill: red;");
+            messageLabel.setText("Registration failed: " + error);
+        } catch (Exception e) {
+            messageLabel.setText("Registration failed (unknown error)");
+        }
+    }
+
+    private void resetFieldStyles() {
+        fullNameField.setStyle(null);
+        passwordField.setStyle(null);
+        phoneNumberField.setStyle(null);
+        roleField.setStyle(null);
+        addressField.setStyle(null);
+        bankAccountField.setStyle(null);
+        bankNameField.setStyle(null);
     }
 
     private void showAlert(Alert.AlertType type, String title, String content) {

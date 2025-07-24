@@ -22,8 +22,6 @@ public class SceneNavigator {
             double currentHeight = stage.getHeight();
 
             stage.setScene(new Scene(root));
-
-
             stage.setWidth(currentWidth);
             stage.setHeight(currentHeight);
 
@@ -46,8 +44,8 @@ public class SceneNavigator {
             stage.setScene(new Scene(root));
             stage.setWidth(currentWidth);
             stage.setHeight(currentHeight);
-            stage.show();
 
+            stage.show();
             return loader.getController();
         } catch (IOException e) {
             e.printStackTrace();

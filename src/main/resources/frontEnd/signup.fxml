@@ -18,23 +18,35 @@
         <Label text="📝 Create Your Account"
                style="-fx-font-size: 30px; -fx-text-fill: #1e2a38; -fx-font-weight: bold;"/>
 
-        <VBox spacing="12" style="-fx-background-color: white; -fx-padding: 20 25; -fx-background-radius: 12; -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.05), 10, 0, 0, 4);">
+        <VBox spacing="12"
+              style="-fx-background-color: white; -fx-padding: 20 25; -fx-background-radius: 12; -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.05), 10, 0, 0, 4);">
+
             <TextField fx:id="fullNameField" promptText="👤 Full Name"
                        style="-fx-background-radius: 8; -fx-padding: 8; -fx-font-size: 14px;"/>
             <TextField fx:id="phoneNumberField" promptText="📱 Phone Number"
                        style="-fx-background-radius: 8; -fx-padding: 8; -fx-font-size: 14px;"/>
-            <TextField fx:id="roleField" promptText="🔧 Role (e.g., user/admin)"
-                       style="-fx-background-radius: 8; -fx-padding: 8; -fx-font-size: 14px;"/>
+
+            <ComboBox fx:id="roleField" promptText="Select Role"
+                      style="-fx-background-radius: 8; -fx-padding: 8; -fx-font-size: 14px;"
+                      prefWidth="300"/>
+
             <TextField fx:id="bankNameField" promptText="🏦 Bank Name"
                        style="-fx-background-radius: 8; -fx-padding: 8; -fx-font-size: 14px;"/>
             <TextField fx:id="bankAccountField" promptText="💳 Bank Account Number"
                        style="-fx-background-radius: 8; -fx-padding: 8; -fx-font-size: 14px;"/>
-            <TextField fx:id="emailField" promptText="📧 Email"
+            <TextField fx:id="emailField" promptText="📧 Email (optional)"
                        style="-fx-background-radius: 8; -fx-padding: 8; -fx-font-size: 14px;"/>
             <TextField fx:id="addressField" promptText="🏠 Address"
                        style="-fx-background-radius: 8; -fx-padding: 8; -fx-font-size: 14px;"/>
-            <TextField fx:id="profileField" promptText="🌄 Profile Picture URL (optional)"
-                       style="-fx-background-radius: 8; -fx-padding: 8; -fx-font-size: 14px;"/>
+
+            <HBox spacing="10" alignment="CENTER_LEFT">
+                <TextField fx:id="profileField" promptText="🌄 Profile Picture (optional)"
+                           style="-fx-background-radius: 8; -fx-padding: 8; -fx-font-size: 14px;"
+                           editable="false" prefWidth="300"/>
+                <Button text="Choose Image" onAction="#chooseProfileImage"
+                        style="-fx-background-color: #0077cc; -fx-text-fill: white; -fx-background-radius: 6;"/>
+            </HBox>
+
             <PasswordField fx:id="passwordField" promptText="🔑 Password"
                            style="-fx-background-radius: 8; -fx-padding: 8; -fx-font-size: 14px;"/>
         </VBox>
@@ -43,7 +55,7 @@
                style="-fx-text-fill: red; -fx-font-size: 13px;"/>
 
         <Button text="Sign Up"
-                style="-fx-background-color: #0077cc; -fx-text-fill: white; -fx-font-size: 15px; -fx-font-weight: bold; -fx-background-radius: 10; -fx-padding: 10 30; fx-cursor: hand;"
+                style="-fx-background-color: #0077cc; -fx-text-fill: white; -fx-font-size: 15px; -fx-font-weight: bold; -fx-background-radius: 10; -fx-padding: 10 30;"
                 onAction="#handleRegister"/>
 
         <Hyperlink text="Already have an account? Log in"
