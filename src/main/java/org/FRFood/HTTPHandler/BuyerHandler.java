@@ -491,7 +491,7 @@ public class BuyerHandler implements HttpHandler {
                         return;
                     }
                     Food tempFood = optionalTempFood.get();
-                    if (tempFood.getId() == food.getId())
+                    if (tempFood.getId().equals(food.getId()))
                         found = true;
                 }
                 if (found) {
