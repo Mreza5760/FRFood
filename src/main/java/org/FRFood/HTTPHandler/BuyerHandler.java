@@ -474,7 +474,7 @@ public class BuyerHandler implements HttpHandler {
             }
 
             Food food = optionalFood.get();
-            List<Rate> rates = rateDAO.getAllRates(food);
+            List<Rate> rates = rateDAO.getAllRates();
             List<Rate> foodRates = new ArrayList<>();
             for (Rate rate : rates) {
                 Optional<Order> optionalOrder = orderDAO.getById(rate.getOrderId());
@@ -499,6 +499,7 @@ public class BuyerHandler implements HttpHandler {
                 }
             }
             String json = objectMapper.writeValueAsString(foodRates);
+            System.out.println(json);
             JsonResponse.sendJsonResponse(exchange, 200, json);
         } catch (Exception e) {
             HttpError.internal(exchange, "Internal server error");
