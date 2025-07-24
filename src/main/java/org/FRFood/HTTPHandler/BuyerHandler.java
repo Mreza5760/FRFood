@@ -400,7 +400,7 @@ public class BuyerHandler implements HttpHandler {
             userDAO.insertFavorite(user.getId(), restaurantOpt.get());
             JsonResponse.sendJsonResponse(exchange, 200, "{\"message\":\"Added to favorites\"}");
         } catch (Exception e) {
-            HttpError.internal(exchange, "Internal server error");
+            HttpError.internal(exchange, "Internal server error"+e.getMessage());
         }
     }
 
@@ -433,7 +433,7 @@ public class BuyerHandler implements HttpHandler {
             userDAO.deleteFavorite(user.getId(), restaurant);
             JsonResponse.sendJsonResponse(exchange, 200, "{\"message\":\"Removed from favorites\"}");
         } catch (Exception e) {
-            HttpError.internal(exchange, "Internal server error");
+            HttpError.internal(exchange, "Internal server error" + e.getMessage());
         }
     }
 
@@ -515,7 +515,7 @@ public class BuyerHandler implements HttpHandler {
             JsonNode avgNode = objectMapper.valueToTree(avg);
             root.set("avg_rating", avgNode);
             JsonNode ratesNode = objectMapper.valueToTree(foodRates);
-            root.set("rates", ratesNode);
+            root.set("comments", ratesNode);
             String json = objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(root);
 
             JsonResponse.sendJsonResponse(exchange, 200, json);
@@ -634,12 +634,13 @@ public class BuyerHandler implements HttpHandler {
         try {
             List<Rate> rates = rateDAO.getUserRateOnOrder(user.getId(),  orderID);
             if (rates.isEmpty()) {
-                JsonResponse.sendJsonResponse(exchange,200,"{\"message\":\"No\"}");
+                JsonResponse.sendJsonResponse(exchange,469,"{\"message\":\"No\"}");
             } else {
                 JsonResponse.sendJsonResponse(exchange,200,"{\"message\":\"Yes\"}");
             }
         } catch (SQLException e) {
-            HttpError.internal(exchange, "Internal server error");
+            HttpError.internal(exchange, "Internal server error" + e.getMessage());
+            e.printStackTrace();
         }
     }
 

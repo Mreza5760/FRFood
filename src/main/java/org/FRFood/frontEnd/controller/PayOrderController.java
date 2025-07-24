@@ -17,8 +17,14 @@ import org.FRFood.frontEnd.Util.SessionManager;
 
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
+import java.net.URI;
 import java.net.URL;
+import java.net.http.HttpClient;
+import java.net.http.HttpRequest;
+import java.net.http.HttpResponse;
 import java.nio.charset.StandardCharsets;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 public class PayOrderController {
 
@@ -55,8 +61,14 @@ public class PayOrderController {
             payWalletButton.setVisible(true);
             payWalletButton.setManaged(true);
         }else if(mode == 2 && currentOrder.getStatus() == Status.completed) {
-            addRatingButton.setVisible(true);
-            addRatingButton.setManaged(true);
+            isOwnedByCurrentUser(currentOrder.getId()).thenAccept(isOwner -> {
+                if (!isOwner) {
+                    Platform.runLater(() -> {
+                        addRatingButton.setVisible(true);
+                        addRatingButton.setManaged(true);
+                    });
+                }
+            });
         }else if (mode == 3 && currentOrder.getStatus() == Status.waiting) {
             acceptButton.setVisible(true);
             acceptButton.setManaged(true);
@@ -230,4 +242,37 @@ public class PayOrderController {
         AddRatingController.setOrderId(currentOrder.getId());
         SceneNavigator.switchTo("/frontend/addRating.fxml", payWalletButton);
     }
+
+    private CompletableFuture<Boolean> isOwnedByCurrentUser(int orderId) {
+        HttpRequest request;
+        try {
+            request = HttpRequest.newBuilder()
+                    .uri(new URI("http://localhost:8080/ratings/user/" + orderId))
+                    .header("Authorization", "Bearer " + SessionManager.getAuthToken())
+                    .GET()
+                    .build();
+        } catch (Exception e) {
+            e.printStackTrace();
+            return CompletableFuture.completedFuture(false);
+        }
+
+        return HttpClient.newHttpClient()
+                .sendAsync(request, HttpResponse.BodyHandlers.ofString())
+                .thenApply(response -> {
+                    if (response.statusCode() == 200 || response.statusCode() == 204) {
+                        System.out.println("empty rate for order " + response.statusCode());
+                        return true;
+                    } else if (response.statusCode() == 469) {
+                        return false;
+                    } else {
+                        System.err.println("Failed to fetch: HTTP " + response.statusCode() + " " + response.body());
+                        return false;
+                    }
+                }).exceptionally(e -> {
+                    e.printStackTrace();
+                    return false;
+                });
+    }
+
+
 }

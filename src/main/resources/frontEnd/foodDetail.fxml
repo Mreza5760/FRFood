@@ -45,9 +45,16 @@
 
     <Label text="⭐ Reviews" style="-fx-font-size: 20px; -fx-font-weight: bold; -fx-text-fill: #1e2a38;"/>
 
-    <VBox fx:id="reviewsContainer" spacing="15" alignment="TOP_LEFT"
-          style="-fx-background-color: white; -fx-padding: 20; -fx-background-radius: 12; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.08), 8, 0, 0, 2);"
-          maxWidth="800">
-    </VBox>
+    <ScrollPane fx:id="rateScrollPane"
+                fitToWidth="true"
+                hbarPolicy="NEVER"
+                vbarPolicy="AS_NEEDED"
+                style="-fx-background-color: transparent;">
+        <VBox fx:id="rateListContainer"
+              spacing="20"
+              alignment="TOP_CENTER"
+              style="-fx-background-color: transparent; -fx-padding: 20;"
+              prefWidth="700"/>
+    </ScrollPane>
 
 </VBox>

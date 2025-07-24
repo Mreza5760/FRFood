@@ -7,6 +7,7 @@ import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
+import javafx.scene.Cursor;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
@@ -15,6 +16,9 @@ import javafx.scene.control.TextField;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.*;
+import javafx.scene.paint.Color;
+import javafx.scene.text.Font;
+import javafx.scene.text.FontWeight;
 import javafx.stage.Stage;
 import org.FRFood.entity.Restaurant;
 import org.FRFood.frontEnd.Util.SceneNavigator;
@@ -25,6 +29,7 @@ import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
+import java.util.ArrayList;
 import java.util.Base64;
 import java.util.List;
 
@@ -38,15 +43,34 @@ public class AllRestaurantsController {
 
     private final ObjectMapper mapper = new ObjectMapper();
 
-    @FXML
-    public void initialize() {
-        backButton.setOnAction(e -> goBack());
-        searchBox1.setOnAction(e -> handleSearch1());
-        searchBox2.setOnAction(e -> handleSearch2());
-        fetchRestaurants();
+    private static int mode;
+
+    public static void setMode(int mode) {
+        AllRestaurantsController.mode = mode;
     }
 
+    @FXML
+    public void initialize() {
+        if (mode == 2) {
+            backButton.setOnAction(e -> goBack());
+            fetchRestaurants2();
+        } else {
+            backButton.setOnAction(e -> goBack());
+            searchBox1.setOnAction(e -> handleSearch1());
+            searchBox2.setOnAction(e -> handleSearch2());
+            fetchRestaurants();
+        }
+    }
 
+    void fetchRestaurants2() {
+        List<Restaurant> restaurants = getFavoriteRestaurants();
+        Platform.runLater(() -> {
+            restaurantList.getChildren().clear();
+            for (Restaurant r : restaurants) {
+                restaurantList.getChildren().add(createRestaurantCard(r));
+            }
+        });
+    }
 
     private void fetchRestaurants() {
         String tempJson = "{\"search\": \"\" }";
@@ -127,7 +151,33 @@ public class AllRestaurantsController {
 
         card.setOnMouseClicked(e -> handleClick(r)); // full card click
 
-        card.getChildren().addAll(logo, info, spacer);
+
+        final boolean[] isFavorite = {false};
+        for (Restaurant restaurant : getFavoriteRestaurants()) {
+            if (restaurant.getId().equals(r.getId())) {
+                isFavorite[0] = true;
+                break;
+            }
+        }
+
+        Label starLabel = new Label(isFavorite[0] ? "★" : "☆");
+        starLabel.setFont(Font.font("Arial Unicode MS", FontWeight.BOLD, 26));
+        starLabel.setTextFill(Color.GOLD);
+        starLabel.setCursor(Cursor.HAND);
+
+        starLabel.setOnMouseClicked(e -> {
+            e.consume();
+            if (isFavorite[0]) {
+                handleAddToFavorits(r);
+                starLabel.setText("☆");
+            } else {
+                handleRemoveFromFavorits(r);
+                starLabel.setText("★");
+            }
+            isFavorite[0] = !isFavorite[0];
+        });
+
+        card.getChildren().addAll(logo, info, spacer, starLabel);
         return card;
     }
 
@@ -159,4 +209,73 @@ public class AllRestaurantsController {
 
     private void handleSearch2() {
     }
+
+    private List<Restaurant> getFavoriteRestaurants() {
+        List<Restaurant> favoriteRestaurants = new ArrayList<>();
+
+        HttpRequest request = HttpRequest.newBuilder()
+                .uri(URI.create("http://localhost:8080/favorites"))
+                .header("Authorization", "Bearer " + SessionManager.getAuthToken())
+                .GET()
+                .build();
+
+        try {
+            HttpResponse<String> response = HttpClient.newHttpClient()
+                    .send(request, HttpResponse.BodyHandlers.ofString());
+
+            if (response.statusCode() == 200) {
+                favoriteRestaurants = mapper.readValue(response.body(), new TypeReference<List<Restaurant>>() {
+                });
+            } else {
+                System.err.println("Failed to fetch restaurants: HTTP " + response.statusCode());
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return favoriteRestaurants;
+    }
+
+    private void handleRemoveFromFavorits(Restaurant restaurant) {
+        HttpRequest request = HttpRequest.newBuilder()
+                .uri(URI.create("http://localhost:8080/favorites/" + restaurant.getId()))
+                .header("Authorization", "Bearer " + SessionManager.getAuthToken())
+                .PUT(HttpRequest.BodyPublishers.ofString(""))
+                .build();
+
+        try {
+            HttpResponse<String> response = HttpClient.newHttpClient()
+                    .send(request, HttpResponse.BodyHandlers.ofString());
+
+            if (response.statusCode() != 200) {
+                System.err.println("Failed to fetch restaurants: HTTP " + response.statusCode() + response.body());
+            }
+
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void handleAddToFavorits(Restaurant restaurant) {
+        HttpRequest request = HttpRequest.newBuilder()
+                .uri(URI.create("http://localhost:8080/favorites/" + restaurant.getId()))
+                .header("Authorization", "Bearer " + SessionManager.getAuthToken())
+                .DELETE()
+                .build();
+
+        try {
+            HttpResponse<String> response = HttpClient.newHttpClient()
+                    .send(request, HttpResponse.BodyHandlers.ofString());
+
+            if (response.statusCode() != 200) {
+                System.err.println("Failed to fetch restaurants: HTTP " + response.statusCode() + response.body());
+            }
+
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
 }

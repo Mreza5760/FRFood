@@ -5,29 +5,47 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
+import javafx.geometry.Insets;
+import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
-import javafx.scene.layout.VBox;
-import javafx.scene.text.Text;
+import javafx.scene.layout.*;
+import javafx.geometry.Pos;
+import org.FRFood.entity.Rate;
 import org.FRFood.frontEnd.Util.SceneNavigator;
 import org.FRFood.frontEnd.Util.SessionManager;
 
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.net.HttpURLConnection;
+import java.net.URI;
 import java.net.URL;
+import java.net.http.HttpClient;
+import java.net.http.HttpRequest;
+import java.net.http.HttpResponse;
+import java.security.cert.PolicyNode;
 import java.util.Base64;
+import java.util.LinkedHashSet;
+import java.util.Set;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 public class FoodDetailsController {
 
     public Label itemAvgRating;
-    @FXML private Label itemNameLabel;
-    @FXML private ImageView itemImage;
-    @FXML private Label itemDescriptionLabel;
-    @FXML private Label itemPriceLabel;
-    @FXML private Label itemSupplyLabel;
-    @FXML private VBox reviewsContainer;
+    @FXML
+    public VBox rateListContainer;
+    @FXML
+    private Label itemNameLabel;
+    @FXML
+    private ImageView itemImage;
+    @FXML
+    private Label itemDescriptionLabel;
+    @FXML
+    private Label itemPriceLabel;
+    @FXML
+    private Label itemSupplyLabel;
 
     private final ObjectMapper mapper = new ObjectMapper();
     private final String token = SessionManager.getAuthToken();
@@ -85,19 +103,12 @@ public class FoodDetailsController {
                 InputStream is = conn.getInputStream();
                 JsonNode root = mapper.readTree(is);
 
-                System.out.println(conn.getResponseCode() + conn.getResponseMessage());
                 Platform.runLater(() -> {
                     itemAvgRating.setText(root.get("avg_rating").asText());
-                    reviewsContainer.getChildren().clear();
+                    rateListContainer.getChildren().clear();
                     for (JsonNode comment : root.get("comments")) {
-                        VBox reviewBox = new VBox(5);
-                        reviewBox.setStyle("-fx-background-color: #f8f8f8; -fx-padding: 10; -fx-background-radius: 8;");
-                        Label rating = new Label("⭐ " + comment.get("rating").asInt());
-                        rating.setStyle("-fx-font-size: 14px; -fx-font-weight: bold;");
-                        Text commentText = new Text(comment.get("comment").asText());
-                        commentText.setWrappingWidth(750);
-                        reviewBox.getChildren().addAll(rating, commentText);
-                        reviewsContainer.getChildren().add(reviewBox);
+                        Rate rate = mapper.convertValue(comment, Rate.class);
+                        showRateCard(rate);
                     }
                 });
 
@@ -107,7 +118,156 @@ public class FoodDetailsController {
         }).start();
     }
 
+    private void showRateCard(Rate rate) {
+        VBox card = new VBox(10);
+        card.setPadding(new Insets(15));
+        card.setStyle("-fx-background-color: white; -fx-background-radius: 12; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.1), 6, 0, 0, 2);");
+        card.setMaxWidth(600);
+        card.setPrefWidth(600);
+
+        // Top row: Rating + Buttons
+        HBox topRow = new HBox();
+        topRow.setAlignment(Pos.TOP_RIGHT);
+        topRow.setSpacing(10);
+        topRow.setPrefWidth(600);
+
+        Label ratingLabel = new Label("⭐ Rating: " + rate.getRating());
+        ratingLabel.setStyle("-fx-font-size: 16px; -fx-font-weight: bold;");
+        HBox.setHgrow(ratingLabel, Priority.ALWAYS);
+
+        Button updateButton = new Button("Update");
+        updateButton.setStyle("-fx-background-color: #00aa88; -fx-text-fill: white; -fx-font-weight: bold; -fx-background-radius: 8;");
+        updateButton.setOnAction(e -> {
+            handleUpdateButton(rate);
+        });
+
+        Button deleteButton = new Button("Delete");
+        deleteButton.setStyle("-fx-background-color: #cc4444; -fx-text-fill: white; -fx-font-weight: bold; -fx-background-radius: 8;");
+        deleteButton.setOnAction(e -> {
+            handleDeleteButton(rate);
+        });
+
+        Region spacer = new Region();
+        HBox.setHgrow(spacer, Priority.ALWAYS);
+
+        isOwnedByCurrentUser(rate.getOrderId()).thenAccept(isOwner -> {
+            if (isOwner) {
+                Platform.runLater(() -> {
+                    topRow.getChildren().addAll(ratingLabel, spacer, updateButton, deleteButton);
+                });
+            }else{
+                topRow.getChildren().addAll(ratingLabel, spacer);
+            }
+        });
+
+        // Comment
+        Label commentLabel = new Label("📝 " + rate.getComment());
+        commentLabel.setWrapText(true);
+        commentLabel.setStyle("-fx-font-size: 14px;");
+
+        // Created At
+        Label createdAtLabel = new Label("📅 " + rate.getCreatedAt());
+        createdAtLabel.setStyle("-fx-font-size: 13px; -fx-text-fill: #666666;");
+
+        // Images
+        FlowPane imagePane = new FlowPane(10, 10);
+        imagePane.setPadding(new Insets(10, 0, 0, 0));
+
+        Set<String> uniqueImages = new LinkedHashSet<>(rate.getImages());
+        for (String base64 : uniqueImages) {
+            try {
+                byte[] imageBytes = Base64.getDecoder().decode(base64);
+                Image image = new Image(new ByteArrayInputStream(imageBytes));
+                ImageView imageView = new ImageView(image);
+                imageView.setFitWidth(100);
+                imageView.setFitHeight(100);
+                imageView.setPreserveRatio(true);
+                imageView.setSmooth(true);
+                imageView.setStyle("-fx-border-radius: 8;");
+                imagePane.getChildren().add(imageView);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+
+        card.getChildren().addAll(topRow, commentLabel, createdAtLabel, imagePane);
+
+        // Add to container
+        rateListContainer.getChildren().add(card);
+    }
+
+    private void handleUpdateButton(Rate rating) {
+        UpdateRatingController.RatingData data = new UpdateRatingController.RatingData();
+        data.id = rating.getId();
+        data.order_id = rating.getOrderId();
+        data.rating = rating.getRating();
+        data.comment = rating.getComment();
+        data.imageBase64 = rating.getImages();
+
+        UpdateRatingController.setRatingData(data);
+        SceneNavigator.switchTo("/frontend/updateRating.fxml",itemDescriptionLabel);
+    }
+
+    private void handleDeleteButton(Rate rate) {
+        HttpRequest request = null;
+        try {
+            request = HttpRequest.newBuilder()
+                    .uri(new URI("http://localhost:8080/ratings/" + rate.getId()))
+                    .header("Authorization", "Bearer " + SessionManager.getAuthToken())
+                    .DELETE()
+                    .build();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        HttpClient.newHttpClient()
+                .sendAsync(request, HttpResponse.BodyHandlers.ofString())
+                .thenApply(response -> {
+                    if (response.statusCode() == 200 || response.statusCode() == 204) {
+                        fetchReviews();
+                    }else {
+                        System.err.println("Failed to fetch: HTTP " + response.statusCode() + " " + response.body());
+                    }
+                    return null;
+                }).exceptionally(e -> {
+                    e.printStackTrace();
+                    return null;
+                });
+    }
+
+
+    private CompletableFuture<Boolean> isOwnedByCurrentUser(int orderId) {
+        HttpRequest request;
+        try {
+            request = HttpRequest.newBuilder()
+                    .uri(new URI("http://localhost:8080/ratings/user/" + orderId))
+                    .header("Authorization", "Bearer " + SessionManager.getAuthToken())
+                    .GET()
+                    .build();
+        } catch (Exception e) {
+            e.printStackTrace();
+            return CompletableFuture.completedFuture(false);
+        }
+
+        return HttpClient.newHttpClient()
+                .sendAsync(request, HttpResponse.BodyHandlers.ofString())
+                .thenApply(response -> {
+                    if (response.statusCode() == 200 || response.statusCode() == 204) {
+                        return true;
+                    } else if (response.statusCode() == 469) {
+                        return false;
+                    } else {
+                        System.err.println("Failed to fetch: HTTP " + response.statusCode() + " " + response.body());
+                        return false;
+                    }
+                }).exceptionally(e -> {
+                    e.printStackTrace();
+                    return false;
+                });
+    }
+
+
     public void handleBack(ActionEvent actionEvent) {
-        SceneNavigator.switchTo("/frontend/menu.fxml",itemNameLabel);
+        SceneNavigator.switchTo("/frontend/menu.fxml", itemNameLabel);
     }
 }
