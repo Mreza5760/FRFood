@@ -504,8 +504,20 @@ public class BuyerHandler implements HttpHandler {
                     foodRates.add(rate);
                 }
             }
-            String json = objectMapper.writeValueAsString(foodRates);
-            System.out.println(json);
+
+            int avg = 0;
+            for (Rate rate : foodRates)
+                avg += rate.getRating();
+            if (!rates.isEmpty())
+                avg /= rates.size();
+
+            ObjectNode root = objectMapper.createObjectNode();
+            JsonNode avgNode = objectMapper.valueToTree(avg);
+            root.set("avg_rating", avgNode);
+            JsonNode ratesNode = objectMapper.valueToTree(foodRates);
+            root.set("rates", ratesNode);
+            String json = objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(root);
+
             JsonResponse.sendJsonResponse(exchange, 200, json);
         } catch (Exception e) {
             HttpError.internal(exchange, "Internal server error");
