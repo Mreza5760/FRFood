@@ -57,6 +57,7 @@ public class BuyerHandler implements HttpHandler {
                     else if (path.equals("/orders/history")) handleOrdersHistory(exchange);
                     else if (path.equals("/favorites")) handleGetFavorites(exchange);
                     else if (path.matches("^/ratings/items/\\d+$")) handeGetFoodRates(exchange);
+                    else if (path.matches("^/ratings/user/\\d+$")) doesHaveRate(exchange);
                     else if (path.matches("^/orders/\\d+$")) handleGetOrder(exchange);
                     else if (path.matches("^/ratings/\\d+$")) handleGetRate(exchange);
                     else if (path.equals("/coupons")) checkCoupon(exchange);
@@ -462,6 +463,9 @@ public class BuyerHandler implements HttpHandler {
     }
 
     private void handeGetFoodRates(HttpExchange exchange) throws IOException {
+        var userOpt = Authenticate.authenticate(exchange);
+        if (userOpt.isEmpty()) return;
+
         String path = exchange.getRequestURI().getPath();
         String[] parts = path.split("/");
         int foodId = Integer.parseInt(parts[3]);
@@ -491,8 +495,10 @@ public class BuyerHandler implements HttpHandler {
                         return;
                     }
                     Food tempFood = optionalTempFood.get();
-                    if (tempFood.getId().equals(food.getId()))
+                    if (tempFood.getId().equals(food.getId())) {
                         found = true;
+                        break;
+                    }
                 }
                 if (found) {
                     foodRates.add(rate);
@@ -596,6 +602,31 @@ public class BuyerHandler implements HttpHandler {
             rateDAO.updateById(id, rate);
             JsonResponse.sendJsonResponse(exchange,200,"{\"message\":\"Rate updated\"}");
         } catch (Exception e) {
+            HttpError.internal(exchange, "Internal server error");
+        }
+    }
+
+    private void doesHaveRate(HttpExchange exchange) throws IOException {
+        var userOpt = Authenticate.authenticate(exchange);
+        if (userOpt.isEmpty()) return;
+        User user = userOpt.get();
+        if (!user.getRole().equals(buyer)) {
+            HttpError.unauthorized(exchange, "Only buyers can check how many rates");
+            return;
+        }
+
+        String path = exchange.getRequestURI().getPath();
+        String[] parts = path.split("/");
+        int orderID = Integer.parseInt(parts[3]);
+
+        try {
+            List<Rate> rates = rateDAO.getUserRateOnOrder(user.getId(),  orderID);
+            if (rates.isEmpty()) {
+                JsonResponse.sendJsonResponse(exchange,200,"{\"message\":\"No\"}");
+            } else {
+                JsonResponse.sendJsonResponse(exchange,200,"{\"message\":\"Yes\"}");
+            }
+        } catch (SQLException e) {
             HttpError.internal(exchange, "Internal server error");
         }
     }

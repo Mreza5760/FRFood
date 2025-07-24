@@ -160,4 +160,10 @@ public class RateDAOImp implements RateDAO {
         }
         return rates;
     }
+
+    @Override
+    public List<Rate> getUserRateOnOrder(int userId, int orderId) throws SQLException {
+        List<Rate> rates = new ArrayList<>();
+        String sql = "SELECT * FROM rating WHERE user_id = ? AND order_id = ?";
+    }
 }
