@@ -1,7 +1,6 @@
 package org.FRFood.entity;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import org.FRFood.util.CouponType;
 
 public class Coupon {
     @JsonProperty("coupon_id")

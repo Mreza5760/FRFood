@@ -2,7 +2,7 @@ package org.FRFood.DAO;
 
 import org.FRFood.entity.Transaction;
 import org.FRFood.util.DBConnector;
-import org.FRFood.util.TransactionMethod;
+import org.FRFood.entity.TransactionMethod;
 
 import java.sql.*;
 import java.util.ArrayList;

@@ -18,13 +18,10 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.Region;
 import javafx.scene.layout.VBox;
-import org.FRFood.DAO.*;
 import org.FRFood.entity.*;
 import org.FRFood.frontEnd.Util.SceneNavigator;
 import org.FRFood.frontEnd.Util.SessionManager;
-import org.FRFood.util.JwtUtil;
-import org.FRFood.util.Role;
-import org.FRFood.util.Status;
+
 
 import java.io.ByteArrayInputStream;
 import java.net.URI;
@@ -51,13 +48,13 @@ public class MenuController {
     private static User currentUser;
     private static int menuId;
     private static String menuTitle;
-    private static int restaurantId;
+    private static Restaurant restaurant;
     public Button addFoodsButton;
 
-    public static void setData(int menuId, String menuTitle, int restaurantId) {
+    public static void setData(int menuId, String menuTitle, Restaurant inRestaurant) {
         MenuController.menuId = menuId;
         MenuController.menuTitle = menuTitle;
-        MenuController.restaurantId = restaurantId;
+        MenuController.restaurant = inRestaurant;
     }
 
     @FXML
@@ -67,41 +64,24 @@ public class MenuController {
 
     @FXML
     public void addFood(ActionEvent actionEvent) {
-        AddFoodToMenuController.setData(menuId, menuTitle, restaurantId);
+        AddFoodToMenuController.setData(menuId, menuTitle, restaurant.getId());
         SceneNavigator.switchTo("/frontend/addFoodToMenu.fxml", menu_name_label);
     }
 
     @FXML
     private void initialize() {
-        String token = SessionManager.getAuthToken();
-        if (token == null) return;
-
-        Jws<Claims> claimsJws = JwtUtil.validateToken(token);
-        int userId = Integer.parseInt(claimsJws.getBody().getSubject());
-
-        UserDAO userDao = new UserDAOImp();
-        try {
-            User user = userDao.getById(userId).orElse(null);
-            if (user == null) return;
-            userRole = user.getRole();
-            currentUser = user;
-            if (userRole == Role.buyer) {
-                addFoodsButton.setVisible(false);
-                addFoodsButton.setManaged(false);
-            }
-            menu_name_label.setText(menuTitle);
-            fetchFoods();
-        } catch (
-                SQLException e) {
-            System.out.println(e);
+        currentUser = SessionManager.getCurrentUser();
+        userRole = currentUser.getRole();
+        if (userRole == Role.buyer) {
+            addFoodsButton.setVisible(false);
+            addFoodsButton.setManaged(false);
         }
-
-        ;
-
+        menu_name_label.setText(menuTitle);
+        fetchFoods();
     }
 
     private void fetchFoods() {
-        String safeUrl = "http://localhost:8080/restaurants/" + restaurantId + "/items/" + URLEncoder.encode(menuTitle, StandardCharsets.UTF_8);
+        String safeUrl = "http://localhost:8080/restaurants/" + restaurant.getId() + "/items/" + URLEncoder.encode(menuTitle, StandardCharsets.UTF_8);
         URI uri = URI.create(safeUrl);
         HttpRequest request = HttpRequest.newBuilder()
                 .uri(uri)
@@ -241,39 +221,33 @@ public class MenuController {
         Map<Integer, Order> cart = SessionManager.getOrderList();
         Order order = new Order();
 
-        if(cart.containsKey(restaurantId)) {
-            order = cart.get(restaurantId);
-        }else{
+        if (cart.containsKey(restaurant.getId())) {
+            order = cart.get(restaurant.getId());
+        } else {
             Order tempOrder = new Order();
-            cart.put(restaurantId, tempOrder);
-            order = cart.get(restaurantId);
+            cart.put(restaurant.getId(), tempOrder);
+            order = cart.get(restaurant.getId());
         }
 
         boolean found = false;
 
         for (OrderItem orderItem : order.getItems()) {
             if (orderItem.getItemId().equals(food.getId())) {
-                if(orderItem.getQuantity() == 0){
+                if (orderItem.getQuantity() == 0) {
                     return;
                 }
-                orderItem.setQuantity(orderItem.getQuantity() -1);
+                orderItem.setQuantity(orderItem.getQuantity() - 1);
                 found = true;
             }
         }
 
-        if (!cart.containsKey(restaurantId)) {
+        if (!cart.containsKey(restaurant.getId())) {
             order.setDeliveryAddress(currentUser.getAddress());
             order.setCustomerId(currentUser.getId());
-            order.setRestaurantId(restaurantId);
+            order.setRestaurantId(restaurant.getId());
             order.setCouponId(0);
-            RestaurantDAO restaurantDAO = new RestaurantDAOImp();
-            try {
-                Restaurant restaurant = restaurantDAO.getById(restaurantId).orElse(null);
-                order.setTaxFee(restaurant.getTaxFee());
-                order.setAdditionalFee(restaurant.getAdditionalFee());
-            } catch (Exception e) {
-                System.out.println(e.getMessage());
-            }
+            order.setTaxFee(restaurant.getTaxFee());
+            order.setAdditionalFee(restaurant.getAdditionalFee());
             Random rand = new Random();
             int randomPrice = rand.nextInt(91) + 10;
             order.setCourierFee(randomPrice);
@@ -295,29 +269,23 @@ public class MenuController {
     private void handleAdd(Food food) {
         Map<Integer, Order> cart = SessionManager.getOrderList();
         Order order = new Order();
-        if (!cart.containsKey(restaurantId)) {
+        if (!cart.containsKey(restaurant.getId())) {
             Order tempOrder = new Order();
-            cart.put(restaurantId, tempOrder);
-            order = cart.get(restaurantId);
+            cart.put(restaurant.getId(), tempOrder);
+            order = cart.get(restaurant.getId());
             order.setDeliveryAddress(currentUser.getAddress());
             order.setCustomerId(currentUser.getId());
-            order.setRestaurantId(restaurantId);
+            order.setRestaurantId(restaurant.getId());
             order.setCouponId(0);
-            RestaurantDAO restaurantDAO = new RestaurantDAOImp();
-            try {
-                Restaurant restaurant = restaurantDAO.getById(restaurantId).orElse(null);
-                order.setTaxFee(restaurant.getTaxFee());
-                order.setAdditionalFee(restaurant.getAdditionalFee());
-            } catch (Exception e) {
-                System.out.println(e.getMessage());
-            }
+            order.setTaxFee(restaurant.getTaxFee());
+            order.setAdditionalFee(restaurant.getAdditionalFee());
             Random rand = new Random();
             int randomPrice = rand.nextInt(91) + 10;
             order.setCourierFee(randomPrice);
             order.setCourierId(0);
             order.setStatus(Status.unpaid);
-        }else{
-            order = cart.get(restaurantId);
+        } else {
+            order = cart.get(restaurant.getId());
         }
 
         boolean found = false;
@@ -346,7 +314,7 @@ public class MenuController {
     }
 
     private void handleDelete(Food food) {
-        String safeUrl = "http://localhost:8080/restaurants/" + restaurantId + "/menu/" + URLEncoder.encode(menuTitle, StandardCharsets.UTF_8) + "/" + food.getId();
+        String safeUrl = "http://localhost:8080/restaurants/" + restaurant.getId() + "/menu/" + URLEncoder.encode(menuTitle, StandardCharsets.UTF_8) + "/" + food.getId();
         URI uri = URI.create(safeUrl);
 //        String url = "http://localhost:8080/restaurants/" + restaurantId+"/menu/" + menuTitle + "/" + food.getId();
         HttpRequest request = HttpRequest.newBuilder()

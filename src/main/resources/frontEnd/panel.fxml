@@ -42,7 +42,7 @@
                 style="-fx-background-color: #ff9900; -fx-text-fill: white; -fx-font-size: 16px; -fx-font-weight: bold; -fx-background-radius: 8;"/>
 
         <!-- Courier-only -->
-        <Button fx:id="activeOrdersButton" text="Active orders"
+        <Button fx:id="activeOrdersButton" text="Active Deliveries"
                 visible="false" managed="false"
                 prefWidth="250" prefHeight="45"
                 style="-fx-background-color: #ff9900; -fx-text-fill: white; -fx-font-size: 16px; -fx-font-weight: bold; -fx-background-radius: 8;"/>
@@ -52,6 +52,12 @@
                 visible="false" managed="false"
                 prefWidth="250" prefHeight="45"
                 style="-fx-background-color: #6600cc; -fx-text-fill: white; -fx-font-size: 16px; -fx-font-weight: bold; -fx-background-radius: 8;"/>
+
+
+        <Button fx:id="deliveryHistoryButton" text="Delivery History"
+                visible="false" managed="false"
+                prefWidth="250" prefHeight="45"
+                style="-fx-background-color: #0077cc; -fx-text-fill: white; -fx-font-size: 16px; -fx-font-weight: bold; -fx-background-radius: 8;"/>
 
         <!-- Admin-only -->
         <Button fx:id="usersButton" text="Users"

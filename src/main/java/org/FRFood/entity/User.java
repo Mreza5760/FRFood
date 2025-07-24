@@ -1,7 +1,5 @@
 package org.FRFood.entity;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import org.FRFood.util.Role;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 public class User {

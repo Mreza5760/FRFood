@@ -13,9 +13,9 @@ import org.FRFood.DAO.*;
 import org.FRFood.entity.*;
 import org.FRFood.util.HttpError;
 import org.FRFood.util.JsonResponse;
-import org.FRFood.util.Status;
+import org.FRFood.entity.Status;
 
-import static org.FRFood.util.Role.courier;
+import static org.FRFood.entity.Role.courier;
 import static org.FRFood.util.Authenticate.authenticate;
 
 public class CourierHandler implements HttpHandler {

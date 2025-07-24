@@ -3,17 +3,12 @@ package org.FRFood.frontEnd.controller;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import javafx.fxml.FXML;
-import javafx.fxml.FXMLLoader;
-import javafx.scene.Parent;
-import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.event.ActionEvent;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import javafx.stage.Stage;
 import org.FRFood.frontEnd.Util.SceneNavigator;
 import org.FRFood.frontEnd.Util.SessionManager;
 
-import java.io.IOException;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.io.OutputStream;
@@ -49,7 +44,6 @@ public class SignUpController {
     private void handleRegister(ActionEvent event) {
         try {
             String jsonRequest = getString();
-            System.out.println(jsonRequest);
             // Send HTTP POST
             if (!chek()) return;
             URL url = new URL(REGISTER_URL);
@@ -66,12 +60,8 @@ public class SignUpController {
 
             int responseCode = conn.getResponseCode();
             if (responseCode == 200) {
-                ObjectMapper mapper = new ObjectMapper();
-                JsonNode node = mapper.readTree(conn.getInputStream());
-                String token = node.get("token").asText();
-                SessionManager.setAuthToken(token);
-                messageLabel.setStyle("-fx-text-fill: #00cc66;");
-                messageLabel.setText("Registered successfully!");
+                showAlert(Alert.AlertType.INFORMATION, "Registration Successful", "Successfully signed up\n please login to get to your panel");
+                SceneNavigator.switchTo("/frontend/login.fxml", messageLabel);
             } else {
                 ObjectMapper mapper = new ObjectMapper();
                 JsonNode node = mapper.readTree(conn.getErrorStream());
@@ -87,9 +77,10 @@ public class SignUpController {
             messageLabel.setText("Login failed: " + e);
         }
     }
+
     @FXML
     private void goToLogin() {
-        SceneNavigator.switchTo("/frontend/Login.fxml",messageLabel);
+        SceneNavigator.switchTo("/frontend/Login.fxml", messageLabel);
     }
 
     private String getString() throws JsonProcessingException {
@@ -129,11 +120,18 @@ public class SignUpController {
         bankAccountField.setStyle(phone.isEmpty() ? "-fx-border-color: red;" : null);
         bankNameField.setStyle(phone.isEmpty() ? "-fx-border-color: red;" : null);
 
-        if (phone.isEmpty() || password.isEmpty() || name.isEmpty() || role.isEmpty() || address.isEmpty() || bankAccount.isEmpty() || bankName.isEmpty()){
+        if (phone.isEmpty() || password.isEmpty() || name.isEmpty() || role.isEmpty() || address.isEmpty() || bankAccount.isEmpty() || bankName.isEmpty()) {
             messageLabel.setText("Please fill in all fields.");
             return false;
         }
         return true;
     }
 
+    private void showAlert(Alert.AlertType type, String title, String content) {
+        Alert alert = new Alert(type);
+        alert.setTitle(title);
+        alert.setHeaderText(null);
+        alert.setContentText(content);
+        alert.showAndWait();
+    }
 }

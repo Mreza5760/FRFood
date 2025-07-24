@@ -6,18 +6,16 @@ import io.jsonwebtoken.Jws;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
-import org.FRFood.DAO.UserDAO;
-import org.FRFood.DAO.UserDAOImp;
 import org.FRFood.entity.User;
 import org.FRFood.frontEnd.Util.SceneNavigator;
 import org.FRFood.frontEnd.Util.SessionManager;
-import org.FRFood.util.JwtUtil;
 
-import java.sql.SQLException;
 
 public class PanelController {
 
     public Button activeOrdersButton;
+
+    public Button deliveryHistoryButton;
     @FXML
     private Label welcomeLabel;
     @FXML
@@ -60,11 +58,17 @@ public class PanelController {
         profileButton.setOnAction(e -> handleProfile());
         deliveriesButton.setOnAction(e -> handleDeliveriesButton());
         activeOrdersButton.setOnAction(e -> handleActiveOrders());
+        deliveryHistoryButton.setOnAction(e -> handleDeliveriesHistory());
 
         // Admin placeholders
         usersButton.setOnAction(e -> handleAllUsers());
         ordersButton.setOnAction(e -> System.out.println("Orders clicked"));
         transactionsButton.setOnAction(e -> handleTransactions());
+    }
+
+    private void handleDeliveriesHistory() {
+        OrderHistoryController.setMode(4);
+        SceneNavigator.switchTo("/frontend/orderHistory.fxml",restaurantButton);
     }
 
     private void handleActiveOrders() {
@@ -78,21 +82,7 @@ public class PanelController {
     }
 
     private void setRoleBasedButtons() {
-        String token = SessionManager.getAuthToken();
-        if (token == null) return;
-
-        Jws<Claims> claimsJws = JwtUtil.validateToken(token);
-        int userId = Integer.parseInt(claimsJws.getBody().getSubject());
-
-        UserDAO userDao = new UserDAOImp();
-        User user = null;
-        try {
-            user = userDao.getById(userId).orElse(null);
-        } catch (SQLException e) {
-            System.out.println("SQLException: " + e.getMessage());
-        }
-        if (user == null) return;
-
+        User user = SessionManager.getCurrentUser();
         welcomeLabel.setText("Welcome, " + user.getFullName() + "!");
 
         switch (user.getRole()) {
@@ -113,6 +103,8 @@ public class PanelController {
                 deliveriesButton.setManaged(true);
                 activeOrdersButton.setVisible(true);
                 activeOrdersButton.setManaged(true);
+                deliveryHistoryButton.setVisible(true);
+                deliveryHistoryButton.setManaged(true);
             }
             case admin -> {
                 usersButton.setVisible(true);

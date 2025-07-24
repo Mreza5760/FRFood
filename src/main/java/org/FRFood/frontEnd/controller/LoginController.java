@@ -3,11 +3,8 @@ package org.FRFood.frontEnd.controller;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import javafx.fxml.FXML;
-import javafx.fxml.FXMLLoader;
-import javafx.scene.Parent;
-import javafx.scene.Scene;
 import javafx.scene.control.*;
-import javafx.stage.Stage;
+import org.FRFood.entity.User;
 import org.FRFood.frontEnd.Util.SceneNavigator;
 import org.FRFood.frontEnd.Util.SessionManager;
 
@@ -65,9 +62,11 @@ public class LoginController {
             if (responseCode == 200) {
                 ObjectMapper mapper = new ObjectMapper();
                 JsonNode node = mapper.readTree(conn.getInputStream());
+                JsonNode userNode = node.get("user");
+                User currentUser = mapper.readValue(userNode.toString(), User.class);
                 String token = node.get("token").asText();
                 SessionManager.setAuthToken(token);
-
+                SessionManager.setCurrentUser(currentUser);
                 Alert alert = new Alert(Alert.AlertType.INFORMATION);
                 alert.setTitle("Login Successful");
                 alert.setHeaderText(null);

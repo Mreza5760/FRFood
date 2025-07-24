@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.image.*?>
+<?import javafx.geometry.Insets?>
+<?import javafx.geometry.Pos?>
+
+<VBox xmlns="http://javafx.com/javafx"
+      xmlns:fx="http://javafx.com/fxml"
+      fx:controller="org.FRFood.frontEnd.controller.AddRatingController"
+      alignment="CENTER" spacing="30"
+      style="-fx-background-color: linear-gradient(to bottom, #eef3f9, #dbe5f1);">
+
+    <padding>
+        <Insets top="60" right="50" bottom="60" left="50"/>
+    </padding>
+
+    <Label text="📝 Submit Your Review"
+           style="-fx-font-size: 30px; -fx-font-weight: bold; -fx-text-fill: #1e2a38;"/>
+
+    <VBox spacing="20" alignment="CENTER" style="-fx-background-color: white; -fx-padding: 30; -fx-background-radius: 12; -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.1), 10, 0, 0, 4);">
+
+        <Label text="Rate your experience:"
+               style="-fx-font-size: 14px; -fx-text-fill: #1e2a38;"/>
+        <HBox fx:id="starBox" alignment="CENTER" spacing="10"
+              xmlns="http://javafx.com/javafx"
+              xmlns:fx="http://javafx.com/fxml">
+        </HBox>
+
+        <Label text="Your Comment:"
+               style="-fx-font-size: 14px; -fx-text-fill: #1e2a38;"/>
+        <TextArea fx:id="commentArea" prefRowCount="4" wrapText="true"
+                  style="-fx-font-size: 14px; -fx-padding: 10; -fx-background-radius: 6;"/>
+
+        <Button text="➕ Add Images" fx:id="addImageButton" onAction="#handleAddImages"
+                style="-fx-background-color: #00aa88; -fx-text-fill: white; -fx-font-size: 14px; -fx-font-weight: bold; -fx-background-radius: 8;"/>
+
+        <FlowPane fx:id="imagePreviewPane" hgap="10" vgap="10" prefHeight="140"
+                  style="-fx-background-color: #f0f4f8; -fx-padding: 10; -fx-background-radius: 8;" />
+
+        <Button text="✅ Submit Review" fx:id="submitButton" onAction="#handleSubmitReview"
+                style="-fx-background-color: #0077cc; -fx-text-fill: white; -fx-font-size: 14px; -fx-font-weight: bold; -fx-background-radius: 8;"/>
+    </VBox>
+</VBox>

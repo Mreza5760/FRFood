@@ -4,7 +4,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
-import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
@@ -12,9 +11,9 @@ import javafx.scene.layout.VBox;
 import org.FRFood.entity.Order;
 import org.FRFood.entity.OrderItem;
 import org.FRFood.entity.Restaurant;
+import org.FRFood.entity.Status;
 import org.FRFood.frontEnd.Util.SceneNavigator;
 import org.FRFood.frontEnd.Util.SessionManager;
-import org.FRFood.util.Status;
 
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
@@ -25,6 +24,7 @@ public class PayOrderController {
 
     public Button acceptButton;
     public Button declineButton;
+    public Button addRatingButton;
     @FXML
     private VBox detailsBox;
     @FXML
@@ -35,6 +35,9 @@ public class PayOrderController {
     private Button payWalletButton;
     @FXML
     private Button foodIsReadyButton;
+
+    @FXML
+    private Button finishButton;
 
     private Order currentOrder;
     private Restaurant restaurant;
@@ -51,7 +54,10 @@ public class PayOrderController {
             payCardButton.setManaged(true);
             payWalletButton.setVisible(true);
             payWalletButton.setManaged(true);
-        } else if (mode == 3 && currentOrder.getStatus() == Status.waiting) {
+        }else if(mode == 2 && currentOrder.getStatus() == Status.completed) {
+            addRatingButton.setVisible(true);
+            addRatingButton.setManaged(true);
+        }else if (mode == 3 && currentOrder.getStatus() == Status.waiting) {
             acceptButton.setVisible(true);
             acceptButton.setManaged(true);
             declineButton.setVisible(true);
@@ -62,6 +68,9 @@ public class PayOrderController {
         } else if (mode == 4 &&  currentOrder.getStatus() == Status.findingCourier) {
             acceptButton.setVisible(true);
             acceptButton.setManaged(true);
+        }else if (mode == 4 &&  currentOrder.getStatus() == Status.onTheWay){
+            finishButton.setVisible(true);
+            finishButton.setManaged(true);
         }
         // Populate details
         detailsBox.getChildren().addAll(
@@ -180,6 +189,10 @@ public class PayOrderController {
         updateOrderStatus(currentOrder.getId(), "findingCourier");
     }
 
+    public void handleFinish(ActionEvent actionEvent) {
+        updateOrderStatus(currentOrder.getId(), "completed");
+    }
+
     private void updateOrderStatus(int orderId, String newStatus) {
         new Thread(() -> {
             try {
@@ -212,4 +225,9 @@ public class PayOrderController {
         }).start();
     }
 
+
+    public void handleAddRating(ActionEvent actionEvent) {
+        AddRatingController.setOrderId(currentOrder.getId());
+        SceneNavigator.switchTo("/frontend/addRating.fxml", payWalletButton);
+    }
 }

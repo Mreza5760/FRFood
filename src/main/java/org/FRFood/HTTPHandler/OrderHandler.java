@@ -8,8 +8,8 @@ import org.FRFood.entity.*;
 import org.FRFood.util.BuyerReq.OrderReq;
 import org.FRFood.util.HttpError;
 import org.FRFood.util.JsonResponse;
-import org.FRFood.util.Status;
-import org.FRFood.util.TransactionMethod;
+import org.FRFood.entity.Status;
+import org.FRFood.entity.TransactionMethod;
 
 import java.io.IOException;
 import java.sql.SQLException;
@@ -17,7 +17,7 @@ import java.util.List;
 import java.util.Optional;
 
 import static org.FRFood.util.Authenticate.authenticate;
-import static org.FRFood.util.TransactionMethod.wallet;
+import static org.FRFood.entity.TransactionMethod.wallet;
 
 public class OrderHandler implements HttpHandler {
     private final UserDAO userDAO;

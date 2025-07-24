@@ -5,11 +5,10 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-import org.FRFood.util.Role;
+import org.FRFood.entity.Role;
 import org.FRFood.entity.User;
 import org.FRFood.util.DBConnector;
 import org.FRFood.entity.Restaurant;
-import org.FRFood.entity.BankAccount;
 
 public class UserDAOImp implements UserDAO {
     @Override
