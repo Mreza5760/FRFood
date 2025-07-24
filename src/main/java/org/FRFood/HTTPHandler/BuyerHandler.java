@@ -447,7 +447,7 @@ public class BuyerHandler implements HttpHandler {
 
         Rate rate = objectMapper.readValue(exchange.getRequestBody(), Rate.class);
 
-        if (rate.getRating() == null || rate.getComment() == null) {
+        if (rate.getRating() == null || rate.getComment() == null || rate.getRating() < 0 || rate.getRating() > 5) {
             HttpError.badRequest(exchange, "Invalid rate");
             return;
         }
@@ -483,8 +483,31 @@ public class BuyerHandler implements HttpHandler {
             }
 
             Food food = optionalFood.get();
-            List<Rate> rates = rateDAO.getFoodRates(food);
-            String json = objectMapper.writeValueAsString(rates);
+            List<Rate> rates = rateDAO.getAllRates(food);
+            List<Rate> foodRates = new ArrayList<>();
+            for (Rate rate : rates) {
+                Optional<Order> optionalOrder = orderDAO.getById(rate.getOrderId());
+                if (optionalOrder.isEmpty()) {
+                    HttpError.notFound(exchange, "Order not found");
+                    return;
+                }
+                Order order = optionalOrder.get();
+                boolean found = false;
+                for (OrderItem orderItem : order.getItems()) {
+                    Optional<Food> optionalTempFood = foodDAO.getById(orderItem.getItemId());
+                    if (optionalTempFood.isEmpty()) {
+                        HttpError.notFound(exchange, "Food not found");
+                        return;
+                    }
+                    Food tempFood = optionalTempFood.get();
+                    if (tempFood.getId() == food.getId())
+                        found = true;
+                }
+                if (found) {
+                    foodRates.add(rate);
+                }
+            }
+            String json = objectMapper.writeValueAsString(foodRates);
             JsonResponse.sendJsonResponse(exchange, 200, json);
         } catch (Exception e) {
             HttpError.internal(exchange, "Internal server error");

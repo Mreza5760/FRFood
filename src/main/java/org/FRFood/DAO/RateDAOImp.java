@@ -24,7 +24,7 @@ public class RateDAOImp implements RateDAO {
             preparedStatement.setString(4,rate.getComment());
 
             try(ResultSet generatedKeys = preparedStatement.executeQuery()){
-                if(generatedKeys.next()){
+                if (generatedKeys.next()) {
                     rate.setId(generatedKeys.getInt(1));
                     id = rate.getId();
                 }
