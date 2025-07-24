@@ -173,12 +173,17 @@ public class AuthHandler implements HttpHandler {
                 currentUser.setFullName((String) updates.get("full_name"));
                 changed = true;
             }
-            if (updates.containsKey("phone_number")) {
-                if (!validatePhoneNumber((String) updates.get("phone_number"))) {
+            if (updates.containsKey("phone")) {
+                String newPhone =  (String) updates.get("phone");
+                if (!validatePhoneNumber(newPhone)) {
                     HttpError.badRequest(exchange, "Invalid phone number");
                     return;
                 }
-                currentUser.setPhoneNumber((String) updates.get("phone_number"));
+                if (!currentUser.getPhoneNumber().equals(newPhone) && userDAO.getByPhone(newPhone).isPresent()) {
+                    HttpError.conflict(exchange, "Phone number already exists");
+                    return;
+                }
+                currentUser.setPhoneNumber((String) updates.get("phone"));
                 changed = true;
             }
             if (updates.containsKey("email")) {
@@ -186,7 +191,7 @@ public class AuthHandler implements HttpHandler {
                 changed = true;
             }
             if (updates.containsKey("password")) {
-                currentUser.setPassword((String) updates.get("password_hash"));
+                currentUser.setPassword((String) updates.get("password"));
                 changed = true;
             }
             if (updates.containsKey("address")) {
