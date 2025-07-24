@@ -686,4 +686,52 @@ public class BuyerHandler implements HttpHandler {
             HttpError.internal(exchange, "Internal server error");
         }
     }
+
+    private void topRestaurants(HttpExchange exchange) throws IOException {
+        var userOpt = Authenticate.authenticate(exchange);
+        if (userOpt.isEmpty()) return;
+        User user = userOpt.get();
+        if (!user.getRole().equals(buyer)) {
+            HttpError.unauthorized(exchange, "Only buyers can top restaurants");
+            return;
+        }
+
+        try {
+            List<Restaurant> allRestaurants = restaurantDAO.searchByString("");
+            List<Restaurant> topRestaurants = new ArrayList<>();
+//            for (Restaurant restaurant : allRestaurants) {
+//                List<Order> orders = orderDAO.getRestaurantOrders(restaurant.getId());
+//                int avg = 0;
+//                for (Order order : orders) {
+//                    List<Rate> rates = rate
+//                }
+//            }
+        } catch (SQLException e) {
+            HttpError.internal(exchange, "Internal server error");
+        }
+    }
+
+    private void topFoods(HttpExchange exchange) throws IOException {
+        var userOpt = Authenticate.authenticate(exchange);
+        if (userOpt.isEmpty()) return;
+        User user = userOpt.get();
+        if (!user.getRole().equals(buyer)) {
+            HttpError.unauthorized(exchange, "Only buyers can top restaurants");
+            return;
+        }
+
+        try {
+            List<Restaurant> allRestaurants = restaurantDAO.searchByString("");
+            List<Restaurant> topRestaurants = new ArrayList<>();
+//            for (Restaurant restaurant : allRestaurants) {
+//                List<Order> orders = orderDAO.getRestaurantOrders(restaurant.getId());
+//                int avg = 0;
+//                for (Order order : orders) {
+//                    List<Rate> rates = rate
+//                }
+//            }
+        } catch (SQLException e) {
+            HttpError.internal(exchange, "Internal server error");
+        }
+    }
 }
