@@ -48,8 +48,10 @@ public class OrderHistoryController {
             uri = "http://localhost:8080/deliveries/available";
         } else if (mode == 3) {
             uri = "http://localhost:8080/deliveries/order";
-        }else if (mode == 4) {
+        } else if (mode == 4) {
             uri = "http://localhost:8080/deliveries/history";
+        } else if (mode == 5) {
+            uri = "http://localhost:8080/admin/orders";
         }
         HttpRequest request = HttpRequest.newBuilder()
                 .uri(URI.create(uri))
@@ -207,9 +209,9 @@ public class OrderHistoryController {
 
 
         if (controller != null) {
-            if (mode == 2 || mode == 3 || mode == 4) {
+            if (mode == 2 || mode == 3 || mode == 4 || mode == 5) {
                 controller.setOrder(theOrder, r, 4);
-            }  else {
+            } else {
                 controller.setOrder(theOrder, r, 2);
             }
         }
@@ -218,7 +220,7 @@ public class OrderHistoryController {
 
     @FXML
     private void goBack() {
-        if (mode == 2 || mode == 3 || mode == 4) {
+        if (mode == 2 || mode == 3 || mode == 4 || mode ==5) {
             SceneNavigator.switchTo("/frontend/panel.fxml", restaurantList);
         } else {
             SceneNavigator.switchTo("/frontend/buyerOrderPage.fxml", restaurantList);

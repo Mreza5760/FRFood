@@ -139,8 +139,9 @@ CREATE TABLE IF NOT EXISTS Order_Items
 CREATE TABLE IF NOT EXISTS Ratings
 (
     id         INTEGER AUTO_INCREMENT PRIMARY KEY,
-    order_id   INTEGER NOT NULL UNIQUE,
+    order_id   INTEGER NOT NULL ,
     user_id    INTEGER NOT NULL,
+    UNIQUE (order_id,user_id),
     rating     INTEGER NOT NULL CHECK (rating >= 1 AND rating <= 5),
     comment    TEXT    NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
