@@ -18,18 +18,20 @@ public class RateDAOImp implements RateDAO {
                 Connection connection = DBConnector.gConnection();
                 PreparedStatement preparedStatement = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
                 ){
-            preparedStatement.setInt(1,rate.getOrderId());
-            preparedStatement.setInt(2,rate.getUserId());
-            preparedStatement.setInt(3,rate.getRating());
-            preparedStatement.setString(4,rate.getComment());
-
-            try(ResultSet generatedKeys = preparedStatement.executeQuery()){
-                if(generatedKeys.next()){
-                    rate.setId(generatedKeys.getInt(1));
-                    id = rate.getId();
+                preparedStatement.setInt(1, rate.getOrderId());
+                preparedStatement.setInt(2, rate.getUserId());
+                preparedStatement.setInt(3, rate.getRating());
+                preparedStatement.setString(4, rate.getComment());
+                int affectedRows = preparedStatement.executeUpdate();
+                if (affectedRows == 0) {
+                    throw new SQLException("Inserting rate failed, no rows affected.");
                 }
-            }
-
+                try (ResultSet generatedKeys = preparedStatement.getGeneratedKeys()) {
+                    if (generatedKeys.next()) {
+                        rate.setId(generatedKeys.getInt(1));
+                        id = rate.getId();
+                    }
+                }
             String sql2 = "INSERT INTO rating_images (rating_id,image_data) VALUES (?,?)";
             for(String imageData : rate.getImages()){
                 try(
@@ -139,15 +141,14 @@ public class RateDAOImp implements RateDAO {
     }
 
     @Override
-    public List<Rate> getFoodRates(Food food) throws SQLException {
+    public List<Rate> getAllRates() throws SQLException {
         List<Rate> rates = new ArrayList<>();
         List<Integer> rateIds = new ArrayList<>();
-        String sql = "SELECT * FROM ratings WHERE food_id = ?";
+        String sql = "SELECT * FROM ratings";
         try(
                 Connection connection = DBConnector.gConnection();
                 PreparedStatement preparedStatement = connection.prepareStatement(sql);
                 ){
-            preparedStatement.setInt(1,food.getId());
             try(ResultSet resultSet = preparedStatement.executeQuery()){
                 while(resultSet.next()){
                     rateIds.add(resultSet.getInt("id"));

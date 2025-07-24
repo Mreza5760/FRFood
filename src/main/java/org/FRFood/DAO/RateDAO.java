@@ -12,5 +12,5 @@ public interface RateDAO {
     void deleteById(int id) throws SQLException;
     void updateById(int id, Rate rate) throws SQLException;
     Optional<Rate> getById(int id) throws SQLException;
-    List<Rate> getFoodRates(Food food) throws SQLException;
+    List<Rate> getAllRates() throws SQLException;
 }

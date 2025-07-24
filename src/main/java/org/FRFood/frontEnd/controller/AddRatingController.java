@@ -1,6 +1,7 @@
 package org.FRFood.frontEnd.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.geometry.Insets;
 import javafx.scene.control.*;
@@ -8,6 +9,7 @@ import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.*;
 import javafx.stage.FileChooser;
+import org.FRFood.frontEnd.Util.SceneNavigator;
 import org.FRFood.frontEnd.Util.SessionManager;
 
 import java.io.File;
@@ -115,6 +117,7 @@ public class AddRatingController {
         body.put("comment", comment);
         body.put("imageBase64", base64Images);
 
+
         try {
             URL url = new URL("http://localhost:8080/ratings");
             HttpURLConnection conn = (HttpURLConnection) url.openConnection();
@@ -126,6 +129,7 @@ public class AddRatingController {
             ObjectMapper mapper = new ObjectMapper();
             String json = mapper.writeValueAsString(body);
 
+
             try (OutputStream os = conn.getOutputStream()) {
                 os.write(json.getBytes());
             }
@@ -134,7 +138,7 @@ public class AddRatingController {
             if (code == 200 || code == 201) {
                 showAlert(Alert.AlertType.INFORMATION, "Success", "Review submitted!");
             } else {
-                showAlert(Alert.AlertType.ERROR, "Error", "Failed. Code: " + code);
+                showAlert(Alert.AlertType.ERROR, "Error", "Failed. Code: " + code+ conn.getResponseMessage());
             }
 
         } catch (Exception e) {
@@ -149,5 +153,9 @@ public class AddRatingController {
         alert.setHeaderText(null);
         alert.setContentText(message);
         alert.showAndWait();
+    }
+
+    public void handleBack(ActionEvent actionEvent) {
+        SceneNavigator.switchTo("/frontend/orderHistory.fxml",imagePreviewPane);
     }
 }
