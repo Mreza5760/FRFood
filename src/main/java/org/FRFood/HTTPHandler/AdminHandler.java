@@ -22,12 +22,14 @@ import static org.FRFood.entity.Role.admin;
 public class AdminHandler implements HttpHandler {
     private final UserDAO userDAO;
     private final OrderDAO orderDAO;
+    private final CouponDAO  couponDAO;
     private final ObjectMapper objectMapper;
     private final TransactionDAO transactionDAO;
 
     public AdminHandler() {
         userDAO = new UserDAOImp();
         orderDAO = new OrderDAOImp();
+        couponDAO = new CouponDAOImp();
         objectMapper = new ObjectMapper();
         transactionDAO = new TransactionDAOImp();
     }
@@ -45,17 +47,32 @@ public class AdminHandler implements HttpHandler {
 
         try {
             switch (method) {
+                case "POST" -> {
+                    if (path.equals("/admin/coupons")) {
+                        handleCreateCoupon(exchange);
+                    } else {
+                        HttpError.notFound(exchange, "Not Found");
+                    }
+                }
                 case "GET" -> {
                     switch (path) {
                         case "/admin/users" -> handleGetUsers(exchange);
                         case "/admin/orders" -> handleGetOrders(exchange);
                         case "/admin/transactions" -> handleGetTransactions(exchange);
+                        case "/admin/coupons" -> handleGetCoupons(exchange);
                         default -> HttpError.notFound(exchange, "Not Found");
                     }
                 }
                 case "PATCH" -> {
                     if (path.matches("/admin/users/\\d+/status")) {
                         handleUserStatus(exchange);
+                    } else {
+                        HttpError.notFound(exchange, "Not Found");
+                    }
+                }
+                case "DELETE" -> {
+                    if ((path.matches("^/admin/coupons/\\d+$"))) {
+                        handleDeleteCoupon(exchange);
                     } else {
                         HttpError.notFound(exchange, "Not Found");
                     }
@@ -212,6 +229,77 @@ public class AdminHandler implements HttpHandler {
             JsonResponse.sendJsonResponse(exchange, 200, objectMapper.writeValueAsString(transactions));
         } catch (SQLException e) {
             HttpError.internal(exchange, "Internal server error while updating profile");
+        }
+    }
+
+    private void handleCreateCoupon(HttpExchange exchange) throws IOException {
+        Optional<User> optionalUser = authenticate(exchange);
+        if (optionalUser.isEmpty()) return;
+        User user = optionalUser.get();
+        if (!user.getRole().equals(admin)) {
+            HttpError.forbidden(exchange, "Only Admin Allowed");
+            return;
+        }
+        Coupon coupon = objectMapper.readValue(exchange.getRequestBody(), Coupon.class);
+        try {
+            if (coupon.getCouponCode() == null || coupon.getType() == null || coupon.getValue() == null || coupon.getUserCount() == null || coupon.getMinPrice() == null) {
+                HttpError.notFound(exchange, "Required field not found");
+                return;
+            }
+            if (couponDAO.getByCode(coupon.getCouponCode()).isPresent()) {
+                HttpError.forbidden(exchange, "Coupon already exists");
+                return;
+            }
+            coupon.setId(couponDAO.insert(coupon));
+            String json = objectMapper.writeValueAsString(coupon);
+            JsonResponse.sendJsonResponse(exchange, 200, json);
+        } catch (SQLException e) {
+            HttpError.internal(exchange, "Internal server error while creating coupon");
+        }
+    }
+
+    private void handleGetCoupons(HttpExchange exchange) throws IOException {
+        Optional<User> optionalUser = authenticate(exchange);
+        if (optionalUser.isEmpty()) return;
+        User user = optionalUser.get();
+        if (!user.getRole().equals(admin)) {
+            HttpError.forbidden(exchange, "Only Admin Allowed");
+            return;
+        }
+
+        try {
+            List<Coupon> coupons = couponDAO.getAllCoupons();
+            String json = objectMapper.writeValueAsString(coupons);
+            JsonResponse.sendJsonResponse(exchange, 200, json);
+        } catch (SQLException e) {
+            HttpError.internal(exchange, "Internal server error while getting coupons");
+        }
+    }
+
+    private void handleDeleteCoupon(HttpExchange exchange) throws IOException {
+        Optional<User> optionalUser = authenticate(exchange);
+        if (optionalUser.isEmpty()) return;
+        User user = optionalUser.get();
+        if (!user.getRole().equals(admin)) {
+            HttpError.forbidden(exchange, "Only Admin Allowed");
+            return;
+        }
+
+        String path = exchange.getRequestURI().getPath();
+        String[] parts = path.split("/");
+        int id = Integer.parseInt(parts[3]);
+
+        try {
+            Optional<Coupon> optionalCoupon = couponDAO.getById(id);
+            if (optionalCoupon.isEmpty()) {
+                HttpError.notFound(exchange, "Coupon not found");
+                return;
+            }
+            Coupon coupon = optionalCoupon.get();
+            couponDAO.delete(coupon.getId());
+            JsonResponse.sendJsonResponse(exchange, 200, "Coupon deleted");
+        } catch (SQLException e) {
+            HttpError.internal(exchange, "Internal server error while deleting coupon");
         }
     }
 }

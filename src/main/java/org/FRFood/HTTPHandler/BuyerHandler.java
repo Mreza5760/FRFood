@@ -678,7 +678,7 @@ public class BuyerHandler implements HttpHandler {
                 return;
             }
             Coupon coupon = optionalCoupon.get();
-            coupon.setUserCount(couponDAO.getUserCount(coupon.getCouponId(), user.getId()));
+            coupon.setUserCount(couponDAO.getUserCount(coupon.getId(), user.getId()));
 
             String json =  objectMapper.writeValueAsString(coupon);
             JsonResponse.sendJsonResponse(exchange, 200, json);
