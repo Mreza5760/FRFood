@@ -120,11 +120,12 @@ CREATE TABLE IF NOT EXISTS Orders
         )                    NOT NULL,
     created_at       TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at       TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    FOREIGN KEY (customer_id) REFERENCES Users (id) ON DELETE RESTRICT,
-    FOREIGN KEY (restaurant_id) REFERENCES Restaurants (id) ON DELETE RESTRICT,
+    FOREIGN KEY (customer_id) REFERENCES Users (id) ON DELETE CASCADE,
+    FOREIGN KEY (restaurant_id) REFERENCES Restaurants (id) ON DELETE CASCADE,
     FOREIGN KEY (courier_id) REFERENCES Users (id) ON DELETE SET NULL,
     FOREIGN KEY (coupon_id) REFERENCES Coupons (id) ON DELETE SET NULL
 );
+
 
 CREATE TABLE IF NOT EXISTS Order_Items
 (
