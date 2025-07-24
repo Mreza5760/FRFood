@@ -36,4 +36,9 @@ public class CouponDAOImp implements CouponDAO {
     public void delete(int id) throws SQLException {
 
     }
+
+    @Override
+    public void update(int id, Coupon coupon) throws SQLException {
+
+    }
 }

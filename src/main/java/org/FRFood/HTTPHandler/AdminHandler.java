@@ -55,17 +55,30 @@ public class AdminHandler implements HttpHandler {
                     }
                 }
                 case "GET" -> {
-                    switch (path) {
-                        case "/admin/users" -> handleGetUsers(exchange);
-                        case "/admin/orders" -> handleGetOrders(exchange);
-                        case "/admin/transactions" -> handleGetTransactions(exchange);
-                        case "/admin/coupons" -> handleGetCoupons(exchange);
-                        default -> HttpError.notFound(exchange, "Not Found");
+                    if (path.equals("/admin/users")) {
+                        handleGetUsers(exchange);
+                    } else if (path.equals("/admin/orders")) {
+                        handleGetOrders(exchange);
+                    } else if (path.equals("/admin/transactions")) {
+                        handleGetTransactions(exchange);
+                    } else if (path.matches("^/admin/coupons/\\d+$")) {
+                        handleGetCoupon(exchange);
+                    } else if (path.equals("/admin/coupons")) {
+                        handleGetCoupons(exchange);
+                    } else {
+                        HttpError.notFound(exchange, "Not Found");
                     }
                 }
                 case "PATCH" -> {
                     if (path.matches("/admin/users/\\d+/status")) {
                         handleUserStatus(exchange);
+                    } else {
+                        HttpError.notFound(exchange, "Not Found");
+                    }
+                }
+                case "PUT" -> {
+                    if ((path.matches("^/admin/coupons/\\d+$"))) {
+                        handleUpdateCoupon(exchange);
                     } else {
                         HttpError.notFound(exchange, "Not Found");
                     }
@@ -300,6 +313,84 @@ public class AdminHandler implements HttpHandler {
             JsonResponse.sendJsonResponse(exchange, 200, "Coupon deleted");
         } catch (SQLException e) {
             HttpError.internal(exchange, "Internal server error while deleting coupon");
+        }
+    }
+
+    private void handleUpdateCoupon(HttpExchange exchange) throws IOException {
+        Optional<User> optionalUser = authenticate(exchange);
+        if (optionalUser.isEmpty()) return;
+        User user = optionalUser.get();
+        if (!user.getRole().equals(admin)) {
+            HttpError.forbidden(exchange, "Only Admin Allowed");
+            return;
+        }
+
+        String path = exchange.getRequestURI().getPath();
+        String[] parts = path.split("/");
+        int id = Integer.parseInt(parts[3]);
+
+        try {
+            Optional<Coupon> optionalCoupon = couponDAO.getById(id);
+            if (optionalCoupon.isEmpty()) {
+                HttpError.notFound(exchange, "Coupon not found");
+                return;
+            }
+            Coupon curCoupon = optionalCoupon.get();
+            Coupon coupon = objectMapper.readValue(exchange.getRequestBody(), Coupon.class);
+            if (coupon.getMinPrice() != null) {
+                curCoupon.setMinPrice(coupon.getMinPrice());
+            }
+            if (coupon.getCouponCode() != null) {
+                curCoupon.setCouponCode(coupon.getCouponCode());
+            }
+            if (coupon.getType() != null) {
+                curCoupon.setType(coupon.getType());
+            }
+            if (coupon.getValue() != null) {
+                curCoupon.setValue(coupon.getValue());
+            }
+            if (coupon.getUserCount() != null) {
+                curCoupon.setUserCount(coupon.getUserCount());
+            }
+            if (coupon.getStartDate() != null) {
+                curCoupon.setStartDate(coupon.getStartDate());
+            }
+            if (coupon.getEndDate() != null) {
+                curCoupon.setEndDate(coupon.getEndDate());
+            }
+
+            couponDAO.update(id, curCoupon);
+            String json = objectMapper.writeValueAsString(coupon);
+            JsonResponse.sendJsonResponse(exchange, 200, json);
+        } catch (SQLException e) {
+            HttpError.internal(exchange, "Internal server error while updating coupon");
+        }
+    }
+
+    private void handleGetCoupon(HttpExchange exchange) throws IOException {
+        Optional<User> optionalUser = authenticate(exchange);
+        if (optionalUser.isEmpty()) return;
+        User user = optionalUser.get();
+        if (!user.getRole().equals(admin)) {
+            HttpError.forbidden(exchange, "Only Admin Allowed");
+            return;
+        }
+
+        String path = exchange.getRequestURI().getPath();
+        String[] parts = path.split("/");
+        int id = Integer.parseInt(parts[3]);
+
+        try {
+            Optional<Coupon> optionalCoupon = couponDAO.getById(id);
+            if (optionalCoupon.isEmpty()) {
+                HttpError.notFound(exchange, "Coupon not found");
+                return;
+            }
+            Coupon coupon = optionalCoupon.get();
+            String json = objectMapper.writeValueAsString(coupon);
+            JsonResponse.sendJsonResponse(exchange, 200, json);
+        } catch (SQLException e) {
+            HttpError.internal(exchange, "Internal server error while getting coupon");
         }
     }
 }
