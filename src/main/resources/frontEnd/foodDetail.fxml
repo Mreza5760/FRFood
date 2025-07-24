@@ -24,8 +24,11 @@
                 onAction="#handleBack"
                 style="-fx-background-color: #e74c3c; -fx-text-fill: white; -fx-font-size: 14px; -fx-font-weight: bold; -fx-background-radius: 8;"/>
     </HBox>
+    <HBox prefWidth="Infinity">
+        <Label fx:id="itemNameLabel" style="-fx-font-size: 28px; -fx-font-weight: bold; -fx-text-fill: #1e2a38;"/>
+        <Label fx:id="itemAvgRating" style="-fx-font-size: 28px; -fx-font-weight: bold; -fx-text-fill: #1e2a38;"/>
+    </HBox>
 
-    <Label fx:id="itemNameLabel" style="-fx-font-size: 28px; -fx-font-weight: bold; -fx-text-fill: #1e2a38;"/>
 
     <ImageView fx:id="itemImage" fitHeight="200" fitWidth="200" preserveRatio="true"
                style="-fx-effect: dropshadow(gaussian, rgba(0,0,0,0.1), 10, 0, 0, 2);" />

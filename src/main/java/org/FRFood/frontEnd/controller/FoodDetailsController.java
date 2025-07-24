@@ -21,6 +21,7 @@ import java.util.Base64;
 
 public class FoodDetailsController {
 
+    public Label itemAvgRating;
     @FXML private Label itemNameLabel;
     @FXML private ImageView itemImage;
     @FXML private Label itemDescriptionLabel;
@@ -86,6 +87,7 @@ public class FoodDetailsController {
 
                 System.out.println(conn.getResponseCode() + conn.getResponseMessage());
                 Platform.runLater(() -> {
+                    itemAvgRating.setText(root.get("avg_rating").asText());
                     reviewsContainer.getChildren().clear();
                     for (JsonNode comment : root.get("comments")) {
                         VBox reviewBox = new VBox(5);
