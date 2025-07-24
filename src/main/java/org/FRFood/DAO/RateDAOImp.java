@@ -164,7 +164,7 @@ public class RateDAOImp implements RateDAO {
     @Override
     public List<Rate> getUserRateOnOrder(int userId, int orderId) throws SQLException {
         List<Rate> rates = new ArrayList<>();
-        String sql = "SELECT * FROM rating WHERE user_id = ? AND order_id = ?";
+        String sql = "SELECT * FROM ratings WHERE user_id = ? AND order_id = ?";
         try(
                 Connection connection = DBConnector.gConnection();
                 PreparedStatement preparedStatement = connection.prepareStatement(sql);
@@ -174,6 +174,7 @@ public class RateDAOImp implements RateDAO {
             try(ResultSet resultSet = preparedStatement.executeQuery()){
                 while(resultSet.next()){
                     rates.add(getById(resultSet.getInt("id")).orElse(null));
+
                 }
             }
         }
