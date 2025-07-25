@@ -8,7 +8,6 @@ import javafx.fxml.FXML;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
-import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
@@ -19,7 +18,6 @@ import javafx.scene.layout.Priority;
 import javafx.scene.layout.Region;
 import javafx.scene.layout.VBox;
 import org.FRFood.entity.Food;
-import org.FRFood.entity.Menu;
 import org.FRFood.frontEnd.Util.SceneNavigator;
 import org.FRFood.frontEnd.Util.SessionManager;
 
@@ -107,13 +105,12 @@ public class AddFoodToMenuController {
         card.setStyle("-fx-background-color: white; -fx-background-radius: 12; -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.1), 10, 0, 0, 6);");
         card.setPrefWidth(600);
 
-        // Logo
         ImageView logo = new ImageView();
         try {
             byte[] imageData = Base64.getDecoder().decode(food.getPicture());
             logo.setImage(new Image(new ByteArrayInputStream(imageData)));
         } catch (Exception e) {
-            logo.setImage(null); // fallback if needed
+            logo.setImage(null);
         }
         logo.setFitWidth(80);
         logo.setFitHeight(80);
@@ -129,7 +126,7 @@ public class AddFoodToMenuController {
         Label supplyLabel = new Label("📍 Supply: " + food.getSupply());
         supplyLabel.setStyle("-fx-font-size: 14px; -fx-text-fill: #3a3a3a;");
 
-        Label feeLabel = new Label("💰 Price: " + food.getPrice() + "$");
+        Label feeLabel = new Label("💰 Price: " + food.getPrice() + " Toman");
         feeLabel.setStyle("-fx-font-size: 14px; -fx-text-fill: #3a3a3a;");
 
         Label descriptionLabel = new Label("📝 " + food.getDescription());
@@ -141,7 +138,6 @@ public class AddFoodToMenuController {
         HBox.setHgrow(spacer, Priority.ALWAYS);
 
 
-// Delete Button
         Button addBtn = new Button("add");
         addBtn.setPrefWidth(100);
         addBtn.setPrefHeight(36);
@@ -153,20 +149,16 @@ public class AddFoodToMenuController {
                     -fx-background-radius: 10;
                     -fx-cursor: hand;
                 """);
-        addBtn.setOnAction(e -> handleaddBtn(food));
+        addBtn.setOnAction(e -> handleAddBtn(food));
 
-// Add both buttons to VBox
         HBox rightBox = new HBox(10, addBtn);
         rightBox.setAlignment(Pos.CENTER_RIGHT);
-
-
-        card.setOnMouseClicked(e -> handleClick(food)); // full card click
 
         card.getChildren().addAll(logo, info, spacer, rightBox);
         return card;
     }
 
-    private void handleaddBtn(Food food) {
+    private void handleAddBtn(Food food) {
         String safeUrl = "http://localhost:8080/restaurants/" + restaurantId + "/menu/" + URLEncoder.encode(menuTitle, StandardCharsets.UTF_8);
         URI uri = URI.create(safeUrl);
 
@@ -201,10 +193,6 @@ public class AddFoodToMenuController {
                     Platform.runLater(() -> showAlert(Alert.AlertType.ERROR, "Error", "An error occurred while sending the request."));
                     return null;
                 });
-
-    }
-
-    private void handleClick(Food food) {
     }
 
     private void showAlert(Alert.AlertType type, String title, String content) {
@@ -214,5 +202,4 @@ public class AddFoodToMenuController {
         alert.setContentText(content);
         alert.showAndWait();
     }
-
 }

@@ -62,7 +62,7 @@ public class MenuController {
 
     @FXML
     public void addFood(ActionEvent actionEvent) {
-        AddFoodToMenuController.setData( menuTitle, restaurant.getId());
+        AddFoodToMenuController.setData(menuTitle, restaurant.getId());
         SceneNavigator.switchTo("/frontend/addFoodToMenu.fxml", menu_name_label);
     }
 
@@ -143,7 +143,7 @@ public class MenuController {
         Label supplyLabel = new Label("📍 Supply: " + food.getSupply());
         supplyLabel.setStyle("-fx-font-size: 14px; -fx-text-fill: #3a3a3a;");
 
-        Label feeLabel = new Label("💰 Price: " + food.getPrice() + "Toman");
+        Label feeLabel = new Label("💰 Price: " + food.getPrice() + " Toman");
         feeLabel.setStyle("-fx-font-size: 14px; -fx-text-fill: #3a3a3a;");
 
         Label descriptionLabel = new Label("📝 " + food.getDescription());
@@ -310,9 +310,6 @@ public class MenuController {
 
     }
 
-    private void handleComments(Food food) {
-    }
-
     private void handleClick(Food food) {
         FoodDetailsController.setItemId(food.getId());
         SceneNavigator.switchTo("/frontend/FoodDetail.fxml", menu_name_label);
@@ -321,7 +318,6 @@ public class MenuController {
     private void handleDelete(Food food) {
         String safeUrl = "http://localhost:8080/restaurants/" + restaurant.getId() + "/menu/" + URLEncoder.encode(menuTitle, StandardCharsets.UTF_8) + "/" + food.getId();
         URI uri = URI.create(safeUrl);
-//        String url = "http://localhost:8080/restaurants/" + restaurantId+"/menu/" + menuTitle + "/" + food.getId();
         HttpRequest request = HttpRequest.newBuilder()
                 .uri(uri)
                 .header("Authorization", "Bearer " + SessionManager.getAuthToken())
@@ -331,7 +327,6 @@ public class MenuController {
         HttpClient.newHttpClient().sendAsync(request, HttpResponse.BodyHandlers.ofString())
                 .thenAccept(response -> {
                     if (response.statusCode() == 200 || response.statusCode() == 204) {
-                        // Optionally refresh the list on UI thread
                         Platform.runLater(this::fetchFoods);
                     } else {
                         System.err.println("Failed to delete food: HTTP " + response.statusCode() + response.body());
@@ -342,5 +337,4 @@ public class MenuController {
                     return null;
                 });
     }
-
 }
