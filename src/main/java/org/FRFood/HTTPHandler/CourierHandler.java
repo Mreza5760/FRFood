@@ -119,7 +119,7 @@ public class CourierHandler implements HttpHandler {
                 transaction.setOrderID(orderId);
                 transaction.setUserID(user.getId());
                 transaction.setAmount(order.getCourierFee());
-                transaction.setMethod(TransactionMethod.online);
+                transaction.setMethod(TransactionMethod.courierPayment);
                 new TransactionDAOImp().insert(transaction);
                 new UserDAOImp().setWallet(user.getId(), user.getWallet() + order.getCourierFee());
             } else {
@@ -158,13 +158,15 @@ public class CourierHandler implements HttpHandler {
 
         try {
             List<Order> orders = orderDAO.getCourierOrders(user.getId());
-
+            List<Order> finalOrders = new ArrayList<>(orders);
+            UserDAO userDAO = new UserDAOImp();
             if (query != null && !query.isEmpty()) {
                 String[] parts = query.split("&");
                 Map<String, String> params = new HashMap<>();
                 for (String part : parts) {
                     String[] keyValue = part.split("=");
-                    params.put(keyValue[0], keyValue[1]);
+                    if (keyValue.length == 2)
+                        params.put(keyValue[0], keyValue[1]);
                 }
                 for (Order order : orders) {
                     Optional<Restaurant> optionalRestaurant = restaurantDAO.getById(order.getRestaurantId());
@@ -174,10 +176,14 @@ public class CourierHandler implements HttpHandler {
                     }
                     Restaurant restaurant = optionalRestaurant.get();
                     if (params.containsKey("vendor") && !restaurant.getName().contains(params.get("vendor"))) {
-                        orders.remove(order);
-                    } else if (params.containsKey("user") && order.getCustomerId() != Integer.parseInt(params.get("user"))) {
-                        orders.remove(order);
-                    } else if (params.containsKey("search")) {
+                        finalOrders.remove(order);
+                    }
+                    if (params.containsKey("user") && !params.get("user").isEmpty()) {
+                        Optional<User> optionalUser = userDAO.getById(order.getCustomerId());
+                        if (optionalUser.isPresent() && !optionalUser.get().getFullName().contains(params.get("user")))
+                            finalOrders.remove(order);
+                    }
+                    if (params.containsKey("search")) {
                         List<OrderItem> items = order.getItems();
                         boolean found = false;
                         for (OrderItem item : items) {
@@ -193,13 +199,13 @@ public class CourierHandler implements HttpHandler {
                             }
                         }
                         if (!found) {
-                            orders.remove(order);
+                            finalOrders.remove(order);
                         }
                     }
                 }
             }
 
-            JsonResponse.sendJsonResponse(exchange, 200, objectMapper.writeValueAsString(orders));
+            JsonResponse.sendJsonResponse(exchange, 200, objectMapper.writeValueAsString(finalOrders));
         }  catch (SQLException e) {
             HttpError.internal(exchange, "Internal server error while updating profile");
         }

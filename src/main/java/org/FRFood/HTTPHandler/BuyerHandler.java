@@ -244,13 +244,15 @@ public class BuyerHandler implements HttpHandler {
 
         try {
             List<Order> orders = orderDAO.getUserOrders(user.getId());
+            List<Order> finalOrders = new ArrayList<>(orders);
 
             if (query != null && !query.isEmpty()) {
                 String[] parts = query.split("&");
                 Map<String, String> params = new HashMap<>();
                 for (String part : parts) {
                     String[] keyValue = part.split("=");
-                    params.put(keyValue[0], keyValue[1]);
+                    if (keyValue.length == 2)
+                        params.put(keyValue[0], keyValue[1]);
                 }
                 for (Order order : orders) {
                     Optional<Restaurant> optionalRestaurant = restaurantDAO.getById(order.getRestaurantId());
@@ -260,8 +262,9 @@ public class BuyerHandler implements HttpHandler {
                     }
                     Restaurant restaurant = optionalRestaurant.get();
                     if (params.containsKey("vendor") && !restaurant.getName().contains(params.get("vendor"))) {
-                        orders.remove(order);
-                    } else if (params.containsKey("search")) {
+                        finalOrders.remove(order);
+                    }
+                    if (params.containsKey("search") && !params.get("search").isEmpty()) {
                         List<OrderItem> items = order.getItems();
                         boolean found = false;
                         for (OrderItem item : items) {
@@ -277,13 +280,13 @@ public class BuyerHandler implements HttpHandler {
                             }
                         }
                         if (!found) {
-                            orders.remove(order);
+                            finalOrders.remove(order);
                         }
                     }
                 }
             }
 
-            String json = objectMapper.writeValueAsString(orders);
+            String json = objectMapper.writeValueAsString(finalOrders);
             JsonResponse.sendJsonResponse(exchange, 200, json);
         } catch (Exception e) {
             HttpError.internal(exchange, "Internal server error" + e.getMessage());

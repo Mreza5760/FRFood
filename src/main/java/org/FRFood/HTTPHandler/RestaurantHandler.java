@@ -427,15 +427,18 @@ public class RestaurantHandler implements HttpHandler {
                 for (Order order : orders) {
                     if (params.containsKey("status") && !params.get("status").equals("null") && !params.get("status").isEmpty() && !order.getStatus().toString().equals(params.get("status"))) {
                         finalOrders.remove(order);
-                    } else if (params.containsKey("user") && !params.get("user").isEmpty()) {
+                    }
+                    if (params.containsKey("user") && !params.get("user").isEmpty()) {
                         Optional<User> optionalUser = userDAO.getById(order.getCustomerId());
                         if (optionalUser.isPresent() && !optionalUser.get().getFullName().contains(params.get("user")))
                             finalOrders.remove(order);
-                    } else if (params.containsKey("courier") && !params.get("courier").isEmpty()) {
+                    }
+                    if (params.containsKey("courier") && !params.get("courier").isEmpty()) {
                         Optional<User> optionalUser = userDAO.getById(order.getCourierId());
                         if (order.getCourierId() == 0 || (optionalUser.isPresent() && !optionalUser.get().getFullName().contains(params.get("courier"))))
                             finalOrders.remove(order);
-                    } else if (params.containsKey("search") && !params.get("search").isEmpty()) {
+                    }
+                    if (params.containsKey("search") && !params.get("search").isEmpty()) {
                         List<OrderItem> items = order.getItems();
                         boolean found = false;
                         for (OrderItem item : items) {
@@ -516,11 +519,24 @@ public class RestaurantHandler implements HttpHandler {
                     food.setSupply(food.getSupply() + orderItem.getQuantity());
                     foodDAO.update(food);
                 }
+                Transaction transaction = new Transaction();
+                transaction.setOrderID(orderId);
+                transaction.setUserID(order.getCustomerId());
+                transaction.setAmount(order.getPayPrice());
+                transaction.setMethod(TransactionMethod.refund);
+                new TransactionDAOImp().insert(transaction);
                 new UserDAOImp().setWallet(customer.getId(), customer.getWallet() + order.getPayPrice());
             } else if (status == Status.preparing) {
                 Optional<User> optionalOwner = new UserDAOImp().getById(restaurant.getOwner().getId());
                 if (optionalOwner.isEmpty()) return;
                 User owner = optionalOwner.get();
+
+                Transaction transaction = new Transaction();
+                transaction.setOrderID(orderId);
+                transaction.setUserID(user.getId());
+                transaction.setAmount(order.getPayPrice() - order.getCourierFee());
+                transaction.setMethod(TransactionMethod.restaurantPayment);
+                new TransactionDAOImp().insert(transaction);
                 new UserDAOImp().setWallet(owner.getId(), owner.getWallet() + order.getPayPrice() - order.getCourierFee());
             }
 
