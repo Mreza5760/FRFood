@@ -14,7 +14,6 @@
           AnchorPane.topAnchor="20" AnchorPane.leftAnchor="20"
           AnchorPane.rightAnchor="20" AnchorPane.bottomAnchor="20">
 
-        <!-- Header -->
         <HBox alignment="CENTER_LEFT" spacing="15"
               style="-fx-background-color: #0077cc; -fx-padding: 10; -fx-background-radius: 8;">
             <Button fx:id="backButton" text="⬅ Back"
@@ -24,11 +23,9 @@
                    style="-fx-font-size: 22px; -fx-font-weight: bold; -fx-text-fill: white;"/>
         </HBox>
 
-        <!-- Table Title -->
         <Label text="Your Transactions"
                style="-fx-font-size: 18px; -fx-font-weight: bold; -fx-text-fill: #1e2a38;"/>
 
-        <!-- Transactions Table -->
         <TableView fx:id="transactionsTable" prefHeight="450" prefWidth="700"
                    style="-fx-background-radius: 8; -fx-border-radius: 8;
                           -fx-border-color: #cccccc; -fx-border-width: 1;">

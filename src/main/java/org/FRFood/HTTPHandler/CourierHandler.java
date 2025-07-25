@@ -35,7 +35,7 @@ public class CourierHandler implements HttpHandler {
         String overrideMethod = exchange.getRequestHeaders().getFirst("X-HTTP-Method-Override");
 
         if ("POST".equalsIgnoreCase(method) && overrideMethod != null) {
-            method = overrideMethod.toUpperCase(); // Treat POST+Override as that method
+            method = overrideMethod.toUpperCase();
         }
 
         try {
@@ -115,6 +115,12 @@ public class CourierHandler implements HttpHandler {
             }
 
             if (status == Status.completed) {
+                Transaction transaction = new Transaction();
+                transaction.setOrderID(orderId);
+                transaction.setUserID(user.getId());
+                transaction.setAmount(order.getCourierFee());
+                transaction.setMethod(TransactionMethod.online);
+                new TransactionDAOImp().insert(transaction);
                 new UserDAOImp().setWallet(user.getId(), user.getWallet() + order.getCourierFee());
             } else {
                 int activeOrder = 0;

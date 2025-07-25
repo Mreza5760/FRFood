@@ -30,7 +30,7 @@ public class AllUsersController {
     @FXML private TableColumn<User, String> addressColumn;
     @FXML private TableColumn<User, Integer> walletColumn;
     @FXML private TableColumn<User, String> roleColumn;
-    @FXML private TableColumn<User, Void> confirmedColumn; // change to Void for custom cell with buttons
+    @FXML private TableColumn<User, Void> confirmedColumn;
     @FXML private Button backButton;
 
     private final String token = SessionManager.getAuthToken();

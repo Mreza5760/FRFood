@@ -39,7 +39,7 @@ public class RestaurantHandler implements HttpHandler {
         String overrideMethod = exchange.getRequestHeaders().getFirst("X-HTTP-Method-Override");
 
         if ("POST".equalsIgnoreCase(method) && overrideMethod != null) {
-            method = overrideMethod.toUpperCase(); // Treat POST+Override as that method
+            method = overrideMethod.toUpperCase();
         }
 
         try {
@@ -139,6 +139,12 @@ public class RestaurantHandler implements HttpHandler {
         try {
             var restaurantOpt = Authenticate.restaurantChecker(exchange, user, restaurantId);
             if (restaurantOpt.isEmpty()) return;
+
+            Optional<Restaurant> optionalRestaurant = restaurantDAO.getById(restaurantId);
+            if (optionalRestaurant.isEmpty()) {
+                HttpError.internal(exchange, "Restaurant not found");
+                return;
+            }
 
             Restaurant updated = objectMapper.readValue(exchange.getRequestBody(), Restaurant.class);
             updated.setId(restaurantId);

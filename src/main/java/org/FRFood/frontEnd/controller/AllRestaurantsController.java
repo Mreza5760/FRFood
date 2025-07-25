@@ -51,11 +51,10 @@ public class AllRestaurantsController {
 
     @FXML
     public void initialize() {
+        backButton.setOnAction(e -> goBack());
         if (mode == 2) {
-            backButton.setOnAction(e -> goBack());
             fetchRestaurants2();
         } else {
-            backButton.setOnAction(e -> goBack());
             searchBox1.setOnAction(e -> handleSearch1());
             searchBox2.setOnAction(e -> handleSearch2());
             fetchRestaurants("",null);
@@ -132,19 +131,17 @@ public class AllRestaurantsController {
         card.setStyle("-fx-background-color: white; -fx-background-radius: 12; -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.1), 10, 0, 0, 6);");
         card.setPrefWidth(600);
 
-        // Logo
         ImageView logo = new ImageView();
         try {
             byte[] imageData = Base64.getDecoder().decode(r.getLogo());
             logo.setImage(new Image(new ByteArrayInputStream(imageData)));
         } catch (Exception e) {
-            logo.setImage(null); // fallback if needed
+            logo.setImage(null);
         }
         logo.setFitWidth(80);
         logo.setFitHeight(80);
         logo.setPreserveRatio(true);
 
-        // Info
         VBox info = new VBox(8);
         info.setAlignment(Pos.CENTER_LEFT);
 
@@ -165,7 +162,7 @@ public class AllRestaurantsController {
         Region spacer = new Region();
         HBox.setHgrow(spacer, Priority.ALWAYS);
 
-        card.setOnMouseClicked(e -> handleClick(r)); // full card click
+        card.setOnMouseClicked(e -> handleClick(r));
 
 
         final boolean[] isFavorite = {false};
@@ -184,10 +181,10 @@ public class AllRestaurantsController {
         starLabel.setOnMouseClicked(e -> {
             e.consume();
             if (isFavorite[0]) {
-                handleAddToFavorits(r);
+                handleAddToFavorites(r);
                 starLabel.setText("☆");
             } else {
-                handleRemoveFromFavorits(r);
+                handleRemoveFromFavorites(r);
                 starLabel.setText("★");
             }
             isFavorite[0] = !isFavorite[0];
@@ -217,7 +214,10 @@ public class AllRestaurantsController {
 
     @FXML
     private void goBack() {
-        SceneNavigator.switchTo("/frontend/buyerOrderPage.fxml", searchBox1);
+        if (mode == 2)
+            SceneNavigator.switchTo("/frontend/panel.fxml", backButton);
+        else
+            SceneNavigator.switchTo("/frontend/buyerOrderPage.fxml", backButton);
     }
 
     private void handleSearch1() {
@@ -266,7 +266,7 @@ public class AllRestaurantsController {
         return favoriteRestaurants;
     }
 
-    private void handleRemoveFromFavorits(Restaurant restaurant) {
+    private void handleRemoveFromFavorites(Restaurant restaurant) {
         HttpRequest request = HttpRequest.newBuilder()
                 .uri(URI.create("http://localhost:8080/favorites/" + restaurant.getId()))
                 .header("Authorization", "Bearer " + SessionManager.getAuthToken())
@@ -281,13 +281,12 @@ public class AllRestaurantsController {
                 System.err.println("Failed to fetch restaurants: HTTP " + response.statusCode() + response.body());
             }
 
-
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
 
-    private void handleAddToFavorits(Restaurant restaurant) {
+    private void handleAddToFavorites(Restaurant restaurant) {
         HttpRequest request = HttpRequest.newBuilder()
                 .uri(URI.create("http://localhost:8080/favorites/" + restaurant.getId()))
                 .header("Authorization", "Bearer " + SessionManager.getAuthToken())
@@ -302,10 +301,8 @@ public class AllRestaurantsController {
                 System.err.println("Failed to fetch restaurants: HTTP " + response.statusCode() + response.body());
             }
 
-
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
-
 }
