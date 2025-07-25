@@ -456,7 +456,7 @@ public class RestaurantHandler implements HttpHandler {
                 }
             }
 
-            JsonResponse.sendJsonResponse(exchange, 200, objectMapper.writeValueAsString(orders));
+            JsonResponse.sendJsonResponse(exchange, 200, objectMapper.writeValueAsString(finalOrders));
         } catch (SQLException e) {
             HttpError.internal(exchange, "Failed to get restaurant orders");
         }
