@@ -140,6 +140,12 @@ public class RestaurantHandler implements HttpHandler {
             var restaurantOpt = Authenticate.restaurantChecker(exchange, user, restaurantId);
             if (restaurantOpt.isEmpty()) return;
 
+            Optional<Restaurant> optionalRestaurant = restaurantDAO.getById(restaurantId);
+            if (optionalRestaurant.isEmpty()) {
+                HttpError.internal(exchange, "Restaurant not found");
+                return;
+            }
+
             Restaurant updated = objectMapper.readValue(exchange.getRequestBody(), Restaurant.class);
             updated.setId(restaurantId);
             if (!Validation.validatePhone(updated.getPhone())) {

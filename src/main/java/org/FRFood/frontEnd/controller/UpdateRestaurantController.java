@@ -5,6 +5,7 @@ import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.Node;
+import javafx.scene.control.Alert;
 import javafx.scene.control.TextField;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
@@ -30,8 +31,7 @@ public class UpdateRestaurantController {
     private String logoBase64 = "";
     private final String token = SessionManager.getAuthToken();
 
-    // This will be called externally to pre-load data
-    public void setRestaurantData(int id, String name, String address, String phone, double taxFee, double additionalFee, String logo) {
+    public void setRestaurantData(int id, String name, String address, String phone, int taxFee, int additionalFee, String logo) {
         this.restaurantId = id;
         nameField.setText(name);
         addressField.setText(address);
@@ -64,6 +64,29 @@ public class UpdateRestaurantController {
 
     @FXML
     public void handleSave(ActionEvent event) {
+        String name = nameField.getText().trim();
+        String address = addressField.getText().trim();
+        String phone = phoneField.getText().trim();
+        String taxFeeStr = taxFeeField.getText().trim();
+        String additionalFeeStr = additionalFeeField.getText().trim();
+
+        if (name.isEmpty() || address.isEmpty() || phone.isEmpty() || taxFeeStr.isEmpty() || additionalFeeStr.isEmpty()) {
+            showAlert(Alert.AlertType.ERROR, "Fill all fields", "Fill all fields");
+            return;
+        }
+
+        if (!phone.matches("^\\+?\\d{10,15}$")) {
+            showAlert(Alert.AlertType.ERROR, "Invalid phone number", "Invalid phone number");
+            return;
+        }
+
+        int taxFee = parseIntSafe(taxFeeStr);
+        int additionalFee = parseIntSafe(additionalFeeStr);
+        if (taxFee < 0 || additionalFee < 0) {
+            showAlert(Alert.AlertType.ERROR, "Invalid tax fee or additional fee", "Invalid tax fee or additional fee");
+            return;
+        }
+
         new Thread(() -> {
             try {
                 URL url = new URL("http://localhost:8080/restaurants/" + restaurantId);
@@ -75,11 +98,11 @@ public class UpdateRestaurantController {
 
                 ObjectMapper mapper = new ObjectMapper();
                 String requestBody = mapper.createObjectNode()
-                        .put("name", nameField.getText())
-                        .put("address", addressField.getText())
-                        .put("phone", phoneField.getText())
-                        .put("tax_fee", Double.parseDouble(taxFeeField.getText()))
-                        .put("additional_fee", Double.parseDouble(additionalFeeField.getText()))
+                        .put("name", name)
+                        .put("address", address)
+                        .put("phone", phone)
+                        .put("tax_fee", taxFee)
+                        .put("additional_fee", additionalFee)
                         .put("logoBase64", logoBase64)
                         .toString();
 
@@ -93,15 +116,33 @@ public class UpdateRestaurantController {
 
                 if (responseCode == 200) {
                     Platform.runLater(() -> {
-                        // Go back to restaurant list
                         SceneNavigator.switchTo("/frontend/myRestaurants.fxml", (Node) event.getSource());
                     });
+                } else if (responseCode == 400) {
+                    Platform.runLater(() -> {showAlert(Alert.AlertType.ERROR, "Bad Request", "Invalid phone number");});
+                } else {
+                    Platform.runLater(() -> {showAlert(Alert.AlertType.ERROR, "Bad Request", "Failed to update restaurant");});
                 }
-
             } catch (Exception e) {
                 e.printStackTrace();
             }
         }).start();
+    }
+
+    private int parseIntSafe(String text) {
+        try {
+            return Integer.parseInt(text);
+        } catch (NumberFormatException e) {
+            return -1;
+        }
+    }
+
+    private void showAlert(Alert.AlertType type, String title, String content) {
+        Alert alert = new Alert(type);
+        alert.setTitle(title);
+        alert.setHeaderText(null);
+        alert.setContentText(content);
+        alert.showAndWait();
     }
 
     @FXML
