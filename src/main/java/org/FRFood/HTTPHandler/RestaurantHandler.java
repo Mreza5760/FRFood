@@ -415,7 +415,6 @@ public class RestaurantHandler implements HttpHandler {
             if (restaurantOpt.isEmpty()) return;
             List<Order> orders = orderDAO.getRestaurantOrders(restaurantId);
             List<Order> finalOrders = new ArrayList<>(orders);
-
             if (query != null && !query.isEmpty()) {
                 String[] parts = query.split("&");
                 Map<String, String> params = new HashMap<>();
