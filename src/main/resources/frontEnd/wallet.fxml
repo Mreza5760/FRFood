@@ -17,7 +17,6 @@
           AnchorPane.bottomAnchor="20"
           style="-fx-padding: 20;">
 
-        <!-- Header with Back Button -->
         <HBox alignment="CENTER_LEFT" spacing="15"
               style="-fx-background-color: #0077cc; -fx-padding: 10; -fx-background-radius: 8;">
             <Button fx:id="backButton" text="⬅ Back"
@@ -28,12 +27,10 @@
                    style="-fx-font-size: 22px; -fx-font-weight: bold; -fx-text-fill: white;"/>
         </HBox>
 
-        <!-- Current Wallet Balance -->
         <Label fx:id="balanceLabel"
                text="Wallet Balance: 0 Toman"
                style="-fx-font-size: 20px; -fx-font-weight: bold; -fx-text-fill: #1e2a38;"/>
 
-        <!-- Input + Deposit/Withdraw Buttons -->
         <HBox spacing="15" alignment="CENTER">
             <TextField fx:id="amountField"
                        promptText="Enter amount"
@@ -47,7 +44,6 @@
                            -fx-font-size: 14px; -fx-background-radius: 5; -fx-cursor: hand;"/>
         </HBox>
 
-        <!-- Transaction History -->
         <Button fx:id="historyButton"
                 text="View Transaction History"
                 prefWidth="250"

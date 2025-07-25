@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
+import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
@@ -33,7 +34,7 @@ public class WalletController {
     private Button historyButton;
 
     @FXML
-    private Button backButton;  // added backButton reference
+    private Button backButton;
 
     private int balance = 0;
     private final String token = SessionManager.getAuthToken();
@@ -77,13 +78,9 @@ public class WalletController {
     private void updateWallet(boolean isDeposit) {
         try {
             int amount = Integer.parseInt(amountField.getText());
-            if (amount < 0) {
-                System.out.println("Invalid amount");
-                return;
-            }
-
             if (!isDeposit && amount > balance) {
                 System.out.println("Not enough balance for withdrawal.");
+                showAlert(Alert.AlertType.ERROR, "Error", "Not enough balance for withdrawal.");
                 return;
             }
 
@@ -109,7 +106,6 @@ public class WalletController {
 
                     int responseCode = conn.getResponseCode();
                     if (responseCode == 200) {
-                        // Update local balance
                         balance += finalAmount;
                         Platform.runLater(() -> {
                             updateBalanceLabel();
@@ -134,5 +130,13 @@ public class WalletController {
 
     private void updateBalanceLabel() {
         balanceLabel.setText("Wallet Balance: " + balance + " Toman");
+    }
+
+    private void showAlert(Alert.AlertType type, String title, String content) {
+        Alert alert = new Alert(type);
+        alert.setTitle(title);
+        alert.setHeaderText(null);
+        alert.setContentText(content);
+        alert.showAndWait();
     }
 }
