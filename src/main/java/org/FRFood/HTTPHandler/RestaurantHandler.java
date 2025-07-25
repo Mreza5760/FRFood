@@ -424,17 +424,17 @@ public class RestaurantHandler implements HttpHandler {
                 }
                 UserDAO userDAO = new UserDAOImp();
                 for (Order order : orders) {
-                    if (params.containsKey("status") && !params.get("status").isEmpty() && !order.getStatus().toString().equals(params.get("status"))) {
+                    if (params.containsKey("status") && params.get("status") != null && !params.get("status").isEmpty() && !order.getStatus().toString().equals(params.get("status"))) {
                         orders.remove(order);
-                    } else if (params.containsKey("user")) {
+                    } else if (params.containsKey("user") && params.get("user") != null && !params.get("user").isEmpty()) {
                         Optional<User> optionalUser = userDAO.getById(order.getCustomerId());
                         if (optionalUser.isEmpty() || optionalUser.get().getFullName().contains(params.get("user")))
                             orders.remove(order);
-                    } else if (params.containsKey("courier")) {
+                    } else if (params.containsKey("courier") && params.get("courier") != null && !params.get("courier").isEmpty()) {
                         Optional<User> optionalUser = userDAO.getById(order.getCustomerId());
                         if (optionalUser.isEmpty() || optionalUser.get().getFullName().contains(params.get("courier")))
                             orders.remove(order);
-                    } else if (params.containsKey("search")) {
+                    } else if (params.containsKey("search") && params.get("search") != null && !params.get("search").isEmpty()) {
                         List<OrderItem> items = order.getItems();
                         boolean found = false;
                         for (OrderItem item : items) {
