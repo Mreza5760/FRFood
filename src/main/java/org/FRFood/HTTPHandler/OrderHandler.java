@@ -132,6 +132,19 @@ public class OrderHandler implements HttpHandler {
                     return;
                 }
                 Food food = optionalFood.get();
+                if (food.getSupply() < orderItem.getQuantity()) {
+                    HttpError.badRequest(exchange, "Supply less than order quantity");
+                    return;
+                }
+            }
+
+            for (OrderItem orderItem : order.getItems()) {
+                Optional<Food> optionalFood = foodDAO.getById(orderItem.getItemId());
+                if (optionalFood.isEmpty()) {
+                    HttpError.notFound(exchange, "Food not found");
+                    return;
+                }
+                Food food = optionalFood.get();
                 food.setSupply(food.getSupply()-orderItem.getQuantity());
                 foodDAO.update(food);
             }

@@ -12,6 +12,7 @@ import com.sun.net.httpserver.HttpExchange;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import static org.FRFood.util.Authenticate.authenticate;
 
+import java.time.LocalDate;
 import java.util.*;
 import java.io.IOException;
 import java.sql.SQLException;
@@ -458,7 +459,7 @@ public class BuyerHandler implements HttpHandler {
             JsonResponse.sendJsonResponse(exchange, 200, json);
 
         } catch (Exception e) {
-              HttpError.internal(exchange, "Internal server error" + e.getMessage());
+            HttpError.internal(exchange, "Internal server error" + e.getMessage());
         }
     }
 
@@ -580,7 +581,7 @@ public class BuyerHandler implements HttpHandler {
             rateDAO.deleteById(id);
             JsonResponse.sendJsonResponse(exchange,200,"{\"message\":\"Rate deleted\"}");
         } catch (Exception e) {
-              HttpError.internal(exchange, "Internal server error");
+            HttpError.internal(exchange, "Internal server error");
         }
     }
 
@@ -679,7 +680,18 @@ public class BuyerHandler implements HttpHandler {
                 return;
             }
             Coupon coupon = optionalCoupon.get();
-            coupon.setUserCount(couponDAO.getUserCount(coupon.getId(), user.getId()));
+            int userCount = couponDAO.getUserCount(coupon.getId(), user.getId());
+            if (userCount >= coupon.getUserCount()) {
+                HttpError.unauthorized(exchange, "You finish this coupon");
+                return;
+            }
+            LocalDate now = LocalDate.now();
+            LocalDate start = LocalDate.parse(coupon.getStartDate());
+            LocalDate end = LocalDate.parse(coupon.getEndDate());
+            if (!((now.isEqual(start) || now.isAfter(start)) && (now.isEqual(end) || now.isBefore(end)))) {
+                HttpError.unauthorized(exchange, "Coupon is not active");
+                return;
+            }
 
             String json =  objectMapper.writeValueAsString(coupon);
             JsonResponse.sendJsonResponse(exchange, 200, json);
