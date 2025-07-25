@@ -119,7 +119,7 @@ public class CourierHandler implements HttpHandler {
                 transaction.setOrderID(orderId);
                 transaction.setUserID(user.getId());
                 transaction.setAmount(order.getCourierFee());
-                transaction.setMethod(TransactionMethod.online);
+                transaction.setMethod(TransactionMethod.courierPayment);
                 new TransactionDAOImp().insert(transaction);
                 new UserDAOImp().setWallet(user.getId(), user.getWallet() + order.getCourierFee());
             } else {

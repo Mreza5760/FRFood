@@ -519,11 +519,24 @@ public class RestaurantHandler implements HttpHandler {
                     food.setSupply(food.getSupply() + orderItem.getQuantity());
                     foodDAO.update(food);
                 }
+                Transaction transaction = new Transaction();
+                transaction.setOrderID(orderId);
+                transaction.setUserID(order.getCustomerId());
+                transaction.setAmount(order.getPayPrice());
+                transaction.setMethod(TransactionMethod.refund);
+                new TransactionDAOImp().insert(transaction);
                 new UserDAOImp().setWallet(customer.getId(), customer.getWallet() + order.getPayPrice());
             } else if (status == Status.preparing) {
                 Optional<User> optionalOwner = new UserDAOImp().getById(restaurant.getOwner().getId());
                 if (optionalOwner.isEmpty()) return;
                 User owner = optionalOwner.get();
+
+                Transaction transaction = new Transaction();
+                transaction.setOrderID(orderId);
+                transaction.setUserID(user.getId());
+                transaction.setAmount(order.getPayPrice() - order.getCourierFee());
+                transaction.setMethod(TransactionMethod.restaurantPayment);
+                new TransactionDAOImp().insert(transaction);
                 new UserDAOImp().setWallet(owner.getId(), owner.getWallet() + order.getPayPrice() - order.getCourierFee());
             }
 
