@@ -161,6 +161,8 @@ public class OrderHandler implements HttpHandler {
                     userDAO.setWallet(user.getId(), user.getWallet() - transaction.getAmount());
                 }
             }
+            if (order.getCouponId() != 0)
+                new CouponDAOImp().useCoupon(order.getCouponId(), user.getId());
             order.setId(orderDAO.insert(order));
             transaction.setOrderID(order.getId());
             transaction.setId(transactionDAO.insert(transaction));
