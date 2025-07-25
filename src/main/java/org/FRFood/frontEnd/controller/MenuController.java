@@ -62,7 +62,7 @@ public class MenuController {
 
     @FXML
     public void addFood(ActionEvent actionEvent) {
-        AddFoodToMenuController.setData( menuTitle, restaurant.getId());
+        AddFoodToMenuController.setData(menuTitle, restaurant.getId());
         SceneNavigator.switchTo("/frontend/addFoodToMenu.fxml", menu_name_label);
     }
 
@@ -123,19 +123,17 @@ public class MenuController {
         card.setStyle("-fx-background-color: white; -fx-background-radius: 12; -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.1), 10, 0, 0, 6);");
         card.setPrefWidth(600);
 
-        // Logo
         ImageView logo = new ImageView();
         try {
             byte[] imageData = Base64.getDecoder().decode(food.getPicture());
             logo.setImage(new Image(new ByteArrayInputStream(imageData)));
         } catch (Exception e) {
-            logo.setImage(null); // fallback if needed
+            logo.setImage(null);
         }
         logo.setFitWidth(80);
         logo.setFitHeight(80);
         logo.setPreserveRatio(true);
 
-        // Info
         VBox info = new VBox(8);
         info.setAlignment(Pos.CENTER_LEFT);
 
@@ -145,7 +143,7 @@ public class MenuController {
         Label supplyLabel = new Label("📍 Supply: " + food.getSupply());
         supplyLabel.setStyle("-fx-font-size: 14px; -fx-text-fill: #3a3a3a;");
 
-        Label feeLabel = new Label("💰 Price: " + food.getPrice() + "$");
+        Label feeLabel = new Label("💰 Price: " + food.getPrice() + " Toman");
         feeLabel.setStyle("-fx-font-size: 14px; -fx-text-fill: #3a3a3a;");
 
         Label descriptionLabel = new Label("📝 " + food.getDescription());
@@ -159,7 +157,6 @@ public class MenuController {
         HBox rightBox = new HBox();
 
         if (userRole == Role.seller) {
-            // Delete Button
             Button deleteBtn = new Button("Delete");
             deleteBtn.setPrefWidth(100);
             deleteBtn.setPrefHeight(36);
@@ -172,7 +169,6 @@ public class MenuController {
                         -fx-cursor: hand;
                     """);
             deleteBtn.setOnAction(e -> handleDelete(food));
-            // Add both buttons to VBox
             rightBox = new HBox(10, deleteBtn);
             rightBox.setAlignment(Pos.CENTER_RIGHT);
         }
@@ -314,9 +310,6 @@ public class MenuController {
 
     }
 
-    private void handleComments(Food food) {
-    }
-
     private void handleClick(Food food) {
         FoodDetailsController.setItemId(food.getId());
         SceneNavigator.switchTo("/frontend/FoodDetail.fxml", menu_name_label);
@@ -325,7 +318,6 @@ public class MenuController {
     private void handleDelete(Food food) {
         String safeUrl = "http://localhost:8080/restaurants/" + restaurant.getId() + "/menu/" + URLEncoder.encode(menuTitle, StandardCharsets.UTF_8) + "/" + food.getId();
         URI uri = URI.create(safeUrl);
-//        String url = "http://localhost:8080/restaurants/" + restaurantId+"/menu/" + menuTitle + "/" + food.getId();
         HttpRequest request = HttpRequest.newBuilder()
                 .uri(uri)
                 .header("Authorization", "Bearer " + SessionManager.getAuthToken())
@@ -335,7 +327,6 @@ public class MenuController {
         HttpClient.newHttpClient().sendAsync(request, HttpResponse.BodyHandlers.ofString())
                 .thenAccept(response -> {
                     if (response.statusCode() == 200 || response.statusCode() == 204) {
-                        // Optionally refresh the list on UI thread
                         Platform.runLater(this::fetchFoods);
                     } else {
                         System.err.println("Failed to delete food: HTTP " + response.statusCode() + response.body());
@@ -346,5 +337,4 @@ public class MenuController {
                     return null;
                 });
     }
-
 }

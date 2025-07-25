@@ -39,7 +39,7 @@ public class RestaurantController {
     private static Restaurant restaurant;
     private static String restaurantName;
     public TextField menuTitleField;
-    public HBox HboxForTitleInput;
+    public HBox HBoxForTitleInput;
     public Button backButton;
 
     private static Role userRole;
@@ -79,8 +79,6 @@ public class RestaurantController {
     }
 
     private void fetchMenus() {
-
-
         String url = "http://localhost:8080/restaurants/" + restaurant.getId() + "/menus";
         if (userRole == Role.buyer) {
             url = "http://localhost:8080/vendors/" + restaurant.getId();
@@ -161,7 +159,6 @@ public class RestaurantController {
         card.setStyle("-fx-background-color: white; -fx-background-radius: 12; -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.1), 10, 0, 0, 6);");
         card.setPrefWidth(600);
 
-        // Info
         VBox info = new VBox(4);
         info.setAlignment(Pos.CENTER_LEFT);
 
@@ -172,7 +169,6 @@ public class RestaurantController {
         HBox.setHgrow(spacer, Priority.ALWAYS);
         HBox rightBox = new HBox();
         if (userRole == Role.seller) {
-            // Delete Button
             Button deleteBtn = new Button("Delete");
             deleteBtn.setPrefWidth(100);
             deleteBtn.setPrefHeight(36);
@@ -189,14 +185,14 @@ public class RestaurantController {
             rightBox.setAlignment(Pos.CENTER_RIGHT);
 
         }
-        card.setOnMouseClicked(e -> handleClick(menu)); // full card click
+        card.setOnMouseClicked(e -> handleClick(menu));
 
         card.getChildren().addAll(info, spacer, rightBox);
         return card;
     }
 
     private void handleClick(Menu menu) {
-        MenuController.setData( menu.getTitle(), restaurant);
+        MenuController.setData(menu.getTitle(), restaurant);
         SceneNavigator.switchTo("/frontend/menu.fxml", restaurant_name_label);
     }
 
@@ -231,8 +227,8 @@ public class RestaurantController {
     }
 
     public void addMenu(ActionEvent actionEvent) {
-        HboxForTitleInput.setVisible(true);
-        HboxForTitleInput.setManaged(true);
+        HBoxForTitleInput.setVisible(true);
+        HBoxForTitleInput.setManaged(true);
     }
 
     public void addFood(ActionEvent actionEvent) {
@@ -242,6 +238,7 @@ public class RestaurantController {
 
     public void submitMenu(ActionEvent actionEvent) {
         String jsonBody = null;
+        if (menuTitleField.getText().isEmpty()) return;
         try {
             ObjectMapper mapper = new ObjectMapper();
             Map<String, String> jsonMap = new HashMap<>();
@@ -278,7 +275,7 @@ public class RestaurantController {
     }
 
     public void viewFoods(ActionEvent actionEvent) {
-        AllRestaurantFoodController.setData(restaurant.getId(), restaurantName);
-        SceneNavigator.switchTo("/frontend/allRestaurantFood.fxml", restaurant_name_label);
+        AllFoodsController.setData(restaurant.getId(), restaurantName);
+        SceneNavigator.switchTo("/frontend/allFoods.fxml", restaurant_name_label);
     }
 }

@@ -142,7 +142,7 @@ CREATE TABLE IF NOT EXISTS Order_Items
     quantity INTEGER NOT NULL,
     PRIMARY KEY (order_id, item_id),
     FOREIGN KEY (order_id) REFERENCES Orders (id) ON DELETE CASCADE,
-    FOREIGN KEY (item_id) REFERENCES FoodItems (id) ON DELETE RESTRICT
+    FOREIGN KEY (item_id) REFERENCES FoodItems (id) ON DELETE CASCADE
 );
 
 CREATE TABLE IF NOT EXISTS Ratings
@@ -175,7 +175,7 @@ CREATE TABLE IF NOT EXISTS Transactions
     amount     INTEGER                                     NOT NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (order_id) REFERENCES Orders (id) ON DELETE SET NULL,
-    FOREIGN KEY (user_id) REFERENCES Users (id) ON DELETE RESTRICT
+    FOREIGN KEY (user_id) REFERENCES Users (id) ON DELETE CASCADE
 );
 
 CREATE TABLE IF NOT EXISTS Favorite_Restaurants

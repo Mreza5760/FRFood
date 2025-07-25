@@ -48,7 +48,7 @@
                 fx:id="addMenuButton"
                 style="-fx-background-color: #0077cc; -fx-text-fill: white; -fx-font-weight: bold; -fx-background-radius: 10; -fx-cursor: hand; -fx-pref-height:40;-fx-font-size: 14px;"/>
     </HBox>
-    <HBox fx:id="HboxForTitleInput" spacing="10" alignment="CENTER" visible="false" managed="false">
+    <HBox fx:id="HBoxForTitleInput" spacing="10" alignment="CENTER" visible="false" managed="false">
         <TextField fx:id="menuTitleField"
                    promptText="Enter menu title..."
                    prefWidth="300"

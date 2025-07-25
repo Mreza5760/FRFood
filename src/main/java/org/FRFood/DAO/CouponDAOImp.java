@@ -151,4 +151,9 @@ public class CouponDAOImp implements CouponDAO {
             }
         }
     }
+
+    @Override
+    public void useCoupon(int couponId, int userId) throws SQLException {
+
+    }
 }

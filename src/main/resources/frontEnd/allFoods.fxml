@@ -8,7 +8,7 @@
 
 <VBox xmlns="http://javafx.com/javafx"
       xmlns:fx="http://javafx.com/fxml"
-      fx:controller="org.FRFood.frontEnd.controller.AllRestaurantFoodController"
+      fx:controller="org.FRFood.frontEnd.controller.AllFoodsController"
       alignment="TOP_CENTER" spacing="30"
       style="-fx-background-color: linear-gradient(to bottom, #eef3f9, #dbe5f1);">
 
@@ -25,13 +25,6 @@
                 onAction="#goBack"
                 prefWidth="120"
                 style="-fx-background-color: #ff5555; -fx-text-fill: white; -fx-font-weight: bold; -fx-background-radius: 10; -fx-cursor: hand; -fx-pref-height: 40;-fx-font-size: 14px;"/>
-
-<!--        <Region fx:id="spacer1" HBox.hgrow="ALWAYS"/>-->
-<!--        <Button text="+ Add Food"-->
-<!--                onAction="#addFood"-->
-<!--                prefWidth="120"-->
-<!--                style="-fx-background-color: #00aa88; -fx-text-fill: white; -fx-font-weight: bold; -fx-background-radius: 10; -fx-cursor: hand; -fx-pref-height: 40;-fx-font-size: 14px;"/>-->
-
     </HBox>
     <ScrollPane fitToWidth="true"
                 style="-fx-background: transparent; -fx-background-color: transparent;">

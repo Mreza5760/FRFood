@@ -5,6 +5,7 @@ import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.Node;
+import javafx.scene.control.Alert;
 import javafx.scene.control.TextField;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
@@ -16,8 +17,10 @@ import org.FRFood.frontEnd.Util.SessionManager;
 import java.io.*;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.util.Arrays;
 import java.util.Base64;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class UpdateFoodController {
 
@@ -34,7 +37,6 @@ public class UpdateFoodController {
     private String logoBase64 = "";
     private final String token = SessionManager.getAuthToken();
 
-    // This will be called externally to pre-load data
     public void setFoodData(int id,int inputFoodId, String name, int supply, int price, String inputKeywords, String description, String logo) {
         this.restaurantId = id;
         nameField.setText(name);
@@ -69,6 +71,26 @@ public class UpdateFoodController {
 
     @FXML
     public void handleSave(ActionEvent event) {
+        String name = nameField.getText().trim();
+        String description = descriptionField.getText().trim();
+        String priceText = priceField.getText().trim();
+        String supplyText = supplyField.getText().trim();
+        String keywords = keywordsField.getText().trim();
+        if (name.isEmpty() || description.isEmpty() || priceText.isEmpty() || supplyText.isEmpty() || keywords.isEmpty()) {
+            showAlert(Alert.AlertType.ERROR, "Validation Error", "All fields must be filled out.");
+            return;
+        }
+        List<String> keywordsList = Arrays.stream(keywords.split(","))
+                .map(String::trim)
+                .filter(s -> !s.isEmpty())
+                .collect(Collectors.toList());
+
+        int price = parseIntSafe(priceText);
+        int supply = parseIntSafe(supplyText);
+        if (price < 0 || supply < 0) {
+            showAlert(Alert.AlertType.ERROR, "Error", "Invalid price or supply value.");
+            return;
+        }
         new Thread(() -> {
             try {
                 URL url = new URL("http://localhost:8080/restaurants/" + restaurantId+"/item/" +foodId);
@@ -78,17 +100,14 @@ public class UpdateFoodController {
                 conn.setRequestProperty("Content-Type", "application/json");
                 conn.setDoOutput(true);
 
-                String keywordText = keywordsField.getText();
-                List<String> keywords = List.of(keywordText.split(","));
-
                 ObjectMapper mapper = new ObjectMapper();
                 String requestBody = mapper.writeValueAsString(new FoodRequest(
-                        nameField.getText(),
+                        name,
                         logoBase64,
-                        descriptionField.getText(),
-                        Integer.parseInt(priceField.getText()),
-                        Integer.parseInt(supplyField.getText()),
-                        keywords
+                        description,
+                        price,
+                        supply,
+                        keywordsList
                 ));
 
                 try (OutputStream os = conn.getOutputStream()) {
@@ -101,19 +120,36 @@ public class UpdateFoodController {
 
                 if (responseCode == 200) {
                     Platform.runLater(() -> {
-                        // Go back to restaurant list
-                        SceneNavigator.switchTo("/frontend/allRestaurantFood.fxml", (Node) event.getSource());
+                        showAlert(Alert.AlertType.INFORMATION, "Success", "Food updated successfully.");
+                        SceneNavigator.switchTo("/frontend/allFoods.fxml", (Node) event.getSource());
                     });
                 }
 
             } catch (Exception e) {
                 e.printStackTrace();
+                Platform.runLater(() -> showAlert(Alert.AlertType.ERROR, "Error", "An error occurred while sending the request."));
             }
         }).start();
     }
 
     @FXML
     public void handleCancel(ActionEvent event) {
-        SceneNavigator.switchTo("/frontend/allRestaurantFood.fxml", descriptionField);
+        SceneNavigator.switchTo("/frontend/allFoods.fxml", descriptionField);
+    }
+
+    private void showAlert(Alert.AlertType type, String title, String content) {
+        Alert alert = new Alert(type);
+        alert.setTitle(title);
+        alert.setHeaderText(null);
+        alert.setContentText(content);
+        alert.showAndWait();
+    }
+
+    private int parseIntSafe(String text) {
+        try {
+            return Integer.parseInt(text);
+        } catch (NumberFormatException e) {
+            return -1;
+        }
     }
 }

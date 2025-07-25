@@ -93,7 +93,7 @@ public class RestaurantHandler implements HttpHandler {
                 return;
             }
             if (!validatePhone(restaurant.getPhone())) {
-                HttpError.unsupported(exchange, "Invalid phone number");
+                HttpError.badRequest(exchange, "Invalid phone number");
                 return;
             }
             restaurant.setId(restaurantDAO.insert(restaurant, user.getId()));
@@ -169,7 +169,7 @@ public class RestaurantHandler implements HttpHandler {
             List<Order> orders = orderDAO.getRestaurantOrders(restaurantId);
             for (Order order : orders) {
                 if (order.getStatus() != Status.cancelled && order.getStatus() != Status.completed) {
-                    HttpError.badRequest(exchange, "Invalid order status");
+                    HttpError.badRequest(exchange, "This Restraint have active orders");
                     return;
                 }
             }
@@ -255,7 +255,7 @@ public class RestaurantHandler implements HttpHandler {
                 List<OrderItem> orderItems = order.getItems();
                 for (OrderItem orderItem : orderItems) {
                     if (orderItem.getItemId() == foodId && order.getStatus() != Status.cancelled && order.getStatus() != Status.completed) {
-                        HttpError.badRequest(exchange, "Invalid order status");
+                        HttpError.forbidden(exchange, "Invalid order status");
                         return;
                     }
                 }

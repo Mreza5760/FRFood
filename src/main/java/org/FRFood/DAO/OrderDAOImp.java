@@ -199,6 +199,8 @@ public class OrderDAOImp implements OrderDAO {
         if (order.getCourierId() == null)
             order.setCourierId(0);
         order.setCouponId((Integer) rs.getObject("coupon_id"));
+        if (order.getCouponId() == null)
+            order.setCouponId(0);
         order.setDeliveryAddress(rs.getString("delivery_address"));
         order.setRawPrice(rs.getInt("raw_price"));
         order.setTaxFee(rs.getInt("tax_fee"));
