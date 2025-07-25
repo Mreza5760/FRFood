@@ -16,9 +16,13 @@ import java.time.LocalDate;
 import java.util.*;
 import java.io.IOException;
 import java.sql.SQLException;
+import java.util.stream.Collectors;
+
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+
+import javax.naming.InsufficientResourcesException;
 
 public class BuyerHandler implements HttpHandler {
     private final FoodDAO foodDAO;
@@ -710,15 +714,51 @@ public class BuyerHandler implements HttpHandler {
         }
 
         try {
-            List<Restaurant> allRestaurants = restaurantDAO.searchByString("");
+            Map<Integer, Integer> restaurantsScore = new HashMap<>();
+            Map<Integer, Integer> restaurantsNumberOfScore = new HashMap<>();
+            List<Rate> rates = rateDAO.getAllRates();
+
+            for (Rate rate : rates) {
+                Optional<Order> optionalOrder = orderDAO.getById(rate.getOrderId());
+                if (optionalOrder.isEmpty()) {
+                    HttpError.notFound(exchange, "Order not found");
+                    return;
+                }
+                Order order = optionalOrder.get();
+                int restaurantId = order.getRestaurantId();
+
+                restaurantsScore.put(restaurantId, restaurantsScore.getOrDefault(restaurantId, 0) + rate.getRating());
+
+                restaurantsNumberOfScore.put(restaurantId, restaurantsNumberOfScore.getOrDefault(restaurantId, 0) + 1);
+            }
+
+            List<Map.Entry<Integer, Double>> averageScores = new ArrayList<>();
+            for (Map.Entry<Integer, Integer> entry : restaurantsScore.entrySet()) {
+                int restaurantId = entry.getKey();
+                int totalScore = entry.getValue();
+                int count = restaurantsNumberOfScore.getOrDefault(restaurantId, 1);
+                double average = (double) totalScore / count;
+                averageScores.add(Map.entry(restaurantId, average));
+            }
+
+            averageScores.sort((a, b) -> Double.compare(b.getValue(), a.getValue()));
+
             List<Restaurant> topRestaurants = new ArrayList<>();
-//            for (Restaurant restaurant : allRestaurants) {
-//                List<Order> orders = orderDAO.getRestaurantOrders(restaurant.getId());
-//                int avg = 0;
-//                for (Order order : orders) {
-//                    List<Rate> rates = rate
-//                }
-//            }
+            int limit = Math.min(5, averageScores.size());
+
+            for (int i = 0; i < limit; i++) {
+                int restaurantId = averageScores.get(i).getKey();
+                Optional<Restaurant> optionalRestaurant = restaurantDAO.getById(restaurantId);
+                if (optionalRestaurant.isEmpty()) {
+                    HttpError.notFound(exchange, "Restaurant not found");
+                    return;
+                }
+                Restaurant restaurant = optionalRestaurant.get();
+                topRestaurants.add(restaurant);
+            }
+
+            String json = objectMapper.writeValueAsString(topRestaurants);
+            JsonResponse.sendJsonResponse(exchange, 200, json);
         } catch (SQLException e) {
             HttpError.internal(exchange, "Internal server error");
         }
@@ -734,15 +774,30 @@ public class BuyerHandler implements HttpHandler {
         }
 
         try {
-            List<Restaurant> allRestaurants = restaurantDAO.searchByString("");
-            List<Restaurant> topRestaurants = new ArrayList<>();
-//            for (Restaurant restaurant : allRestaurants) {
-//                List<Order> orders = orderDAO.getRestaurantOrders(restaurant.getId());
-//                int avg = 0;
-//                for (Order order : orders) {
-//                    List<Rate> rates = rate
-//                }
-//            }
+            List<Order> orders = orderDAO.getUserOrders(user.getId());
+            Map<Food, Integer> foodCount = new HashMap<>();
+
+            for (Order order : orders) {
+                for (OrderItem orderItem : order.getItems()) {
+                    Optional<Food> foodOpt = foodDAO.getById(orderItem.getItemId());
+                    if (foodOpt.isEmpty()) {
+                        HttpError.notFound(exchange, "Food not found");
+                        return;
+                    }
+                    Food food = foodOpt.get();
+                    foodCount.put(food, foodCount.getOrDefault(food, 0) + orderItem.getQuantity());
+                }
+            }
+
+            List<Food> topFoods = foodCount.entrySet()
+                    .stream()
+                    .sorted(Map.Entry.<Food, Integer>comparingByValue().reversed())
+                    .limit(5)
+                    .map(Map.Entry::getKey)
+                    .toList();
+
+            String json = objectMapper.writeValueAsString(topFoods);
+            JsonResponse.sendJsonResponse(exchange, 200, json);
         } catch (SQLException e) {
             HttpError.internal(exchange, "Internal server error");
         }
