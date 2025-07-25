@@ -421,7 +421,8 @@ public class RestaurantHandler implements HttpHandler {
                 Map<String, String> params = new HashMap<>();
                 for (String part : parts) {
                     String[] keyValue = part.split("=");
-                    params.put(keyValue[0], keyValue[1]);
+                    if (keyValue.length == 2)
+                        params.put(keyValue[0], keyValue[1]);
                 }
                 UserDAO userDAO = new UserDAOImp();
                 for (Order order : orders) {
