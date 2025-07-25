@@ -595,7 +595,8 @@ public class BuyerHandler implements HttpHandler {
             Map<String, String> params = new HashMap<>();
             for (String part : parts) {
                 String[] keyValue = part.split("=");
-                params.put(keyValue[0], keyValue[1]);
+                if (keyValue.length == 2)
+                    params.put(keyValue[0], keyValue[1]);
             }
             if (!params.containsKey("coupon_code")) {
                 HttpError.badRequest(exchange, "Coupon code not found");
