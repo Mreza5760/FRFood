@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.geometry.Insets?>
+<?import javafx.geometry.Pos?>
+<?import java.time.LocalDate?>
+
+<VBox xmlns="http://javafx.com/javafx"
+      xmlns:fx="http://javafx.com/fxml"
+      fx:controller="org.FRFood.frontEnd.controller.CreateCouponController"
+      alignment="TOP_CENTER" spacing="30"
+      style="-fx-background-color: linear-gradient(to bottom, #eef3f9, #dbe5f1);">
+
+    <padding>
+        <Insets top="40" left="50" right="50" bottom="40"/>
+    </padding>
+
+    <HBox alignment="CENTER_LEFT" spacing="10">
+        <Button text="← Back"
+                onAction="#handleBack"
+                style="-fx-background-color: #ff6666; -fx-text-fill: white; -fx-font-weight: bold; -fx-background-radius: 8;"/>
+        <Label text="🎁 Create New Coupon"
+               style="-fx-font-size: 26px; -fx-font-weight: bold; -fx-text-fill: #1e2a38;"/>
+    </HBox>
+
+    <VBox spacing="20" alignment="CENTER"
+          style="-fx-background-color: white; -fx-padding: 30; -fx-background-radius: 12; -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.1), 8, 0, 0, 4);">
+
+        <TextField fx:id="codeField" promptText="Coupon Code"
+                   style="-fx-font-size: 14px; -fx-padding: 10; -fx-background-radius: 6;"/>
+
+        <ComboBox fx:id="typeBox" promptText="Type"
+                  style="-fx-font-size: 14px; -fx-padding: 10; -fx-background-radius: 6;" />
+
+        <TextField fx:id="valueField" promptText="Value"
+                   style="-fx-font-size: 14px; -fx-padding: 10; -fx-background-radius: 6;"/>
+
+        <TextField fx:id="minPriceField" promptText="Minimum Price"
+                   style="-fx-font-size: 14px; -fx-padding: 10; -fx-background-radius: 6;"/>
+
+        <TextField fx:id="userCountField" promptText="User Count"
+                   style="-fx-font-size: 14px; -fx-padding: 10; -fx-background-radius: 6;"/>
+
+        <DatePicker fx:id="startDatePicker" promptText="Start Date"
+                    style="-fx-font-size: 14px; -fx-padding: 10; -fx-background-radius: 6;"/>
+
+        <DatePicker fx:id="endDatePicker" promptText="End Date"
+                    style="-fx-font-size: 14px; -fx-padding: 10; -fx-background-radius: 6;"/>
+
+        <Button text="Create Coupon"
+                onAction="#handleCreate"
+                style="-fx-background-color: #0077cc; -fx-text-fill: white; -fx-font-size: 14px; -fx-font-weight: bold; -fx-background-radius: 8;"
+                prefWidth="200"/>
+    </VBox>
+</VBox>

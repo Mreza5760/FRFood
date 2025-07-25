@@ -7,6 +7,7 @@ import javafx.fxml.FXML;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
+import javafx.scene.control.TextField;
 import javafx.scene.layout.VBox;
 import org.FRFood.entity.Order;
 import org.FRFood.entity.OrderItem;
@@ -31,6 +32,10 @@ public class PayOrderController {
     public Button acceptButton;
     public Button declineButton;
     public Button addRatingButton;
+    @FXML
+    public TextField CouponCodeField;
+    @FXML
+    public Button validateTokeButton;
     @FXML
     private VBox detailsBox;
     @FXML
@@ -60,6 +65,10 @@ public class PayOrderController {
             payCardButton.setManaged(true);
             payWalletButton.setVisible(true);
             payWalletButton.setManaged(true);
+            CouponCodeField.setVisible(true);
+            CouponCodeField.setManaged(true);
+            validateTokeButton.setVisible(true);
+            validateTokeButton.setManaged(true);
         }else if(mode == 2 && currentOrder.getStatus() == Status.completed) {
             isOwnedByCurrentUser(currentOrder.getId()).thenAccept(isOwner -> {
                 if (!isOwner) {

@@ -33,6 +33,21 @@
     <VBox fx:id="itemsBox" spacing="10" style="-fx-background-color: #ffffff; -fx-padding: 15; -fx-background-radius: 12;"/>
 
     <HBox spacing="20" alignment="CENTER">
+        <TextField fx:id="CouponCodeField" promptText="Coupon code"
+                   managed="false"
+                   visible="false"
+                   style="-fx-background-radius: 8; -fx-padding: 8; -fx-font-size: 14px;"/>
+
+        <Button fx:id="validateTokeButton" text="validate"
+                onAction="#handlevalidateToke"
+                managed="false"
+                visible="false"
+                style="-fx-background-color: #0077cc; -fx-text-fill: white; -fx-font-size: 14px; -fx-font-weight: bold; -fx-background-radius: 10;"
+                prefWidth="180" prefHeight="40"/>
+
+    </HBox>
+
+    <HBox spacing="20" alignment="CENTER">
         <Button fx:id="payCardButton" text="💳 Pay with Card"
                 onAction="#handlePayWithCard"
                 managed="false"

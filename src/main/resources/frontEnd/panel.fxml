@@ -64,6 +64,12 @@
                 visible="false" managed="false"
                 prefWidth="250" prefHeight="45"
                 style="-fx-background-color: #4444cc; -fx-text-fill: white; -fx-font-size: 16px; -fx-font-weight: bold; -fx-background-radius: 8;"/>
+
+        <Button fx:id="couponsButton" text="Show Coupons"
+                visible="false" managed="false"
+                prefWidth="250" prefHeight="45"
+                style="-fx-background-color: #cc0077; -fx-text-fill: white; -fx-font-size: 16px; -fx-font-weight: bold; -fx-background-radius: 8;"/>
+
         <Button fx:id="ordersButton" text="Orders"
                 visible="false" managed="false"
                 prefWidth="250" prefHeight="45"
