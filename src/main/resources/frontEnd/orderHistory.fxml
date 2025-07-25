@@ -40,6 +40,32 @@
         </HBox>
     </VBox>
 
+    <VBox fx:id="adminFilterList" visible="false" managed="false" spacing="15" alignment="CENTER" style="-fx-background-color: white; -fx-background-radius: 12; -fx-padding: 30; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.1), 10, 0, 0, 4);">
+
+        <HBox spacing="20" alignment="CENTER">
+            <Label text="Status:" style="-fx-font-size: 14px;"/>
+            <ComboBox fx:id="statusComboBox" promptText="Select Status" prefWidth="120"/>
+
+            <TextField fx:id="userIdField" promptText="Customer name"
+                       style="-fx-font-size: 14px; -fx-padding: 8; -fx-background-radius: 6;" prefWidth="130"/>
+
+            <TextField fx:id="courierIdField" promptText="Courier name"
+                       style="-fx-font-size: 14px; -fx-padding: 8; -fx-background-radius: 6;" prefWidth="130"/>
+
+            <TextField fx:id="adminVendorField" promptText="Vendor name"
+                       style="-fx-font-size: 14px; -fx-padding: 8; -fx-background-radius: 6;" prefWidth="130"/>
+        </HBox>
+
+        <HBox spacing="15" alignment="CENTER">
+            <TextField fx:id="adminSearchField" promptText="Search orders..."
+                       style="-fx-font-size: 14px; -fx-padding: 10; -fx-background-radius: 6;" prefWidth="300"/>
+
+            <Button text="Search" onAction="#handleSearch"
+                    style="-fx-background-color: #0077cc; -fx-text-fill: white; -fx-font-weight: bold; -fx-background-radius: 8;"
+                    prefWidth="120"/>
+        </HBox>
+    </VBox>
+
     <ScrollPane fitToWidth="true"
                 style="-fx-background: transparent; -fx-background-color: transparent;">
         <VBox fx:id="restaurantList" spacing="20" alignment="TOP_CENTER" />

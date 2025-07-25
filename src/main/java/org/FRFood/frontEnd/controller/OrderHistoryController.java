@@ -8,6 +8,7 @@ import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
+import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.image.Image;
@@ -34,6 +35,12 @@ public class OrderHistoryController {
     public TextField vendorIdField;
     @FXML
     public VBox buyerFilterList;
+    public TextField adminSearchField;
+    public TextField adminVendorField;
+    public TextField courierIdField;
+    public TextField userIdField;
+    public ComboBox statusComboBox;
+    public VBox adminFilterList;
     @FXML
     private VBox restaurantList;
 
@@ -50,6 +57,10 @@ public class OrderHistoryController {
         if(mode == 1){
             buyerFilterList.setVisible(true);
             buyerFilterList.setManaged(true);
+        }else if(mode == 5){
+            statusComboBox.getItems().addAll("", "waiting", "preparing", "cancelled", "findingCourier", "onTheWay", "completed");
+            adminFilterList.setVisible(true);
+            adminFilterList.setManaged(true);
         }
         fetchOrders();
     }
@@ -68,7 +79,12 @@ public class OrderHistoryController {
         } else if (mode == 4) {
             uri = "http://localhost:8080/deliveries/history";
         } else if (mode == 5) {
-            uri = "http://localhost:8080/admin/orders";
+            uri = "http://localhost:8080/admin/orders?" +
+                    "status=" + statusComboBox.getValue() +
+                    "&search=" + adminSearchField.getText().trim() +
+                    "&customer=" + userIdField.getText().trim() +
+                    "&vendor=" + adminVendorField.getText().trim() +
+                    "&courier=" + courierIdField.getText().trim();
         }
         HttpRequest request = HttpRequest.newBuilder()
                 .uri(URI.create(uri))
