@@ -12,6 +12,7 @@ import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.image.Image;
@@ -34,7 +35,7 @@ import java.net.http.HttpResponse;
 import java.util.Base64;
 import java.util.List;
 
-public class AllRestaurantFoodController {
+public class AllFoodsController {
     @FXML
     public Label restaurant_name_label;
     @FXML
@@ -46,17 +47,13 @@ public class AllRestaurantFoodController {
     private static String restaurantName;
 
     public static void setData(int input, String restaurant_name) {
-        AllRestaurantFoodController.restaurantId = input;
-        AllRestaurantFoodController.restaurantName = restaurant_name;
+        AllFoodsController.restaurantId = input;
+        AllFoodsController.restaurantName = restaurant_name;
     }
 
     @FXML
     public void goBack(ActionEvent actionEvent) {
         SceneNavigator.switchTo("/frontend/restaurant.fxml", foodList);
-    }
-
-    @FXML
-    public void addFood(ActionEvent actionEvent) {
     }
 
     @FXML
@@ -92,7 +89,6 @@ public class AllRestaurantFoodController {
         try {
             JsonNode rootNode = mapper.readTree(body);
 
-            // Extract node for "the thing"
             JsonNode theThingNode = rootNode.get("menu_title");
             List<Food> foods = mapper.convertValue(theThingNode, new TypeReference<List<Food>>() {
             });
@@ -114,19 +110,17 @@ public class AllRestaurantFoodController {
         card.setStyle("-fx-background-color: white; -fx-background-radius: 12; -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.1), 10, 0, 0, 6);");
         card.setPrefWidth(600);
 
-        // Logo
         ImageView logo = new ImageView();
         try {
             byte[] imageData = Base64.getDecoder().decode(food.getPicture());
             logo.setImage(new Image(new ByteArrayInputStream(imageData)));
         } catch (Exception e) {
-            logo.setImage(null); // fallback if needed
+            logo.setImage(null);
         }
         logo.setFitWidth(80);
         logo.setFitHeight(80);
         logo.setPreserveRatio(true);
 
-        // Info
         VBox info = new VBox(8);
         info.setAlignment(Pos.CENTER_LEFT);
 
@@ -136,7 +130,7 @@ public class AllRestaurantFoodController {
         Label supplyLabel = new Label("📍 Supply: " + food.getSupply());
         supplyLabel.setStyle("-fx-font-size: 14px; -fx-text-fill: #3a3a3a;");
 
-        Label feeLabel = new Label("💰 Price: " + food.getPrice() + "$");
+        Label feeLabel = new Label("💰 Price: " + food.getPrice() + "Toman");
         feeLabel.setStyle("-fx-font-size: 14px; -fx-text-fill: #3a3a3a;");
 
         Label descriptionLabel = new Label("📝 " + food.getDescription());
@@ -147,7 +141,6 @@ public class AllRestaurantFoodController {
         Region spacer = new Region();
         HBox.setHgrow(spacer, Priority.ALWAYS);
 
-        // editfood Button
         Button editBtn = new Button("edit food");
         editBtn.setPrefWidth(100);
         editBtn.setPrefHeight(36);
@@ -161,22 +154,6 @@ public class AllRestaurantFoodController {
                 """);
         editBtn.setOnAction(e -> handleEdit(food));
 
-
-        // Comments Button
-        Button CommentsBtn = new Button("Comments");
-        CommentsBtn.setPrefWidth(100);
-        CommentsBtn.setPrefHeight(36);
-        CommentsBtn.setStyle("""
-                    -fx-background-color: #007acc;
-                    -fx-text-fill: white;
-                    -fx-font-size: 14px;
-                    -fx-font-weight: bold;
-                    -fx-background-radius: 10;
-                    -fx-cursor: hand;
-                """);
-        CommentsBtn.setOnAction(e -> handleComments(food));
-
-// Delete Button
         Button deleteBtn = new Button("Delete");
         deleteBtn.setPrefWidth(100);
         deleteBtn.setPrefHeight(36);
@@ -190,12 +167,8 @@ public class AllRestaurantFoodController {
                 """);
         deleteBtn.setOnAction(e -> handleDelete(food));
 
-// Add both buttons to VBox
-        HBox rightBox = new HBox(10, editBtn, CommentsBtn, deleteBtn);
+        HBox rightBox = new HBox(10, editBtn, deleteBtn);
         rightBox.setAlignment(Pos.CENTER_RIGHT);
-
-
-//        card.setOnMouseClicked(e -> handleClick(food)); // full card click
 
         card.getChildren().addAll(logo, info, spacer, rightBox);
         return card;
@@ -209,24 +182,24 @@ public class AllRestaurantFoodController {
                 .header("Authorization", "Bearer " + SessionManager.getAuthToken())
                 .DELETE()
                 .build();
-//
+
         HttpClient.newHttpClient().sendAsync(request, HttpResponse.BodyHandlers.ofString())
                 .thenAccept(response -> {
                     if (response.statusCode() == 200 || response.statusCode() == 204) {
                         System.out.println("Deleted restaurant: " + food.getName());
                         Platform.runLater(this::fetchFoods);
+                    } else if (response.statusCode() == 403) {
+                        System.err.println("Failed to delete restaurant: HTTP " + response.statusCode()+response.body());
+                        showAlert(Alert.AlertType.WARNING, "Delete Failed", "Food is in an active order");
                     } else {
                         System.err.println("Failed to delete restaurant: HTTP " + response.statusCode()+response.body());
+                        showAlert(Alert.AlertType.WARNING, "Delete Failed", response.body());
                     }
                 })
                 .exceptionally(e -> {
                     e.printStackTrace();
                     return null;
                 });
-    }
-
-
-    private void handleComments(Food food) {
     }
 
     private void handleEdit(Food food) {
@@ -236,12 +209,11 @@ public class AllRestaurantFoodController {
 
             UpdateFoodController controller = loader.getController();
             StringBuilder keywords = new StringBuilder();
-            for(Keyword f : food.getKeywords()) {
+            for (Keyword f : food.getKeywords()) {
                 keywords.append(f.getName()).append(",");
             }
             keywords.deleteCharAt(keywords.length()-1);
             controller.setFoodData(restaurantId,food.getId(),food.getName(),food.getSupply(),food.getPrice(),keywords.toString(),food.getDescription(),food.getPicture());
-
 
             Stage stage = (Stage) restaurant_name_label.getScene().getWindow();
             double currentWidth = stage.getWidth();
@@ -253,8 +225,13 @@ public class AllRestaurantFoodController {
         } catch (Exception e) {
             System.out.println(e.getMessage());
         }
-
     }
 
+    private void showAlert(Alert.AlertType type, String title, String content) {
+        Alert alert = new Alert(type);
+        alert.setTitle(title);
+        alert.setHeaderText(null);
+        alert.setContentText(content);
+        alert.showAndWait();
+    }
 }
-

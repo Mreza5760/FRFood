@@ -255,7 +255,7 @@ public class RestaurantHandler implements HttpHandler {
                 List<OrderItem> orderItems = order.getItems();
                 for (OrderItem orderItem : orderItems) {
                     if (orderItem.getItemId() == foodId && order.getStatus() != Status.cancelled && order.getStatus() != Status.completed) {
-                        HttpError.badRequest(exchange, "Invalid order status");
+                        HttpError.forbidden(exchange, "Invalid order status");
                         return;
                     }
                 }

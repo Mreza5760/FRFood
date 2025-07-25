@@ -275,7 +275,7 @@ public class RestaurantController {
     }
 
     public void viewFoods(ActionEvent actionEvent) {
-        AllRestaurantFoodController.setData(restaurant.getId(), restaurantName);
-        SceneNavigator.switchTo("/frontend/allRestaurantFood.fxml", restaurant_name_label);
+        AllFoodsController.setData(restaurant.getId(), restaurantName);
+        SceneNavigator.switchTo("/frontend/allFoods.fxml", restaurant_name_label);
     }
 }
