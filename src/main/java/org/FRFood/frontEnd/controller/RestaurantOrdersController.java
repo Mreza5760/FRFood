@@ -22,6 +22,14 @@ import static io.jsonwebtoken.lang.Strings.capitalize;
 public class RestaurantOrdersController {
 
     @FXML
+    public ComboBox statusComboBox;
+    @FXML
+    public TextField userIdField;
+    @FXML
+    public TextField courierIdField;
+    @FXML
+    public TextField searchField;
+    @FXML
     private VBox ordersContainer;
 
     private final ObjectMapper mapper = new ObjectMapper();
@@ -36,6 +44,7 @@ public class RestaurantOrdersController {
 
     @FXML
     public void initialize() {
+        statusComboBox.getItems().addAll("", "waiting", "preparing", "cancelled", "findingCourier", "onTheWay", "completed");
         fetchOrders();
     }
 
@@ -45,7 +54,13 @@ public class RestaurantOrdersController {
     private void fetchOrders() {
         new Thread(() -> {
             try {
-                URL url = new URL("http://localhost:8080/restaurants/" + restaurant.getId() + "/orders");
+                String uri = "http://localhost:8080/restaurants/" +
+                        restaurant.getId() + "/orders?status=\"" +
+                        statusComboBox.getValue().toString() + "\"search=\"" +
+                        searchField.getText().trim() +"\"&user=\"" +
+                        userIdField.getText().trim()+"\"&courier=\"" +
+                        courierIdField.getText().trim() + "\"";
+                URL url = new URL(uri);
                 HttpURLConnection conn = (HttpURLConnection) url.openConnection();
                 conn.setRequestMethod("GET");
                 conn.setRequestProperty("Authorization", "Bearer " + SessionManager.getAuthToken());
@@ -77,7 +92,7 @@ public class RestaurantOrdersController {
             Label idLabel = new Label("🧾 Order #" + order.getId());
             idLabel.setStyle("-fx-font-size: 16px; -fx-font-weight: bold; -fx-text-fill: #1e2a38;");
 
-            Label priceLabel = new Label("💰 Pay Price: " + order.getPayPrice() );
+            Label priceLabel = new Label("💰 Pay Price: " + order.getPayPrice());
             priceLabel.setStyle("-fx-font-size: 14px; -fx-text-fill: #34495e;");
 
             Label statusLabel = new Label("⏱ Status: " + capitalize(order.getStatus().name()));
@@ -86,7 +101,7 @@ public class RestaurantOrdersController {
             Label createdLabel = new Label("📅 Placed: " + order.getCreatedAt());
             createdLabel.setStyle("-fx-font-size: 12px; -fx-text-fill: #7f8c8d;");
 
-            Label feeLabel = new Label("📦 Fees: " + (order.getTaxFee() + order.getAdditionalFee() + order.getCourierFee()) );
+            Label feeLabel = new Label("📦 Fees: " + (order.getTaxFee() + order.getAdditionalFee() + order.getCourierFee()));
             feeLabel.setStyle("-fx-font-size: 13px; -fx-text-fill: #2c3e50;");
 
             VBox.setMargin(idLabel, new Insets(0, 0, 5, 0));
@@ -104,14 +119,16 @@ public class RestaurantOrdersController {
 
 
         if (controller != null) {
-            controller.setOrder(order,restaurant ,3);
+            controller.setOrder(order, restaurant, 3);
         }
     }
-
 
 
     @FXML
     private void handleBack(ActionEvent event) {
         SceneNavigator.switchTo("/frontend/MyRestaurants.fxml", ordersContainer);
+    }
+
+    public void handleSearch(ActionEvent actionEvent) {
     }
 }

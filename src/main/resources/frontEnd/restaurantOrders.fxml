@@ -1,31 +1,58 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import javafx.geometry.Insets?>
-<?import javafx.geometry.Pos?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
+<?import javafx.geometry.Insets?>
+<?import javafx.geometry.Pos?>
 
 <VBox xmlns="http://javafx.com/javafx"
       xmlns:fx="http://javafx.com/fxml"
       fx:controller="org.FRFood.frontEnd.controller.RestaurantOrdersController"
       spacing="20" alignment="TOP_CENTER"
       style="-fx-background-color: linear-gradient(to bottom, #eef3f9, #dbe5f1);"
-      prefWidth="900" prefHeight="700">
+      prefWidth="900" prefHeight="750">
 
     <padding>
         <Insets top="30" right="30" bottom="30" left="30"/>
     </padding>
 
-    <!-- Top bar with Back button and title -->
+    <!-- Top Bar -->
     <HBox alignment="CENTER_LEFT" spacing="10">
         <Button text="⬅ Back" onAction="#handleBack"
                 style="-fx-background-color: #e74c3c; -fx-text-fill: white; -fx-font-weight: bold; -fx-background-radius: 8;"/>
-        <Label text="📋 Restaurant Orders"
+        <Label text="🔍 Filter &amp; Search Orders"
                style="-fx-font-size: 24px; -fx-font-weight: bold; -fx-text-fill: #1e2a38;"/>
     </HBox>
 
-    <!-- Scrollable list of order cards -->
+    <!-- Filters Section -->
+    <VBox spacing="15" alignment="CENTER" style="-fx-background-color: white; -fx-background-radius: 12; -fx-padding: 30; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.1), 10, 0, 0, 4);">
+
+        <HBox spacing="20" alignment="CENTER">
+            <Label text="Status:" style="-fx-font-size: 14px;"/>
+            <ComboBox fx:id="statusComboBox" promptText="Select Status" prefWidth="180"/>
+
+            <Label text="User name:" style="-fx-font-size: 14px;"/>
+            <TextField fx:id="userIdField" promptText="Enter user name"
+                       style="-fx-font-size: 14px; -fx-padding: 8; -fx-background-radius: 6;" prefWidth="120"/>
+
+            <Label text="Courier name:" style="-fx-font-size: 14px;"/>
+            <TextField fx:id="courierIdField" promptText="Enter courier name"
+                       style="-fx-font-size: 14px; -fx-padding: 8; -fx-background-radius: 6;" prefWidth="120"/>
+        </HBox>
+
+        <HBox spacing="15" alignment="CENTER">
+            <TextField fx:id="searchField" promptText="Search orders..."
+                       style="-fx-font-size: 14px; -fx-padding: 10; -fx-background-radius: 6;" prefWidth="300"/>
+
+            <Button text="Search" onAction="#handleSearch"
+                    style="-fx-background-color: #0077cc; -fx-text-fill: white; -fx-font-weight: bold; -fx-background-radius: 8;"
+                    prefWidth="120"/>
+        </HBox>
+    </VBox>
+
+    <!-- Results -->
     <ScrollPane fitToWidth="true" style="-fx-background: transparent;">
         <VBox fx:id="ordersContainer" spacing="15" alignment="TOP_CENTER"/>
     </ScrollPane>
+
 </VBox>
