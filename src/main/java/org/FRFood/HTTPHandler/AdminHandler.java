@@ -11,10 +11,7 @@ import org.FRFood.util.JsonResponse;
 
 import java.io.IOException;
 import java.sql.SQLException;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 
 import static org.FRFood.util.Authenticate.authenticate;
 import static org.FRFood.entity.Role.admin;
@@ -176,6 +173,7 @@ public class AdminHandler implements HttpHandler {
 
         try {
             List<Order> orders = orderDAO.getAllOrders();
+            List<Order> finalOrders = new ArrayList<>(orders);
 
             if (query != null && !query.isEmpty()) {
                 String[] parts = query.split("&");
@@ -192,14 +190,22 @@ public class AdminHandler implements HttpHandler {
                     }
                     Restaurant restaurant = optionalRestaurant.get();
                     if (params.containsKey("vendor") && !restaurant.getName().contains(params.get("vendor"))) {
-                        orders.remove(order);
-                    } else if (params.containsKey("customer") && order.getCustomerId() != Integer.parseInt(params.get("customer"))) {
-                        orders.remove(order);
-                    } else if (params.containsKey("courier") && order.getCourierId() != Integer.parseInt(params.get("courier"))) {
-                        orders.remove(order);
-                    } else if (params.containsKey("status") && !order.getStatus().toString().equals(params.get("status"))) {
-                        orders.remove(order);
-                    } else if (params.containsKey("search")) {
+                        finalOrders.remove(order);
+                    }
+                    if (params.containsKey("customer") && !params.get("customer").isEmpty()) {
+                        Optional<User> optionalUser2 = userDAO.getById(order.getCustomerId());
+                        if (optionalUser2.isPresent() && !optionalUser2.get().getFullName().contains(params.get("customer")))
+                            finalOrders.remove(order);
+                    }
+                    if (params.containsKey("courier") && !params.get("courier").isEmpty()) {
+                        Optional<User> optionalUser2 = userDAO.getById(order.getCourierId());
+                        if (order.getCourierId() == 0 || (optionalUser2.isPresent() && !optionalUser2.get().getFullName().contains(params.get("courier"))))
+                            finalOrders.remove(order);
+                    }
+                    if (params.containsKey("status") && !params.get("status").equals("null") && !params.get("status").isEmpty() && !order.getStatus().toString().equals(params.get("status"))) {
+                        finalOrders.remove(order);
+                    }
+                    if (params.containsKey("search")) {
                         List<OrderItem> items = order.getItems();
                         boolean found = false;
                         for (OrderItem item : items) {
@@ -215,13 +221,13 @@ public class AdminHandler implements HttpHandler {
                             }
                         }
                         if (!found) {
-                            orders.remove(order);
+                            finalOrders.remove(order);
                         }
                     }
                 }
             }
 
-            JsonResponse.sendJsonResponse(exchange, 200, objectMapper.writeValueAsString(orders));
+            JsonResponse.sendJsonResponse(exchange, 200, objectMapper.writeValueAsString(finalOrders));
         } catch (SQLException e) {
             HttpError.internal(exchange, "Internal server error while updating profile");
         }
