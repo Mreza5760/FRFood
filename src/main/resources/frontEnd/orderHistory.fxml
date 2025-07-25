@@ -24,6 +24,22 @@
             prefWidth="180"
             style="-fx-background-color: #ff5555; -fx-text-fill: white; -fx-font-weight: bold; -fx-background-radius: 10; fx-cursor: hand;"/>
 
+    <VBox fx:id="buyerFilterList" managed="false" visible="false" spacing="15" alignment="CENTER" style="-fx-background-color: white; -fx-background-radius: 12; -fx-padding: 30; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.1), 10, 0, 0, 4);">
+
+        <HBox spacing="20" alignment="CENTER">
+            <Label text="vendor name:" style="-fx-font-size: 14px;"/>
+            <TextField fx:id="vendorIdField" promptText="Enter user name"
+                       style="-fx-font-size: 14px; -fx-padding: 8; -fx-background-radius: 6;" prefWidth="120"/>
+
+            <TextField fx:id="searchField" promptText="Search orders..."
+                       style="-fx-font-size: 14px; -fx-padding: 10; -fx-background-radius: 6;" prefWidth="300"/>
+
+            <Button text="Search" onAction="#handleSearch"
+                    style="-fx-background-color: #0077cc; -fx-text-fill: white; -fx-font-weight: bold; -fx-background-radius: 8;"
+                    prefWidth="120"/>
+        </HBox>
+    </VBox>
+
     <ScrollPane fitToWidth="true"
                 style="-fx-background: transparent; -fx-background-color: transparent;">
         <VBox fx:id="restaurantList" spacing="20" alignment="TOP_CENTER" />

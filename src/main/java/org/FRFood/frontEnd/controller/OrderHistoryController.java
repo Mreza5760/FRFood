@@ -4,10 +4,12 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import javafx.application.Platform;
+import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.control.Label;
+import javafx.scene.control.TextField;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.*;
@@ -27,6 +29,12 @@ import java.util.concurrent.CompletableFuture;
 public class OrderHistoryController {
 
     @FXML
+    public TextField searchField;
+    @FXML
+    public TextField vendorIdField;
+    @FXML
+    public VBox buyerFilterList;
+    @FXML
     private VBox restaurantList;
 
     private final ObjectMapper mapper = new ObjectMapper();
@@ -39,12 +47,21 @@ public class OrderHistoryController {
 
     @FXML
     public void initialize() {
+        if(mode == 1){
+            buyerFilterList.setVisible(true);
+            buyerFilterList.setManaged(true);
+        }
         fetchOrders();
     }
 
     private void fetchOrders() {
-        String uri = "http://localhost:8080/orders/history";
-        if (mode == 2) {
+        String uri = null;
+        if (mode == 1) {
+             uri = "http://localhost:8080/orders/history?" +
+                    "search=" + searchField.getText().trim() +
+                    "&vendor=" + vendorIdField.getText().trim();
+        }
+        else if (mode == 2) {
             uri = "http://localhost:8080/deliveries/available";
         } else if (mode == 3) {
             uri = "http://localhost:8080/deliveries/order";
@@ -220,10 +237,14 @@ public class OrderHistoryController {
 
     @FXML
     private void goBack() {
-        if (mode == 2 || mode == 3 || mode == 4 || mode ==5) {
+        if (mode == 2 || mode == 3 || mode == 4 || mode == 5) {
             SceneNavigator.switchTo("/frontend/panel.fxml", restaurantList);
         } else {
             SceneNavigator.switchTo("/frontend/buyerOrderPage.fxml", restaurantList);
         }
+    }
+
+    public void handleSearch(ActionEvent actionEvent) {
+        fetchOrders();
     }
 }

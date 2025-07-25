@@ -58,7 +58,7 @@ public class BuyerHandler implements HttpHandler {
                 case "GET" -> {
                     if (path.matches("^/vendors/\\d+$")) handleVendorsMenu(exchange);
                     else if (path.matches("^/items/\\d+$")) handleGetItem(exchange);
-                    else if (path.equals("/orders/history")) handleOrdersHistory(exchange);
+                    else if (path.matches("^/orders/history/?$")) handleOrdersHistory(exchange);
                     else if (path.equals("/favorites")) handleGetFavorites(exchange);
                     else if (path.matches("^/ratings/items/\\d+$")) handeGetFoodRates(exchange);
                     else if (path.matches("^/ratings/user/\\d+$")) doesHaveRate(exchange);
