@@ -165,7 +165,8 @@ public class CourierHandler implements HttpHandler {
                 Map<String, String> params = new HashMap<>();
                 for (String part : parts) {
                     String[] keyValue = part.split("=");
-                    params.put(keyValue[0], keyValue[1]);
+                    if (keyValue.length == 2)
+                        params.put(keyValue[0], keyValue[1]);
                 }
                 for (Order order : orders) {
                     Optional<Restaurant> optionalRestaurant = restaurantDAO.getById(order.getRestaurantId());
