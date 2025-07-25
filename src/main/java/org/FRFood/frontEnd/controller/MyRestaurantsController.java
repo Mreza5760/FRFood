@@ -238,7 +238,7 @@ public class MyRestaurantsController {
                         Platform.runLater(this::fetchRestaurants);
                     } else {
                         System.err.println("Failed to delete restaurant: HTTP " + response.statusCode());
-                        String errorMessage = response.body(); // assuming 'response' is HttpResponse<String>
+                        String errorMessage = response.body();
                         Platform.runLater(() -> {
                             Alert alert = new Alert(Alert.AlertType.ERROR);
                             alert.setTitle("Delete Failed");
