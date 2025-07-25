@@ -17,6 +17,8 @@ public class PanelController {
 
     public Button deliveryHistoryButton;
     @FXML
+    public Button couponsButton;
+    @FXML
     private Label welcomeLabel;
     @FXML
     private Button logoutButton;
@@ -64,6 +66,11 @@ public class PanelController {
         usersButton.setOnAction(e -> handleAllUsers());
         ordersButton.setOnAction(e -> adminOrderButtonClick());
         transactionsButton.setOnAction(e -> handleTransactions());
+        couponsButton.setOnAction(e -> handleCouponsButton());
+    }
+
+    private void handleCouponsButton() {
+        SceneNavigator.switchTo("/frontend/allCoupons.fxml",restaurantButton);
     }
 
     private void adminOrderButtonClick() {
@@ -118,7 +125,8 @@ public class PanelController {
                 ordersButton.setManaged(true);
                 transactionsButton.setVisible(true);
                 transactionsButton.setManaged(true);
-
+                couponsButton.setVisible(true);
+                couponsButton.setManaged(true);
                 // Hide Wallet & Profile for Admin
                 walletButton.setVisible(false);
                 walletButton.setManaged(false);

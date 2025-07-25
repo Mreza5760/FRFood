@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.geometry.Pos?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<VBox xmlns="http://javafx.com/javafx"
+      xmlns:fx="http://javafx.com/fxml"
+      fx:controller="org.FRFood.frontEnd.controller.AllCouponsController"
+      spacing="20"
+      style="-fx-background-color: linear-gradient(to bottom, #eef3f9, #dbe5f1);"
+      alignment="TOP_CENTER">
+
+    <padding>
+        <Insets top="30" left="40" right="40" bottom="30"/>
+    </padding>
+
+    <HBox spacing="10" alignment="CENTER_LEFT" maxWidth="Infinity">
+        <Button fx:id="backButton"
+                text="← Back"
+                onAction="#handleBack"
+                style="-fx-background-color: #ff6666; -fx-text-fill: white; -fx-font-weight: bold; -fx-background-radius: 8;"/>
+
+        <Label text="📦 All Coupons"
+               style="-fx-font-size: 26px; -fx-font-weight: bold; -fx-text-fill: #1e2a38;"/>
+
+        <Region fx:id="spacer" HBox.hgrow="ALWAYS"/>
+
+        <Button fx:id="addCouponButton"
+                text="＋ Add"
+                onAction="#handleAddCoupon"
+                style="-fx-background-color: #00aa88; -fx-text-fill: white; -fx-font-weight: bold; -fx-background-radius: 8;"/>
+    </HBox>
+
+    <ScrollPane fitToWidth="true" style="-fx-background: transparent;">
+        <VBox fx:id="couponContainer" spacing="15" alignment="TOP_CENTER">
+            <padding>
+                <Insets top="10" right="10" bottom="10" left="10"/>
+            </padding>
+        </VBox>
+    </ScrollPane>
+
+</VBox>
