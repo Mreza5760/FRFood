@@ -258,6 +258,17 @@ public class MenuController {
             System.out.println("error so bad");
         }
 
+        boolean empty = true;
+        for(OrderItem orderItem : order.getItems()) {
+            if(orderItem.getQuantity() != 0) {
+                empty = false;
+                break;
+            }
+        }
+        if (empty) {
+            cart.remove(restaurant.getId());
+        }
+
         order.setRawPrice(order.getRawPrice() - food.getPrice());
 
         order.setPayPrice(order.getCourierFee() + order.getRawPrice() + order.getTaxFee() + order.getAdditionalFee());

@@ -84,7 +84,7 @@ CREATE TABLE IF NOT EXISTS FoodItem_menus(
 CREATE TABLE IF NOT EXISTS Coupons
 (
     id          INTEGER AUTO_INCREMENT PRIMARY KEY,
-    coupon_code VARCHAR(50)    NOT NULL UNIQUE,
+    coupon_code VARCHAR(100)    NOT NULL UNIQUE,
     `type`      ENUM ('fixed',
         'percent'
         )                      NOT NULL,
