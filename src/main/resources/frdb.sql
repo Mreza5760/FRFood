@@ -171,7 +171,7 @@ CREATE TABLE IF NOT EXISTS Transactions
     id         INTEGER AUTO_INCREMENT PRIMARY KEY,
     order_id   INTEGER                                     NULL,
     user_id    INTEGER                                     NOT NULL,
-    method     ENUM ('wallet', 'online')                   NOT NULL,
+    method     ENUM ('wallet', 'online', 'refund', 'restaurantPayment', 'courierPayment')                   NOT NULL,
     amount     INTEGER                                     NOT NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (order_id) REFERENCES Orders (id) ON DELETE SET NULL,
