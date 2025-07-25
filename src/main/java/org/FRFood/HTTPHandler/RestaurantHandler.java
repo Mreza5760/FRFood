@@ -430,7 +430,7 @@ public class RestaurantHandler implements HttpHandler {
                         Optional<User> optionalUser = userDAO.getById(order.getCustomerId());
                         if (optionalUser.isEmpty() || optionalUser.get().getFullName().contains(params.get("user")))
                             orders.remove(order);
-                    } else if (params.containsKey("courier") && order.getCourierId() != Integer.parseInt(params.get("courier"))) {
+                    } else if (params.containsKey("courier")) {
                         Optional<User> optionalUser = userDAO.getById(order.getCustomerId());
                         if (optionalUser.isEmpty() || optionalUser.get().getFullName().contains(params.get("courier")))
                             orders.remove(order);
