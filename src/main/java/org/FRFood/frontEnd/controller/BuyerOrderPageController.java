@@ -19,12 +19,10 @@ public class BuyerOrderPageController {
 
     @FXML
     private void initialize() {
-        // Navigate back to the panel
         backButton.setOnAction(event ->
                 SceneNavigator.switchTo("/frontEnd/Panel.fxml", backButton)
         );
 
-        // Placeholder actions
         orderHistoryButton.setOnAction(event ->
                 handleOrderHistoryButtonClick()
         );
@@ -46,5 +44,4 @@ public class BuyerOrderPageController {
         OrderHistoryController.setMode(1);
         SceneNavigator.switchTo("/frontEnd/orderHistory.fxml", orderHistoryButton);
     }
-
 }

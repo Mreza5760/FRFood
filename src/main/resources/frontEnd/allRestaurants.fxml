@@ -32,7 +32,7 @@
               alignment="TOP_CENTER" spacing="30"
               style="-fx-background-color: linear-gradient(to bottom, #eef3f9, #dbe5f1);">
 
-            <Label text="🏬 enjoy ordering food from FRfood"
+            <Label text="🏬 enjoy ordering food from FRFood"
                    style="-fx-font-size: 30px; -fx-font-weight: bold; -fx-text-fill: #1e2a38;"/>
 
             <ScrollPane fitToWidth="true"
