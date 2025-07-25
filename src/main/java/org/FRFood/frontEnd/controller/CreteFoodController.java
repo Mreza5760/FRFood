@@ -17,8 +17,10 @@ import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.nio.file.Files;
+import java.util.Arrays;
 import java.util.Base64;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class CreteFoodController {
     private static int restaurantId;
@@ -50,37 +52,31 @@ public class CreteFoodController {
     }
 
     private void handleSubmit() {
-        String name = nameField.getText();
-        String description = descriptionField.getText();
-        String priceText = priceField.getText();
-        String supplyText = supplyField.getText();
-        String keywords = keywordsTextField.getText();
+        String name = nameField.getText().trim();
+        String description = descriptionField.getText().trim();
+        String priceText = priceField.getText().trim();
+        String supplyText = supplyField.getText().trim();
+        String keywords = keywordsTextField.getText().trim();
 
-        if (name.isEmpty() || description.isEmpty() || priceText.isEmpty() || supplyText.isEmpty()) {
+        if (name.isEmpty() || description.isEmpty() || priceText.isEmpty() || supplyText.isEmpty() || keywords.isEmpty()) {
             showAlert(Alert.AlertType.ERROR, "Validation Error", "All fields must be filled out.");
             return;
         }
-        List<String> keywordsList = null;
-        if(keywords.isEmpty()){
-            keywords =null;
-        }else {
-            keywordsList = List.of(keywords.split(","));
-        }
-        double price;
-        int supply;
-        try {
-            price = Double.parseDouble(priceText);
-            supply = Integer.parseInt(supplyText);
-        } catch (NumberFormatException e) {
-            showAlert(Alert.AlertType.ERROR, "Input Error", "Price must be a number and supply must be an integer.");
+
+        List<String> keywordsList = Arrays.stream(keywords.split(","))
+                .map(String::trim)
+                .filter(s -> !s.isEmpty())
+                .collect(Collectors.toList());
+
+        int price = parseIntSafe(priceText);
+        int supply = parseIntSafe(supplyText);
+        if (price < 0 || supply < 0) {
+            showAlert(Alert.AlertType.ERROR, "Error", "Invalid price or supply value.");
             return;
         }
 
-
-
         ObjectMapper mapper = new ObjectMapper();
         try {
-            // Build JSON
             String requestBody = mapper.writeValueAsString(new FoodRequest(
                     name,
                     logoBase64,
@@ -144,4 +140,11 @@ public class CreteFoodController {
         }
     }
 
+    private int parseIntSafe(String text) {
+        try {
+            return Integer.parseInt(text);
+        } catch (NumberFormatException e) {
+            return -1;
+        }
+    }
 }

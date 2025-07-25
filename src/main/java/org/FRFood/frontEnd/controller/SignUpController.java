@@ -124,17 +124,17 @@ public class SignUpController {
 
     private String buildRequestJson() throws JsonProcessingException {
         Map<String, Object> userData = new HashMap<>();
-        userData.put("full_name", fullNameField.getText());
-        userData.put("password", passwordField.getText());
-        userData.put("email", emailField.getText().isBlank() ? null : emailField.getText());
-        userData.put("phone", phoneNumberField.getText());
+        userData.put("full_name", fullNameField.getText().trim());
+        userData.put("password", passwordField.getText().trim());
+        userData.put("email", emailField.getText().isBlank() ? null : emailField.getText().trim());
+        userData.put("phone", phoneNumberField.getText().trim());
         userData.put("role", roleField.getValue());
-        userData.put("address", addressField.getText());
+        userData.put("address", addressField.getText().trim());
         userData.put("profileImageBase64", base64ProfileImage);
 
         Map<String, String> bank = new HashMap<>();
-        bank.put("bank_name", bankNameField.getText());
-        bank.put("account_number", bankAccountField.getText());
+        bank.put("bank_name", bankNameField.getText().trim());
+        bank.put("account_number", bankAccountField.getText().trim());
 
         userData.put("bank_info", bank);
 
@@ -150,6 +150,7 @@ public class SignUpController {
         String address = addressField.getText().trim();
         String bankAccount = bankAccountField.getText().trim();
         String bankName = bankNameField.getText().trim();
+        String email = emailField.getText().trim();
 
         resetFieldStyles();
 
@@ -181,6 +182,10 @@ public class SignUpController {
         }
         if (bankName.isEmpty()) {
             bankNameField.setStyle("-fx-border-color: red;");
+            valid = false;
+        }
+        if (!email.isEmpty() && !email.matches("^[\\w.-]+@[\\w.-]+\\.[a-zA-Z]{2,}$")) {
+            emailField.setStyle("-fx-border-color: red;");
             valid = false;
         }
 
