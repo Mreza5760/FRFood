@@ -414,6 +414,7 @@ public class RestaurantHandler implements HttpHandler {
             var restaurantOpt = Authenticate.restaurantChecker(exchange, user, restaurantId);
             if (restaurantOpt.isEmpty()) return;
             List<Order> orders = orderDAO.getRestaurantOrders(restaurantId);
+            List<Order> finalOrders = new ArrayList<>(orders);
 
             if (query != null && !query.isEmpty()) {
                 String[] parts = query.split("&");
@@ -425,15 +426,15 @@ public class RestaurantHandler implements HttpHandler {
                 UserDAO userDAO = new UserDAOImp();
                 for (Order order : orders) {
                     if (params.containsKey("status") && params.get("status") != null && !params.get("status").isEmpty() && !order.getStatus().toString().equals(params.get("status"))) {
-                        orders.remove(order);
+                        finalOrders.remove(order);
                     } else if (params.containsKey("user") && params.get("user") != null && !params.get("user").isEmpty()) {
                         Optional<User> optionalUser = userDAO.getById(order.getCustomerId());
                         if (optionalUser.isEmpty() || optionalUser.get().getFullName().contains(params.get("user")))
-                            orders.remove(order);
+                            finalOrders.remove(order);
                     } else if (params.containsKey("courier") && params.get("courier") != null && !params.get("courier").isEmpty()) {
                         Optional<User> optionalUser = userDAO.getById(order.getCustomerId());
                         if (optionalUser.isEmpty() || optionalUser.get().getFullName().contains(params.get("courier")))
-                            orders.remove(order);
+                            finalOrders.remove(order);
                     } else if (params.containsKey("search") && params.get("search") != null && !params.get("search").isEmpty()) {
                         List<OrderItem> items = order.getItems();
                         boolean found = false;
@@ -449,14 +450,13 @@ public class RestaurantHandler implements HttpHandler {
                                 break;
                             }
                         }
-                        if (!found) {
-                            orders.remove(order);
-                        }
+                        if (!found)
+                            finalOrders.remove(order);
                     }
                 }
             }
 
-            JsonResponse.sendJsonResponse(exchange, 200, objectMapper.writeValueAsString(orders));
+            JsonResponse.sendJsonResponse(exchange, 200, objectMapper.writeValueAsString(finalOrders));
         } catch (SQLException e) {
             HttpError.internal(exchange, "Failed to get restaurant orders");
         }
