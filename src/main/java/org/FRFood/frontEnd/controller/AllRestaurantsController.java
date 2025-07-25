@@ -58,7 +58,7 @@ public class AllRestaurantsController {
             backButton.setOnAction(e -> goBack());
             searchBox1.setOnAction(e -> handleSearch1());
             searchBox2.setOnAction(e -> handleSearch2());
-            fetchRestaurants();
+            fetchRestaurants("",null);
         }
     }
 
@@ -72,8 +72,24 @@ public class AllRestaurantsController {
         });
     }
 
-    private void fetchRestaurants() {
-        String tempJson = "{\"search\": \"\" }";
+    private void fetchRestaurants(String searchString,String[] keywords) {
+        StringBuilder keywordsJsonArray = null;
+        String tempJson = null;
+        if (keywords != null) {
+            keywordsJsonArray = new StringBuilder("[");
+            for (int i = 0; i < keywords.length; i++) {
+                keywordsJsonArray.append("\"").append(keywords[i]).append("\"");
+                if (i < keywords.length - 1) {
+                    keywordsJsonArray.append(", ");
+                }
+            }
+            keywordsJsonArray.append("]");
+            tempJson = "{ \"search\": \"" + searchString.trim() + "\", \"keywords\": " + keywordsJsonArray + " }";
+        }else{
+            tempJson = "{ \"search\": \"" + searchString.trim()+"\"}";
+        }
+
+
         HttpRequest request = HttpRequest.newBuilder()
                 .uri(URI.create("http://localhost:8080/vendors"))
                 .header("Authorization", "Bearer " + SessionManager.getAuthToken())
@@ -205,9 +221,23 @@ public class AllRestaurantsController {
     }
 
     private void handleSearch1() {
+        String temp =searchBox2.getText().trim();
+        if(!temp.isEmpty()){
+            String[] parts = temp.split(",");
+            fetchRestaurants(searchBox1.getText(),parts);
+        }else{
+            fetchRestaurants(searchBox1.getText(),null);
+        }
     }
 
     private void handleSearch2() {
+        String temp =searchBox2.getText().trim();
+        if(!temp.isEmpty()){
+            String[] parts = temp.split(",");
+            fetchRestaurants(searchBox1.getText(),parts);
+        }else{
+            fetchRestaurants(searchBox1.getText(),null);
+        }
     }
 
     private List<Restaurant> getFavoriteRestaurants() {

@@ -39,7 +39,7 @@
                    style="-fx-background-radius: 8; -fx-padding: 8; -fx-font-size: 14px;"/>
 
         <Button fx:id="validateTokeButton" text="validate"
-                onAction="#handlevalidateToke"
+                onAction="#handlevalidateToken"
                 managed="false"
                 visible="false"
                 style="-fx-background-color: #0077cc; -fx-text-fill: white; -fx-font-size: 14px; -fx-font-weight: bold; -fx-background-radius: 10;"
