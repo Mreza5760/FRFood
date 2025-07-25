@@ -51,7 +51,7 @@ public class RestaurantHandler implements HttpHandler {
                 }
                 case "GET" -> {
                     if (path.equals("/restaurants/mine")) myRestaurants(exchange);
-                    else if (path.matches("^/restaurants/\\d+/orders$")) getOrders(exchange);
+                    else if (path.matches("^/restaurants/\\d+/orders/?$")) getOrders(exchange);
                     else if (path.matches("^/restaurants/\\d+/menus$")) getMenus(exchange);
                     else if (path.matches("^/restaurants/\\d+/items/[^/]+$")) getMenuItems(exchange);
                     else if (path.matches("^/restaurants/\\d+/menu/[^/]+$")) getItemsOutOfMenu(exchange);
@@ -379,7 +379,7 @@ public class RestaurantHandler implements HttpHandler {
         }
 
         String[] parts = exchange.getRequestURI().getPath().split("/");
-        String menuTitle =URLDecoder.decode(parts[4], StandardCharsets.UTF_8);
+        String menuTitle = URLDecoder.decode(parts[4], StandardCharsets.UTF_8);
         int foodId = Integer.parseInt(parts[5]);
         int restaurantId = Integer.parseInt(parts[2]);
         try {
@@ -425,17 +425,17 @@ public class RestaurantHandler implements HttpHandler {
                 }
                 UserDAO userDAO = new UserDAOImp();
                 for (Order order : orders) {
-                    if (params.containsKey("status") && params.get("status") != null && !params.get("status").isEmpty() && !order.getStatus().toString().equals(params.get("status"))) {
+                    if (params.containsKey("status") && !params.get("status").equals("null") && !params.get("status").isEmpty() && !order.getStatus().toString().equals(params.get("status"))) {
                         finalOrders.remove(order);
-                    } else if (params.containsKey("user") && params.get("user") != null && !params.get("user").isEmpty()) {
+                    } else if (params.containsKey("user") && !params.get("user").isEmpty()) {
                         Optional<User> optionalUser = userDAO.getById(order.getCustomerId());
                         if (optionalUser.isEmpty() || optionalUser.get().getFullName().contains(params.get("user")))
                             finalOrders.remove(order);
-                    } else if (params.containsKey("courier") && params.get("courier") != null && !params.get("courier").isEmpty()) {
+                    } else if (params.containsKey("courier") && !params.get("courier").isEmpty()) {
                         Optional<User> optionalUser = userDAO.getById(order.getCustomerId());
                         if (optionalUser.isEmpty() || optionalUser.get().getFullName().contains(params.get("courier")))
                             finalOrders.remove(order);
-                    } else if (params.containsKey("search") && params.get("search") != null && !params.get("search").isEmpty()) {
+                    } else if (params.containsKey("search") && !params.get("search").isEmpty()) {
                         List<OrderItem> items = order.getItems();
                         boolean found = false;
                         for (OrderItem item : items) {
@@ -458,6 +458,7 @@ public class RestaurantHandler implements HttpHandler {
 
             JsonResponse.sendJsonResponse(exchange, 200, objectMapper.writeValueAsString(finalOrders));
         } catch (SQLException e) {
+            System.out.println(e.getMessage());
             HttpError.internal(exchange, "Failed to get restaurant orders");
         }
     }
@@ -512,7 +513,7 @@ public class RestaurantHandler implements HttpHandler {
                         return;
                     }
                     Food food = optionalFood.get();
-                    food.setSupply(food.getSupply()+orderItem.getQuantity());
+                    food.setSupply(food.getSupply() + orderItem.getQuantity());
                     foodDAO.update(food);
                 }
                 new UserDAOImp().setWallet(customer.getId(), customer.getWallet() + order.getPayPrice());
@@ -523,7 +524,7 @@ public class RestaurantHandler implements HttpHandler {
                 new UserDAOImp().setWallet(owner.getId(), owner.getWallet() + order.getPayPrice() - order.getCourierFee());
             }
 
-            orderDAO.changeStatus(orderId, status,user.getId());
+            orderDAO.changeStatus(orderId, status, user.getId());
             JsonResponse.sendJsonResponse(exchange, 200, "{\"message\":\"Order status updated\"}");
         } catch (SQLException e) {
             HttpError.internal(exchange, "Failed to update order status");
@@ -575,7 +576,7 @@ public class RestaurantHandler implements HttpHandler {
 
             List<Food> allFoods = restaurantDAO.getFoods(restaurantId);
             List<Food> menuFoods = restaurantDAO.getMenuFood(restaurantId, menu.getId());
-            for(Food food : menuFoods){
+            for (Food food : menuFoods) {
                 allFoods.remove(food);
             }
             String json = objectMapper.writeValueAsString(allFoods);

@@ -14,6 +14,8 @@ import org.FRFood.frontEnd.Util.SessionManager;
 
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.List;
 
@@ -55,11 +57,15 @@ public class RestaurantOrdersController {
         new Thread(() -> {
             try {
                 String uri = "http://localhost:8080/restaurants/" +
-                        restaurant.getId() + "/orders?status=\"" +
-                        statusComboBox.getValue().toString() + "\"search=\"" +
-                        searchField.getText().trim() +"\"&user=\"" +
-                        userIdField.getText().trim()+"\"&courier=\"" +
-                        courierIdField.getText().trim() + "\"";
+                        restaurant.getId() + "/orders?" +
+                        "status=" + statusComboBox.getValue() +
+                        "&search=" + searchField.getText().trim() +
+                        "&user=" + userIdField.getText().trim() +
+                        "&courier=" + courierIdField.getText().trim();
+
+                //debug
+                System.out.println(uri);
+
                 URL url = new URL(uri);
                 HttpURLConnection conn = (HttpURLConnection) url.openConnection();
                 conn.setRequestMethod("GET");
@@ -67,6 +73,8 @@ public class RestaurantOrdersController {
 
                 List<Order> orders = Arrays.asList(mapper.readValue(conn.getInputStream(), Order[].class));
                 Platform.runLater(() -> displayOrders(orders));
+
+
 
             } catch (Exception e) {
                 e.printStackTrace();
