@@ -62,19 +62,14 @@ public class RestaurantOrdersController {
                         "&search=" + searchField.getText().trim() +
                         "&user=" + userIdField.getText().trim() +
                         "&courier=" + courierIdField.getText().trim();
-
-                //debug
-                System.out.println(uri);
-
                 URL url = new URL(uri);
                 HttpURLConnection conn = (HttpURLConnection) url.openConnection();
                 conn.setRequestMethod("GET");
                 conn.setRequestProperty("Authorization", "Bearer " + SessionManager.getAuthToken());
 
+
                 List<Order> orders = Arrays.asList(mapper.readValue(conn.getInputStream(), Order[].class));
                 Platform.runLater(() -> displayOrders(orders));
-
-
 
             } catch (Exception e) {
                 e.printStackTrace();
@@ -138,5 +133,6 @@ public class RestaurantOrdersController {
     }
 
     public void handleSearch(ActionEvent actionEvent) {
+        fetchOrders();
     }
 }
