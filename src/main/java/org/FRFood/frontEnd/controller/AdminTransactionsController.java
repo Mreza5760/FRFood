@@ -34,7 +34,6 @@ public class AdminTransactionsController {
 
     @FXML
     public void initialize() {
-        // Bind properties
         idColumn.setCellValueFactory(new PropertyValueFactory<>("id"));
         userIdColumn.setCellValueFactory(new PropertyValueFactory<>("userID"));
         methodColumn.setCellValueFactory(new PropertyValueFactory<>("method"));

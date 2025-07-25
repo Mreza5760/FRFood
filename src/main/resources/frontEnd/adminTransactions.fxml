@@ -15,7 +15,6 @@
           AnchorPane.rightAnchor="20" AnchorPane.bottomAnchor="20"
           style="-fx-padding: 20;">
 
-        <!-- Header Bar -->
         <HBox alignment="CENTER_LEFT" spacing="15"
               style="-fx-background-color: #0077cc; -fx-padding: 10; -fx-background-radius: 8;">
             <Button fx:id="backButton" text="⬅ Back"
@@ -26,13 +25,12 @@
                    style="-fx-font-size: 22px; -fx-font-weight: bold; -fx-text-fill: white;"/>
         </HBox>
 
-        <!-- Table -->
         <TableView fx:id="transactionsTable" prefHeight="500" prefWidth="850"
                    style="-fx-background-color: white; -fx-border-color: #ccc; -fx-border-radius: 8; -fx-background-radius: 8;">
             <columns>
-                <TableColumn fx:id="idColumn" text="Transaction ID" prefWidth="150"/>
-                <TableColumn fx:id="orderIdColumn" text="Order ID" prefWidth="150"/>
-                <TableColumn fx:id="userIdColumn" text="User ID" prefWidth="150"/>
+                <TableColumn fx:id="idColumn" text="TransactionID" prefWidth="150"/>
+                <TableColumn fx:id="orderIdColumn" text="OrderID / Type" prefWidth="150"/>
+                <TableColumn fx:id="userIdColumn" text="UserID" prefWidth="150"/>
                 <TableColumn fx:id="methodColumn" text="Method" prefWidth="150"/>
                 <TableColumn fx:id="amountColumn" text="Amount" prefWidth="150"/>
             </columns>

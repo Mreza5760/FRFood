@@ -87,9 +87,7 @@ public class OrderHandler implements HttpHandler {
             Transaction transaction = new Transaction();
             transaction.setOrderID(0);
             transaction.setUserID(user.getId());
-            transaction.setMethod(
-                    TransactionMethod.online
-            );
+            transaction.setMethod(TransactionMethod.online);
             transaction.setAmount(amount);
 
             transaction.setId(transactionDAO.insert(transaction));

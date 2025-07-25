@@ -42,7 +42,7 @@ public class AdminHandler implements HttpHandler {
         String overrideMethod = exchange.getRequestHeaders().getFirst("X-HTTP-Method-Override");
 
         if ("POST".equalsIgnoreCase(method) && overrideMethod != null) {
-            method = overrideMethod.toUpperCase(); // Treat POST+Override as that method
+            method = overrideMethod.toUpperCase();
         }
 
         try {
