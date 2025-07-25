@@ -422,13 +422,18 @@ public class RestaurantHandler implements HttpHandler {
                     String[] keyValue = part.split("=");
                     params.put(keyValue[0], keyValue[1]);
                 }
+                UserDAO userDAO = new UserDAOImp();
                 for (Order order : orders) {
-                    if (params.containsKey("status") && !order.getStatus().toString().equals(params.get("status"))) {
+                    if (params.containsKey("status") && !params.get("status").isEmpty() && !order.getStatus().toString().equals(params.get("status"))) {
                         orders.remove(order);
-                    } else if (params.containsKey("user") && order.getCustomerId() != Integer.parseInt(params.get("user"))) {
-                        orders.remove(order);
-                    } else if (params.containsKey("courier") &&  order.getCourierId() != Integer.parseInt(params.get("courier"))) {
-                      orders.remove(order);
+                    } else if (params.containsKey("user")) {
+                        Optional<User> optionalUser = userDAO.getById(order.getCustomerId());
+                        if (optionalUser.isEmpty() || optionalUser.get().getFullName().contains(params.get("user")))
+                            orders.remove(order);
+                    } else if (params.containsKey("courier") && order.getCourierId() != Integer.parseInt(params.get("courier"))) {
+                        Optional<User> optionalUser = userDAO.getById(order.getCustomerId());
+                        if (optionalUser.isEmpty() || optionalUser.get().getFullName().contains(params.get("courier")))
+                            orders.remove(order);
                     } else if (params.containsKey("search")) {
                         List<OrderItem> items = order.getItems();
                         boolean found = false;
