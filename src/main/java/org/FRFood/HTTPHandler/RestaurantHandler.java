@@ -427,15 +427,18 @@ public class RestaurantHandler implements HttpHandler {
                 for (Order order : orders) {
                     if (params.containsKey("status") && !params.get("status").equals("null") && !params.get("status").isEmpty() && !order.getStatus().toString().equals(params.get("status"))) {
                         finalOrders.remove(order);
-                    } else if (params.containsKey("user") && !params.get("user").isEmpty()) {
+                    }
+                    if (params.containsKey("user") && !params.get("user").isEmpty()) {
                         Optional<User> optionalUser = userDAO.getById(order.getCustomerId());
                         if (optionalUser.isPresent() && !optionalUser.get().getFullName().contains(params.get("user")))
                             finalOrders.remove(order);
-                    } else if (params.containsKey("courier") && !params.get("courier").isEmpty()) {
+                    }
+                    if (params.containsKey("courier") && !params.get("courier").isEmpty()) {
                         Optional<User> optionalUser = userDAO.getById(order.getCourierId());
                         if (order.getCourierId() == 0 || (optionalUser.isPresent() && !optionalUser.get().getFullName().contains(params.get("courier"))))
                             finalOrders.remove(order);
-                    } else if (params.containsKey("search") && !params.get("search").isEmpty()) {
+                    }
+                    if (params.containsKey("search") && !params.get("search").isEmpty()) {
                         List<OrderItem> items = order.getItems();
                         boolean found = false;
                         for (OrderItem item : items) {
