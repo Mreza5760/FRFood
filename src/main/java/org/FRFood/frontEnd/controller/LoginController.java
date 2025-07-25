@@ -30,7 +30,7 @@ public class LoginController {
 
         boolean valid = true;
 
-        if (phone.isEmpty() || !phone.matches("^\\+?\\d{10,15}$")) {
+        if (phone.isEmpty()) {
             phoneField.setStyle("-fx-border-color: red;");
             valid = false;
         }
@@ -77,6 +77,22 @@ public class LoginController {
                         SceneNavigator.switchTo("/frontend/panel.fxml", messageLabel);
                     });
 
+                } else if (responseCode == 404) {
+                    JsonNode node = mapper.readTree(conn.getErrorStream());
+                    String error = node.has("error") ? node.get("error").asText() : "Login failed";
+                    Platform.runLater(() -> {
+                        phoneField.setStyle("-fx-border-color: red;");
+                        messageLabel.setStyle("-fx-text-fill: red;");
+                        messageLabel.setText("Login failed: " + error);
+                    });
+                } else if (responseCode == 401) {
+                    JsonNode node = mapper.readTree(conn.getErrorStream());
+                    String error = node.has("error") ? node.get("error").asText() : "Login failed";
+                    Platform.runLater(() -> {
+                        passwordField.setStyle("-fx-border-color: red;");
+                        messageLabel.setStyle("-fx-text-fill: red;");
+                        messageLabel.setText("Login failed: " + error);
+                    });
                 } else {
                     JsonNode node = mapper.readTree(conn.getErrorStream());
                     String error = node.has("error") ? node.get("error").asText() : "Login failed";

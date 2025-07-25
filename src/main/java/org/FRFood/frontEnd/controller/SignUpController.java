@@ -222,6 +222,7 @@ public class SignUpController {
         addressField.setStyle(null);
         bankAccountField.setStyle(null);
         bankNameField.setStyle(null);
+        emailField.setStyle(null);
     }
 
     private void showAlert(Alert.AlertType type, String title, String content) {

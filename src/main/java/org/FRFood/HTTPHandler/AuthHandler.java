@@ -114,7 +114,7 @@ public class AuthHandler implements HttpHandler {
         try {
             Optional<User> OpUser = userDAO.getByPhone(loginRequest.getPhoneNumber());
             if (OpUser.isEmpty()) {
-                HttpError.unauthorized(exchange, "Phone number not found");
+                HttpError.notFound(exchange, "Phone number not found");
                 return;
             }
             User user = OpUser.get();
