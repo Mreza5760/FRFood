@@ -26,6 +26,7 @@ import org.FRFood.entity.Food;
 import org.FRFood.entity.Keyword;
 import org.FRFood.frontEnd.Util.SceneNavigator;
 import org.FRFood.frontEnd.Util.SessionManager;
+import org.FRFood.util.BuyerReq.ItemsReq;
 
 import java.io.ByteArrayInputStream;
 import java.net.URI;
@@ -45,10 +46,14 @@ public class AllFoodsController {
 
     private static int restaurantId;
     private static String restaurantName;
+    private static int mode;
+    private static ItemsReq itemsReq;
 
-    public static void setData(int input, String restaurant_name) {
+    public static void setData(int input, String restaurant_name, int mode, ItemsReq item) {
         AllFoodsController.restaurantId = input;
         AllFoodsController.restaurantName = restaurant_name;
+        AllFoodsController.mode = mode;
+        AllFoodsController.itemsReq = item;
     }
 
     @FXML
@@ -63,26 +68,54 @@ public class AllFoodsController {
     }
 
     private void fetchFoods() {
-        String safeUrl = "http://localhost:8080/vendors/" + restaurantId;
-        URI uri = URI.create(safeUrl);
-        HttpRequest request = HttpRequest.newBuilder()
-                .uri(uri)
-                .header("Authorization", "Bearer " + SessionManager.getAuthToken())
-                .GET()
-                .build();
+        if (mode == 1) {
+            String safeUrl = "http://localhost:8080/vendors/" + restaurantId;
+            URI uri = URI.create(safeUrl);
+            HttpRequest request = HttpRequest.newBuilder()
+                    .uri(uri)
+                    .header("Authorization", "Bearer " + SessionManager.getAuthToken())
+                    .GET()
+                    .build();
 
-        HttpClient.newHttpClient().sendAsync(request, HttpResponse.BodyHandlers.ofString())
-                .thenAccept(response -> {
-                    if (response.statusCode() == 200) {
-                        displayFoods(response.body());
-                    } else {
-                        System.err.println("Failed to fetch restaurants: HTTP " + response.statusCode() + response.body());
-                    }
-                })
-                .exceptionally(e -> {
-                    e.printStackTrace();
-                    return null;
-                });
+            HttpClient.newHttpClient().sendAsync(request, HttpResponse.BodyHandlers.ofString())
+                    .thenAccept(response -> {
+                        if (response.statusCode() == 200) {
+                            displayFoods(response.body());
+                        } else {
+                            System.err.println("Failed to fetch restaurants: HTTP " + response.statusCode() + response.body());
+                        }
+                    })
+                    .exceptionally(e -> {
+                        e.printStackTrace();
+                        return null;
+                    });
+        } else {
+            try {
+                String json = mapper.writeValueAsString(itemsReq);
+                HttpRequest request = HttpRequest.newBuilder()
+                        .uri(URI.create("http://localhost:8080/items"))
+                        .header("Authorization", "Bearer " + SessionManager.getAuthToken())
+                        .POST(HttpRequest.BodyPublishers.ofString(json))
+                        .build();
+
+                HttpClient.newHttpClient().sendAsync(request, HttpResponse.BodyHandlers.ofString())
+                        .thenAccept(response -> {
+                            if (response.statusCode() == 200) {
+                                displayFoods(response.body());
+                            } else {
+                                System.err.println("Failed to fetch restaurants: HTTP " + response.statusCode());
+                            }
+                        })
+                        .exceptionally(e -> {
+                            e.printStackTrace();
+                            return null;
+                        });
+            } catch (Exception e) {
+                System.out.println(e.getMessage());
+            }
+        }
+
+
     }
 
     private void displayFoods(String body) {
@@ -189,10 +222,10 @@ public class AllFoodsController {
                         System.out.println("Deleted restaurant: " + food.getName());
                         Platform.runLater(this::fetchFoods);
                     } else if (response.statusCode() == 403) {
-                        System.err.println("Failed to delete restaurant: HTTP " + response.statusCode()+response.body());
+                        System.err.println("Failed to delete restaurant: HTTP " + response.statusCode() + response.body());
                         showAlert(Alert.AlertType.WARNING, "Delete Failed", "Food is in an active order");
                     } else {
-                        System.err.println("Failed to delete restaurant: HTTP " + response.statusCode()+response.body());
+                        System.err.println("Failed to delete restaurant: HTTP " + response.statusCode() + response.body());
                         showAlert(Alert.AlertType.WARNING, "Delete Failed", response.body());
                     }
                 })
@@ -212,8 +245,8 @@ public class AllFoodsController {
             for (Keyword f : food.getKeywords()) {
                 keywords.append(f.getName()).append(",");
             }
-            keywords.deleteCharAt(keywords.length()-1);
-            controller.setFoodData(restaurantId,food.getId(),food.getName(),food.getSupply(),food.getPrice(),keywords.toString(),food.getDescription(),food.getPicture());
+            keywords.deleteCharAt(keywords.length() - 1);
+            controller.setFoodData(restaurantId, food.getId(), food.getName(), food.getSupply(), food.getPrice(), keywords.toString(), food.getDescription(), food.getPicture());
 
             Stage stage = (Stage) restaurant_name_label.getScene().getWindow();
             double currentWidth = stage.getWidth();

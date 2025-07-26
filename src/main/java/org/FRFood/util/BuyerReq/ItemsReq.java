@@ -7,4 +7,5 @@ public class ItemsReq {
     public int minPrice;
     public int maxPrice;
     public List<String> keywords;
+
 }

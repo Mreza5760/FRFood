@@ -187,6 +187,16 @@ public class MenuController {
                     """);
             removeBtn.setOnAction(e -> handleRemove(food));
 
+            Order temp = SessionManager.getOrderList().get(restaurant.getId());
+            OrderItem theFood = null;
+            if (temp != null) {
+                for (OrderItem order : temp.getItems()) {
+                    if (order.getItemId().equals(food.getId())) {
+                        theFood = order;
+                    }
+                }
+            }
+
             // add Button
             Button addBtn = new Button("+");
             addBtn.setMaxSize(36, 36);
@@ -200,9 +210,15 @@ public class MenuController {
                     """);
             addBtn.setOnAction(e -> handleAdd(food));
 
-
+            if (theFood != null) {
+                Label counter = new Label(theFood.getQuantity().toString());
+                counter.setStyle("-fx-text-fill: black;");
+                rightBox = new HBox(10, removeBtn, counter, addBtn);
+            } else {
+                rightBox = new HBox(10, removeBtn, addBtn);
+            }
             // Add both buttons to VBox
-            rightBox = new HBox(10, removeBtn, addBtn);
+
             rightBox.setAlignment(Pos.CENTER_RIGHT);
         }
         card.setOnMouseClicked(e -> handleClick(food)); // full card click
@@ -213,15 +229,11 @@ public class MenuController {
 
     private void handleRemove(Food food) {
         Map<Integer, Order> cart = SessionManager.getOrderList();
-        Order order = new Order();
 
-        if (cart.containsKey(restaurant.getId())) {
-            order = cart.get(restaurant.getId());
-        } else {
-            Order tempOrder = new Order();
-            cart.put(restaurant.getId(), tempOrder);
-            order = cart.get(restaurant.getId());
+        if (!cart.containsKey(restaurant.getId())) {
+            return;
         }
+        Order order = cart.get(restaurant.getId());
 
         boolean found = false;
 
@@ -235,28 +247,13 @@ public class MenuController {
             }
         }
 
-        if (!cart.containsKey(restaurant.getId())) {
-            order.setDeliveryAddress(currentUser.getAddress());
-            order.setCustomerId(currentUser.getId());
-            order.setRestaurantId(restaurant.getId());
-            order.setCouponId(0);
-            order.setTaxFee(restaurant.getTaxFee());
-            order.setAdditionalFee(restaurant.getAdditionalFee());
-            Random rand = new Random();
-            int randomPrice = rand.nextInt(91) + 10;
-            order.setCourierFee(randomPrice);
-            order.setCourierId(0);
-            order.setStatus(Status.unpaid);
-        }
-
-
         if (!found) {
             System.out.println("error so bad");
         }
 
         boolean empty = true;
-        for(OrderItem orderItem : order.getItems()) {
-            if(orderItem.getQuantity() != 0) {
+        for (OrderItem orderItem : order.getItems()) {
+            if (orderItem.getQuantity() != 0) {
                 empty = false;
                 break;
             }
@@ -269,6 +266,7 @@ public class MenuController {
 
         order.setPayPrice(order.getCourierFee() + order.getRawPrice() + order.getTaxFee() + order.getAdditionalFee());
 
+        Platform.runLater(this::fetchFoods);
     }
 
     private void handleAdd(Food food) {
@@ -307,6 +305,8 @@ public class MenuController {
         order.setRawPrice(order.getRawPrice() + food.getPrice());
 
         order.setPayPrice(order.getCourierFee() + order.getRawPrice() + order.getTaxFee() + order.getAdditionalFee());
+
+        Platform.runLater(this::fetchFoods);
 
     }
 
