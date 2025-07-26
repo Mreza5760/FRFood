@@ -54,7 +54,7 @@ public class AdminHandler implements HttpHandler {
                 case "GET" -> {
                     if (path.equals("/admin/users")) {
                         handleGetUsers(exchange);
-                    } else if (path.equals("/admin/orders")) {
+                    } else if (path.matches("^/admin/orders/?$")) {
                         handleGetOrders(exchange);
                     } else if (path.equals("/admin/transactions")) {
                         handleGetTransactions(exchange);

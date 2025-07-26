@@ -9,10 +9,7 @@ import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.VBox;
-import org.FRFood.entity.Order;
-import org.FRFood.entity.OrderItem;
-import org.FRFood.entity.Restaurant;
-import org.FRFood.entity.Status;
+import org.FRFood.entity.*;
 import org.FRFood.frontEnd.Util.SceneNavigator;
 import org.FRFood.frontEnd.Util.SessionManager;
 
@@ -25,6 +22,7 @@ import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.nio.charset.StandardCharsets;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 public class PayOrderController {
@@ -69,7 +67,7 @@ public class PayOrderController {
             CouponCodeField.setManaged(true);
             validateTokeButton.setVisible(true);
             validateTokeButton.setManaged(true);
-        }else if(mode == 2 && currentOrder.getStatus() == Status.completed) {
+        } else if (mode == 2 && currentOrder.getStatus() == Status.completed) {
             isOwnedByCurrentUser(currentOrder.getId()).thenAccept(isOwner -> {
                 if (!isOwner) {
                     Platform.runLater(() -> {
@@ -78,7 +76,7 @@ public class PayOrderController {
                     });
                 }
             });
-        }else if (mode == 3 && currentOrder.getStatus() == Status.waiting) {
+        } else if (mode == 3 && currentOrder.getStatus() == Status.waiting) {
             acceptButton.setVisible(true);
             acceptButton.setManaged(true);
             declineButton.setVisible(true);
@@ -86,10 +84,10 @@ public class PayOrderController {
         } else if (mode == 3 && currentOrder.getStatus() == Status.preparing) {
             foodIsReadyButton.setVisible(true);
             foodIsReadyButton.setManaged(true);
-        } else if (mode == 4 &&  currentOrder.getStatus() == Status.findingCourier) {
+        } else if (mode == 4 && currentOrder.getStatus() == Status.findingCourier) {
             acceptButton.setVisible(true);
             acceptButton.setManaged(true);
-        }else if (mode == 4 &&  currentOrder.getStatus() == Status.onTheWay){
+        } else if (mode == 4 && currentOrder.getStatus() == Status.onTheWay) {
             finishButton.setVisible(true);
             finishButton.setManaged(true);
         }
@@ -140,7 +138,7 @@ public class PayOrderController {
             SceneNavigator.switchTo("/frontend/cart.fxml", payCardButton);
         } else if (mode == 3) {
             SceneNavigator.switchTo("/frontend/restaurantOrders.fxml", payWalletButton);
-        }else if(mode == 4){
+        } else if (mode == 4) {
             SceneNavigator.switchTo("/frontend/orderHistory.fxml", payWalletButton);
         }
     }
@@ -285,6 +283,43 @@ public class PayOrderController {
 
 
     public void handlevalidateToken(ActionEvent actionEvent) {
-        
+        String code = CouponCodeField.getText().trim();
+        new Thread(() -> {
+            try {
+                String temp = "http://localhost:8080/coupons?" +
+                        "coupon_code=" + code;
+                URL url = new URL(temp);
+                HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+                conn.setRequestMethod("GET");
+                conn.setRequestProperty("Authorization", "Bearer " + SessionManager.getAuthToken());
+                conn.setRequestProperty("Content-Type", "application/json");
+                conn.setDoOutput(true);
+
+                int resCode = conn.getResponseCode();
+
+                if (resCode >= 200 && resCode < 300) {
+                    ObjectMapper mapper = new ObjectMapper();
+                    Coupon coupon = mapper.readValue(conn.getInputStream(), Coupon.class);
+                    int currentRawPrice = SessionManager.getOrderList().get(restaurant.getId()).getRawPrice();
+                    if (coupon.getMinPrice() >= currentRawPrice) {
+                        showAlert("error", "you have to at least buy" + coupon.getMinPrice() + "to use this", Alert.AlertType.ERROR);
+                    }
+                    if (coupon.getType() == CouponType.fixed) {
+                        if (currentRawPrice - coupon.getValue() < 0) {
+                            SessionManager.getOrderList().get(restaurant.getId()).setRawPrice(0);
+                        } else {
+                            SessionManager.getOrderList().get(restaurant.getId()).setRawPrice(currentRawPrice - coupon.getValue());
+                        }
+                    } else {
+                        SessionManager.getOrderList().get(restaurant.getId()).setRawPrice(currentRawPrice * (1 - coupon.getValue() / 100));
+                    }
+                    Platform.runLater(() -> setOrder(SessionManager.getOrderList().get(restaurant.getId()), restaurant, 5));
+                } else {
+                    showAlert("error", conn.getResponseMessage(), Alert.AlertType.ERROR);
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }).start();
     }
 }
