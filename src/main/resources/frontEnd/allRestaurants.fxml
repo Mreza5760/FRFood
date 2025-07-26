@@ -20,10 +20,25 @@
 
             <Region HBox.hgrow="ALWAYS"/>
 
-            <TextField fx:id="searchBox1" promptText="🔍 Search vendor..."
+            <TextField fx:id="minPrice" promptText="min"
+                       style="-fx-background-radius: 8; -fx-padding: 8; -fx-pref-width: 30; -fx-font-size: 13px;"/>
+
+            <TextField fx:id="maxPrice" promptText="max"
+                       style="-fx-background-radius: 8; -fx-padding: 8; -fx-pref-width: 30; -fx-font-size: 13px;"/>
+
+            <TextField fx:id="searchBox1" promptText="🔍 Search vendor/food name..."
                        style="-fx-background-radius: 8; -fx-padding: 8; -fx-pref-width: 200; -fx-font-size: 13px;"/>
-            <TextField fx:id="searchBox2" promptText="🍽 Search food..."
+            <TextField fx:id="searchBox2" promptText="🍽 Search food keywords..."
                        style="-fx-background-radius: 8; -fx-padding: 8; -fx-pref-width: 200; -fx-font-size: 13px;"/>
+
+            <Button fx:id="searchInFood" text="searchInFood"
+                    style="-fx-background-color: blue; -fx-text-fill: white; -fx-font-weight: bold;
+                           -fx-background-radius: 8; -fx-pref-height: 38; -fx-font-size: 14px;"/>
+
+            <Button fx:id="searchInRestaurant" text="searchInRestaurant"
+                    style="-fx-background-color: blue; -fx-text-fill: white; -fx-font-weight: bold;
+                           -fx-background-radius: 8; -fx-pref-height: 38; -fx-font-size: 14px;"/>
+
         </HBox>
     </top>
     <center>

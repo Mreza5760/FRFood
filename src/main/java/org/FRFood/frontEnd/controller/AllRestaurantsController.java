@@ -23,6 +23,7 @@ import javafx.stage.Stage;
 import org.FRFood.entity.Restaurant;
 import org.FRFood.frontEnd.Util.SceneNavigator;
 import org.FRFood.frontEnd.Util.SessionManager;
+import org.FRFood.util.BuyerReq.ItemsReq;
 
 import java.io.ByteArrayInputStream;
 import java.net.URI;
@@ -38,6 +39,10 @@ public class AllRestaurantsController {
     public Button backButton;
     public TextField searchBox1;
     public TextField searchBox2;
+    public TextField minPrice;
+    public TextField maxPrice;
+    public Button searchInFood;
+    public Button searchInRestaurant;
     @FXML
     private VBox restaurantList;
 
@@ -55,9 +60,9 @@ public class AllRestaurantsController {
         if (mode == 2) {
             fetchRestaurants2();
         } else {
-            searchBox1.setOnAction(e -> handleSearch1());
-            searchBox2.setOnAction(e -> handleSearch2());
-            fetchRestaurants("",null);
+            searchInRestaurant.setOnAction(e -> handleSearch1());
+            searchInFood.setOnAction(e -> handleSearch2());
+            fetchRestaurants("", null);
         }
     }
 
@@ -71,7 +76,7 @@ public class AllRestaurantsController {
         });
     }
 
-    private void fetchRestaurants(String searchString,String[] keywords) {
+    private void fetchRestaurants(String searchString, String[] keywords) {
         StringBuilder keywordsJsonArray = null;
         String tempJson = null;
         if (keywords != null) {
@@ -84,8 +89,8 @@ public class AllRestaurantsController {
             }
             keywordsJsonArray.append("]");
             tempJson = "{ \"search\": \"" + searchString.trim() + "\", \"keywords\": " + keywordsJsonArray + " }";
-        }else{
-            tempJson = "{ \"search\": \"" + searchString.trim()+"\"}";
+        } else {
+            tempJson = "{ \"search\": \"" + searchString.trim() + "\"}";
         }
 
 
@@ -221,23 +226,28 @@ public class AllRestaurantsController {
     }
 
     private void handleSearch1() {
-        String temp =searchBox2.getText().trim();
-        if(!temp.isEmpty()){
+        String temp = searchBox2.getText().trim();
+        if (!temp.isEmpty()) {
             String[] parts = temp.split(",");
-            fetchRestaurants(searchBox1.getText(),parts);
-        }else{
-            fetchRestaurants(searchBox1.getText(),null);
+            fetchRestaurants(searchBox1.getText(), parts);
+        } else {
+            fetchRestaurants(searchBox1.getText(), null);
         }
     }
 
     private void handleSearch2() {
-        String temp =searchBox2.getText().trim();
-        if(!temp.isEmpty()){
-            String[] parts = temp.split(",");
-            fetchRestaurants(searchBox1.getText(),parts);
-        }else{
-            fetchRestaurants(searchBox1.getText(),null);
-        }
+        String name = searchBox1.getText().trim();
+        int minPriceValue = Integer.parseInt(minPrice.getText().trim());
+        int maxPriceValue = Integer.parseInt(maxPrice.getText().trim());
+        String temp = searchBox2.getText().trim();
+        String[] parts = temp.split(",");
+        ItemsReq itemsReq = new ItemsReq();
+        itemsReq.search = name;
+        itemsReq.minPrice = minPriceValue;
+        itemsReq.maxPrice = maxPriceValue;
+        itemsReq.keywords = List.of(parts);
+        AllFoodsController.setData(0, "Foods :", 2, itemsReq);
+        SceneNavigator.switchTo("/frontend/allFoods.fxml", restaurantList);
     }
 
     private List<Restaurant> getFavoriteRestaurants() {

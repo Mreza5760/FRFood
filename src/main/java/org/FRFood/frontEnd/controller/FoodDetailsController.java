@@ -1,5 +1,6 @@
 package org.FRFood.frontEnd.controller;
 
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import javafx.application.Platform;
@@ -12,11 +13,13 @@ import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.*;
 import javafx.geometry.Pos;
+import org.FRFood.entity.Keyword;
 import org.FRFood.entity.Rate;
 import org.FRFood.frontEnd.Util.SceneNavigator;
 import org.FRFood.frontEnd.Util.SessionManager;
 
 import java.io.ByteArrayInputStream;
+import java.io.IOException;
 import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.net.URI;
@@ -27,6 +30,7 @@ import java.net.http.HttpResponse;
 import java.security.cert.PolicyNode;
 import java.util.Base64;
 import java.util.LinkedHashSet;
+import java.util.List;
 import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -36,6 +40,8 @@ public class FoodDetailsController {
     public Label itemAvgRating;
     @FXML
     public VBox rateListContainer;
+    @FXML
+    public Label itemKeywordsLabel;
     @FXML
     private Label itemNameLabel;
     @FXML
@@ -78,6 +84,22 @@ public class FoodDetailsController {
                     itemDescriptionLabel.setText(root.get("description").asText());
                     itemPriceLabel.setText("$" + root.get("price").asDouble());
                     itemSupplyLabel.setText(String.valueOf(root.get("supply").asInt()));
+
+                    List<Keyword> keywords;
+                    try {
+                        keywords = mapper.readValue(
+                                root.get("keywords").traverse(),
+                                new TypeReference<List<Keyword>>() {
+                                });
+                    } catch (IOException e) {
+                        throw new RuntimeException(e);
+                    }
+                    String keys = "";
+                    for (Keyword temp : keywords){
+                        keys += temp.getName() + ",";
+                    }
+                    keys = keys.substring(0, keys.length() - 1);
+                    itemKeywordsLabel.setText(keys);
 
                     String imageBase64 = root.get("imageBase64").asText();
                     if (!imageBase64.isEmpty()) {
@@ -155,7 +177,7 @@ public class FoodDetailsController {
                 Platform.runLater(() -> {
                     topRow.getChildren().addAll(ratingLabel, spacer, updateButton, deleteButton);
                 });
-            }else{
+            } else {
                 topRow.getChildren().addAll(ratingLabel, spacer);
             }
         });
@@ -205,7 +227,7 @@ public class FoodDetailsController {
         data.imageBase64 = rating.getImages();
 
         UpdateRatingController.setRatingData(data);
-        SceneNavigator.switchTo("/frontend/updateRating.fxml",itemDescriptionLabel);
+        SceneNavigator.switchTo("/frontend/updateRating.fxml", itemDescriptionLabel);
     }
 
     private void handleDeleteButton(Rate rate) {
@@ -225,7 +247,7 @@ public class FoodDetailsController {
                 .thenApply(response -> {
                     if (response.statusCode() == 200 || response.statusCode() == 204) {
                         fetchReviews();
-                    }else {
+                    } else {
                         System.err.println("Failed to fetch: HTTP " + response.statusCode() + " " + response.body());
                     }
                     return null;
