@@ -11,8 +11,7 @@
       fx:controller="org.FRFood.frontEnd.controller.ProfileController"
       alignment="TOP_CENTER"
       spacing="25"
-      style="-fx-background-color: linear-gradient(to bottom, #eef3f9, #dbe5f1);"
->
+      style="-fx-background-color: linear-gradient(to bottom, #eef3f9, #dbe5f1);">
 
     <padding>
         <Insets top="40" right="50" bottom="40" left="50"/>
@@ -24,13 +23,11 @@
     <ImageView fx:id="profileImage"
                fitHeight="120" fitWidth="120"
                style="-fx-effect: dropshadow(gaussian, rgba(0,0,0,0.15), 10, 0, 0, 2); -fx-background-radius: 60;"
-               pickOnBounds="true" preserveRatio="true"
-    />
+               pickOnBounds="true" preserveRatio="true"/>
 
     <Button text="Change Picture" onAction="#handleChangePicture"
             prefWidth="140" prefHeight="36"
-            style="-fx-background-color: #0077cc; -fx-text-fill: white; -fx-font-weight: bold; -fx-background-radius: 8; fx-cursor: hand;"
-    />
+            style="-fx-background-color: #0077cc; -fx-text-fill: white; -fx-font-weight: bold; -fx-background-radius: 8; fx-cursor: hand;"/>
 
     <GridPane hgap="15" vgap="15" maxWidth="500">
         <columnConstraints>
@@ -50,17 +47,21 @@
                style="-fx-font-weight: bold; -fx-text-fill: #1e2a38;"/>
         <TextField fx:id="emailField" GridPane.rowIndex="2" GridPane.columnIndex="1"/>
 
-        <Label text="Address:" GridPane.rowIndex="3" GridPane.columnIndex="0"
+        <Label text="New Password:" GridPane.rowIndex="3" GridPane.columnIndex="0"
                style="-fx-font-weight: bold; -fx-text-fill: #1e2a38;"/>
-        <TextField fx:id="addressField" GridPane.rowIndex="3" GridPane.columnIndex="1"/>
+        <PasswordField fx:id="passwordField" GridPane.rowIndex="3" GridPane.columnIndex="1"/>
 
-        <Label text="Bank Name:" GridPane.rowIndex="4" GridPane.columnIndex="0"
+        <Label text="Address:" GridPane.rowIndex="4" GridPane.columnIndex="0"
                style="-fx-font-weight: bold; -fx-text-fill: #1e2a38;"/>
-        <TextField fx:id="bankNameField" GridPane.rowIndex="4" GridPane.columnIndex="1"/>
+        <TextField fx:id="addressField" GridPane.rowIndex="4" GridPane.columnIndex="1"/>
 
-        <Label text="Account Number:" GridPane.rowIndex="5" GridPane.columnIndex="0"
+        <Label text="Bank Name:" GridPane.rowIndex="5" GridPane.columnIndex="0"
                style="-fx-font-weight: bold; -fx-text-fill: #1e2a38;"/>
-        <TextField fx:id="accountNumberField" GridPane.rowIndex="5" GridPane.columnIndex="1"/>
+        <TextField fx:id="bankNameField" GridPane.rowIndex="5" GridPane.columnIndex="1"/>
+
+        <Label text="Account Number:" GridPane.rowIndex="6" GridPane.columnIndex="0"
+               style="-fx-font-weight: bold; -fx-text-fill: #1e2a38;"/>
+        <TextField fx:id="accountNumberField" GridPane.rowIndex="6" GridPane.columnIndex="1"/>
     </GridPane>
 
     <HBox spacing="25" alignment="CENTER" maxWidth="500" >
