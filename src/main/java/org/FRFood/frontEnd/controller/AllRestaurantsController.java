@@ -58,6 +58,18 @@ public class AllRestaurantsController {
     public void initialize() {
         backButton.setOnAction(e -> goBack());
         if (mode == 2) {
+            minPrice.setVisible(false);
+            minPrice.setManaged(false);
+            maxPrice.setVisible(false);
+            maxPrice.setManaged(false);
+            searchInFood.setVisible(false);
+            searchInFood.setManaged(false);
+            searchInRestaurant.setVisible(false);
+            searchInRestaurant.setManaged(false);
+            searchBox1.setVisible(false);
+            searchBox1.setManaged(false);
+            searchBox2.setManaged(false);
+            searchBox2.setVisible(false);
             fetchRestaurants2();
         } else {
             searchInRestaurant.setOnAction(e -> handleSearch1());
