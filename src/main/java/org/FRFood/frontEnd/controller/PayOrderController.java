@@ -1,5 +1,6 @@
 package org.FRFood.frontEnd.controller;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import javafx.application.Platform;
 import javafx.event.ActionEvent;
@@ -13,6 +14,7 @@ import org.FRFood.entity.*;
 import org.FRFood.frontEnd.Util.SceneNavigator;
 import org.FRFood.frontEnd.Util.SessionManager;
 
+import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URI;
@@ -22,8 +24,7 @@ import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.nio.charset.StandardCharsets;
 import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicReference;
 
 public class PayOrderController {
 
@@ -112,7 +113,9 @@ public class PayOrderController {
 
         // Populate order items
         for (OrderItem item : order.getItems()) {
-            String itemText = "🍔food id:" + item.getItemId() + " | " + "quantity :" + item.getQuantity();
+            Food food = fetchItemDetails(item.getItemId());
+            String itemText = "🍔food Name:" + food.getName() + " | " + "quantity :" +
+                    item.getQuantity() + " | each:" + food.getPrice();
             Label itemLabel = new Label(itemText);
             itemLabel.setStyle("-fx-font-size: 14px;");
             itemsBox.getChildren().add(itemLabel);
@@ -279,6 +282,25 @@ public class PayOrderController {
                     e.printStackTrace();
                     return false;
                 });
+    }
+
+    private Food fetchItemDetails(int foodId) {
+        try {
+            ObjectMapper mapper = new ObjectMapper();
+
+            URL url = new URL("http://localhost:8080/items/" + foodId);
+            HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+            conn.setRequestMethod("GET");
+            conn.setRequestProperty("Authorization", "Bearer " + SessionManager.getAuthToken());
+
+            InputStream is = conn.getInputStream();
+            JsonNode root = mapper.readTree(is);
+
+            return mapper.treeToValue(root, Food.class);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return null;
     }
 
 

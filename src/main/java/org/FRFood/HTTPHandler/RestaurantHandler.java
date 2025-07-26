@@ -543,6 +543,9 @@ public class RestaurantHandler implements HttpHandler {
             orderDAO.changeStatus(orderId, status, user.getId());
             JsonResponse.sendJsonResponse(exchange, 200, "{\"message\":\"Order status updated\"}");
         } catch (SQLException e) {
+            //debug
+            System.err.println(e.getMessage());
+            e.printStackTrace();
             HttpError.internal(exchange, "Failed to update order status");
         }
     }
