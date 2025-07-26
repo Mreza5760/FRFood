@@ -348,6 +348,10 @@ public class AdminHandler implements HttpHandler {
                 curCoupon.setMinPrice(coupon.getMinPrice());
             }
             if (coupon.getCouponCode() != null) {
+                if (!curCoupon.getCouponCode().equals(coupon.getCouponCode()) && couponDAO.getByCode(coupon.getCouponCode()).isPresent()) {
+                    HttpError.forbidden(exchange, "Coupon already exists");
+                    return;
+                }
                 curCoupon.setCouponCode(coupon.getCouponCode());
             }
             if (coupon.getType() != null) {
