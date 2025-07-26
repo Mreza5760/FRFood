@@ -1,6 +1,7 @@
 package org.FRFood.frontEnd.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.scene.control.Alert.AlertType;
@@ -35,16 +36,40 @@ public class CreateCouponController {
     @FXML
     private void handleCreate() {
         try {
-            String code = codeField.getText();
+            String code = codeField.getText() != null ? codeField.getText().trim() : "";
             String type = typeBox.getValue();
-            int value = Integer.parseInt(valueField.getText());
-            int minPrice = Integer.parseInt(minPriceField.getText());
-            int userCount = Integer.parseInt(userCountField.getText());
+            String valueText = valueField.getText() != null ? valueField.getText().trim() : "";
+            String minPriceText = minPriceField.getText() != null ? minPriceField.getText().trim() : "";
+            String userCountText = userCountField.getText() != null ? userCountField.getText().trim() : "";
             LocalDate startDate = startDatePicker.getValue();
             LocalDate endDate = endDatePicker.getValue();
 
-            if (code == null || type == null || startDate == null || endDate == null) {
-                showAlert(AlertType.ERROR, "Invalid Input", "Please fill in all fields.");
+            if (code.isEmpty() || type == null || valueText.isEmpty() || minPriceText.isEmpty() || userCountText.isEmpty()
+                    || startDate == null || endDate == null) {
+                showAlert(AlertType.ERROR, "Invalid Input", "All fields must be filled in.");
+                return;
+            }
+
+            int value, minPrice, userCount;
+            try {
+                value = Integer.parseInt(valueText);
+                minPrice = Integer.parseInt(minPriceText);
+                userCount = Integer.parseInt(userCountText);
+                if (value <= 0 || minPrice < 0 || userCount <= 0) {
+                    showAlert(AlertType.ERROR, "Invalid Numbers", "Value, Min Price, and User Count must be positive.");
+                    return;
+                }
+                if (type.equals("percent") && value > 100) {
+                    showAlert(AlertType.ERROR, "Invalid Numbers", "Value cant be greater than 100.");
+                    return;
+                }
+            } catch (NumberFormatException e) {
+                showAlert(AlertType.ERROR, "Invalid Numbers", "Please enter valid numeric values.");
+                return;
+            }
+
+            if (endDate.isBefore(startDate)) {
+                showAlert(AlertType.ERROR, "Invalid Dates", "End Date cannot be before Start Date.");
                 return;
             }
 
@@ -68,10 +93,16 @@ public class CreateCouponController {
 
             HttpClient.newHttpClient().sendAsync(request, HttpResponse.BodyHandlers.ofString())
                     .thenAccept(response -> {
-                        if (response.statusCode() == 200 || response.statusCode() == 201) {
-                            showAlert(AlertType.INFORMATION, "Success", "Coupon created successfully!");
+                        int status = response.statusCode();
+                        if (status == 200 || status == 201) {
+                            Platform.runLater(() -> {
+                                showAlert(AlertType.INFORMATION, "Success", "Coupon created successfully!");
+                                SceneNavigator.switchTo("/frontend/allCoupons.fxml", codeField);
+                            });
+                        } else if (status == 403) {
+                            showAlert(AlertType.ERROR, "Duplicate Coupon", "This coupon code already exists.");
                         } else {
-                            showAlert(AlertType.ERROR, "Failed", "Server responded with status: " + response.statusCode());
+                            showAlert(AlertType.ERROR, "Failed", "Server error: HTTP " + status);
                         }
                     })
                     .exceptionally(ex -> {
@@ -80,18 +111,17 @@ public class CreateCouponController {
                     });
 
         } catch (Exception e) {
-            showAlert(AlertType.ERROR, "Error", "Invalid input: " + e.getMessage());
+            showAlert(AlertType.ERROR, "Error", "Unexpected error: " + e.getMessage());
         }
     }
 
     @FXML
     private void handleBack() {
-        SceneNavigator.switchTo("/frontend/allCoupons.fxml",codeField);
+        SceneNavigator.switchTo("/frontend/allCoupons.fxml", codeField);
     }
 
     private void showAlert(AlertType type, String title, String message) {
-        // JavaFX thread-safe alert
-        javafx.application.Platform.runLater(() -> {
+        Platform.runLater(() -> {
             Alert alert = new Alert(type);
             alert.setTitle(title);
             alert.setHeaderText(null);

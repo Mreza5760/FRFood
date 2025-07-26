@@ -104,6 +104,9 @@ public class RestaurantDAOImp implements RestaurantDAO {
                     restaurant.setLogo(rs.getString("logo"));
                     restaurant.setTaxFee(rs.getInt("tax_fee"));
                     restaurant.setAdditionalFee(rs.getInt("additional_fee"));
+                    int ownerId = rs.getInt("owner_id");
+                    UserDAO userDAO = new UserDAOImp();
+                    restaurant.setOwner(userDAO.getById(ownerId).orElse(null));
                     restaurants.add(restaurant);
                 }
                 return restaurants;

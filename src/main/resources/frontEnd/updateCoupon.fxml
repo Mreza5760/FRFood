@@ -15,7 +15,7 @@
         <Insets top="40" left="50" right="50" bottom="40"/>
     </padding>
 
-    <HBox alignment="CENTER_LEFT" spacing="10">
+    <HBox alignment="CENTER_LEFT" spacing="10" maxWidth="600">
         <Button text="← Back"
                 onAction="#handleCancel"
                 style="-fx-background-color: #ff6666; -fx-text-fill: white; -fx-font-weight: bold; -fx-background-radius: 8;"/>
@@ -24,7 +24,8 @@
     </HBox>
 
     <VBox spacing="20" alignment="CENTER"
-          style="-fx-background-color: white; -fx-padding: 30; -fx-background-radius: 12; -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.1), 8, 0, 0, 4);">
+          style="-fx-background-color: white; -fx-padding: 30; -fx-background-radius: 12; -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.1), 8, 0, 0, 4);"
+          maxWidth="500">
 
         <TextField fx:id="codeField" promptText="Coupon Code"
                    style="-fx-font-size: 14px; -fx-padding: 10; -fx-background-radius: 6;"/>
@@ -51,12 +52,12 @@
             <Button text="Cancel"
                     onAction="#handleCancel"
                     style="-fx-background-color: #999999; -fx-text-fill: white; -fx-font-weight: bold; -fx-background-radius: 8;"
-                    prefWidth="120"/>
+                    prefWidth="120" prefHeight="40"/>
 
             <Button text="Update Coupon"
                     onAction="#handleUpdate"
                     style="-fx-background-color: #00aa88; -fx-text-fill: white; -fx-font-weight: bold; -fx-background-radius: 8;"
-                    prefWidth="140"/>
+                    prefWidth="160" prefHeight="40"/>
         </HBox>
     </VBox>
 </VBox>

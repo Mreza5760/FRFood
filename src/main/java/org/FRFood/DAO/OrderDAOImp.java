@@ -21,7 +21,7 @@ public class OrderDAOImp implements OrderDAO {
             """;
 
         try (Connection conn = DBConnector.gConnection()) {
-            conn.setAutoCommit(false); // Transaction start
+            conn.setAutoCommit(false);
             int orderId;
 
             try (PreparedStatement stmt = conn.prepareStatement(sqlOrder, Statement.RETURN_GENERATED_KEYS)) {
@@ -108,7 +108,7 @@ public class OrderDAOImp implements OrderDAO {
     }
 
     @Override
-    public void changeStatus(Integer orderID, Status status, int userId) throws SQLException {
+    public void changeStatus(int orderID, Status status, int userId) throws SQLException {
         String sql = "UPDATE Orders SET status = ? WHERE id = ?";
         try (Connection conn = DBConnector.gConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
@@ -117,7 +117,7 @@ public class OrderDAOImp implements OrderDAO {
             if (stmt.executeUpdate() == 0) {
                 throw new SQLException("No order updated (id=" + orderID + ")");
             }
-            if(status == Status.onTheWay){
+            if (status == Status.onTheWay) {
                 String sql2 = "UPDATE Orders SET courier_id = ? WHERE id = ?";
                 try (Connection conn2 = DBConnector.gConnection();
                 PreparedStatement stmt2 = conn2.prepareStatement(sql2)) {
@@ -136,6 +136,7 @@ public class OrderDAOImp implements OrderDAO {
         String sql = "SELECT * FROM Orders ORDER BY created_at DESC";
         return fetchOrders(sql);
     }
+
 
 
     private List<Order> fetchOrders(String sql, Object... params) throws SQLException {

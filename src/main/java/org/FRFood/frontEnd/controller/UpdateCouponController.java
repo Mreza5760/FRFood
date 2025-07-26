@@ -1,39 +1,31 @@
 package org.FRFood.frontEnd.controller;
 
-import javafx.fxml.FXML;
-import javafx.scene.Scene;
-import javafx.scene.control.*;
-import javafx.scene.layout.VBox;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import javafx.application.Platform;
 import javafx.collections.FXCollections;
-import javafx.event.ActionEvent;
-import javafx.stage.Stage;
+import javafx.fxml.FXML;
+import javafx.scene.control.*;
+import javafx.scene.control.Alert.AlertType;
 import org.FRFood.entity.Coupon;
-
+import org.FRFood.frontEnd.Util.SceneNavigator;
+import org.FRFood.frontEnd.Util.SessionManager;
 
 import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.time.LocalDate;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import org.FRFood.frontEnd.Util.SceneNavigator;
-import org.FRFood.frontEnd.Util.SessionManager;
-
 import java.util.HashMap;
 import java.util.Map;
 
 public class UpdateCouponController {
 
-    @FXML
-    private TextField codeField, valueField, minPriceField, userCountField;
-
-    @FXML
-    private ComboBox<String> typeBox;
-
-    @FXML
-    private DatePicker startDatePicker, endDatePicker;
+    @FXML private TextField codeField, valueField, minPriceField, userCountField;
+    @FXML private ComboBox<String> typeBox;
+    @FXML private DatePicker startDatePicker, endDatePicker;
 
     private Coupon currentCoupon;
+    private final ObjectMapper objectMapper = new ObjectMapper();
 
     public void setCoupon(Coupon coupon) {
         this.currentCoupon = coupon;
@@ -49,27 +41,55 @@ public class UpdateCouponController {
     }
 
     @FXML
-    private void handleUpdate(ActionEvent event) {
+    private void handleUpdate() {
         try {
-            String couponCode = codeField.getText();
+            String code = codeField.getText() != null ? codeField.getText().trim() : "";
             String type = typeBox.getValue();
-            int value = Integer.parseInt(valueField.getText());
-            int minPrice = Integer.parseInt(minPriceField.getText());
-            int userCount = Integer.parseInt(userCountField.getText());
-            String startDate = startDatePicker.getValue().toString();
-            String endDate = endDatePicker.getValue().toString();
+            String valueText = valueField.getText() != null ? valueField.getText().trim() : "";
+            String minPriceText = minPriceField.getText() != null ? minPriceField.getText().trim() : "";
+            String userCountText = userCountField.getText() != null ? userCountField.getText().trim() : "";
+            LocalDate startDate = startDatePicker.getValue();
+            LocalDate endDate = endDatePicker.getValue();
+
+            if (code.isEmpty() || type == null || valueText.isEmpty() || minPriceText.isEmpty() || userCountText.isEmpty()
+                    || startDate == null || endDate == null) {
+                showAlert(AlertType.ERROR, "Invalid Input", "All fields must be filled in.");
+                return;
+            }
+
+            int value, minPrice, userCount;
+            try {
+                value = Integer.parseInt(valueText);
+                minPrice = Integer.parseInt(minPriceText);
+                userCount = Integer.parseInt(userCountText);
+                if (value <= 0 || minPrice < 0 || userCount <= 0) {
+                    showAlert(AlertType.ERROR, "Invalid Numbers", "Value, Min Price, and User Count must be positive.");
+                    return;
+                }
+                if (type.equals("percent") && value > 100) {
+                    showAlert(AlertType.ERROR, "Invalid Numbers", "Value can’t be greater than 100 for percent type.");
+                    return;
+                }
+            } catch (NumberFormatException e) {
+                showAlert(AlertType.ERROR, "Invalid Numbers", "Please enter valid numeric values.");
+                return;
+            }
+
+            if (endDate.isBefore(startDate)) {
+                showAlert(AlertType.ERROR, "Invalid Dates", "End Date cannot be before Start Date.");
+                return;
+            }
 
             Map<String, Object> data = new HashMap<>();
-            data.put("coupon_code", couponCode);
+            data.put("coupon_code", code);
             data.put("type", type);
             data.put("value", value);
             data.put("min_price", minPrice);
             data.put("user_count", userCount);
-            data.put("start_date", startDate);
-            data.put("end_date", endDate);
+            data.put("start_date", startDate.toString());
+            data.put("end_date", endDate.toString());
 
-            ObjectMapper mapper = new ObjectMapper();
-            String requestBody = mapper.writeValueAsString(data);
+            String requestBody = objectMapper.writeValueAsString(data);
 
             HttpRequest request = HttpRequest.newBuilder()
                     .uri(URI.create("http://localhost:8080/admin/coupons/" + currentCoupon.getId()))
@@ -78,37 +98,42 @@ public class UpdateCouponController {
                     .PUT(HttpRequest.BodyPublishers.ofString(requestBody))
                     .build();
 
-            HttpClient client = HttpClient.newHttpClient();
-            HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
+            HttpClient.newHttpClient().sendAsync(request, HttpResponse.BodyHandlers.ofString())
+                    .thenAccept(response -> {
+                        int status = response.statusCode();
+                        if (status == 200) {
+                            Platform.runLater(() -> {
+                                showAlert(AlertType.INFORMATION, "Success", "Coupon updated successfully!");
+                                SceneNavigator.switchTo("/frontend/allCoupons.fxml", codeField);
+                            });
+                        } else if (status == 403) {
+                            showAlert(AlertType.ERROR, "Duplicate Coupon", "This coupon code already exists.");
+                        } else {
+                            showAlert(AlertType.ERROR, "Failed", "Server error: HTTP " + status);
+                        }
+                    })
+                    .exceptionally(ex -> {
+                        showAlert(AlertType.ERROR, "Error", "Failed to update coupon: " + ex.getMessage());
+                        return null;
+                    });
 
-            if (response.statusCode() == 200) {
-                showAlert("Coupon updated successfully.");
-                SceneNavigator.switchTo("/frontend/allCoupons.fxml",codeField);
-            } else {
-                showAlert("Failed to update coupon.\nStatus: " + response.statusCode());
-            }
         } catch (Exception e) {
-            e.printStackTrace();
-            showAlert("Error: " + e.getMessage());
+            showAlert(AlertType.ERROR, "Error", "Unexpected error: " + e.getMessage());
         }
     }
 
     @FXML
-    private void handleCancel(ActionEvent event) {
-        SceneNavigator.switchTo("/frontend/allCoupons.fxml",codeField);
+    private void handleCancel() {
+        SceneNavigator.switchTo("/frontend/allCoupons.fxml", codeField);
     }
 
-    private void closeStage() {
-        Stage stage = (Stage) codeField.getScene().getWindow();
-        stage.close();
-    }
-
-    private void showAlert(String message) {
-        Alert alert = new Alert(Alert.AlertType.INFORMATION);
-        alert.setTitle("Coupon");
-        alert.setHeaderText(null);
-        alert.setContentText(message);
-        alert.showAndWait();
-
+    private void showAlert(AlertType type, String title, String message) {
+        Platform.runLater(() -> {
+            Alert alert = new Alert(type);
+            alert.setTitle(title);
+            alert.setHeaderText(null);
+            alert.setContentText(message);
+            alert.showAndWait();
+        });
     }
 }

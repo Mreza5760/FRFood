@@ -176,8 +176,6 @@ public class CouponDAOImp implements CouponDAO {
                     preparedStatement2.executeUpdate();
                 }
             }
-
-
         }
     }
 }
