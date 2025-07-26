@@ -4,53 +4,75 @@
 <?import javafx.scene.layout.*?>
 <?import javafx.geometry.Insets?>
 <?import javafx.geometry.Pos?>
-<?import java.time.LocalDate?>
 
-<VBox xmlns="http://javafx.com/javafx"
-      xmlns:fx="http://javafx.com/fxml"
-      fx:controller="org.FRFood.frontEnd.controller.CreateCouponController"
-      alignment="TOP_CENTER" spacing="30"
-      style="-fx-background-color: linear-gradient(to bottom, #eef3f9, #dbe5f1);">
+<BorderPane xmlns="http://javafx.com/javafx"
+            xmlns:fx="http://javafx.com/fxml"
+            fx:controller="org.FRFood.frontEnd.controller.CreateCouponController"
+            style="-fx-background-color: linear-gradient(to bottom, #eef3f9, #dbe5f1);">
 
-    <padding>
-        <Insets top="40" left="50" right="50" bottom="40"/>
-    </padding>
+    <top>
+        <HBox spacing="15" alignment="CENTER_LEFT" style="-fx-padding: 20 40 20 40;">
+            <Button text="← Back"
+                    onAction="#handleBack"
+                    style="-fx-background-color: #ff6666; -fx-text-fill: white; -fx-font-weight: bold; -fx-background-radius: 8;"/>
+            <Label text="🎁 Create New Coupon"
+                   style="-fx-font-size: 30px; -fx-font-weight: bold; -fx-text-fill: #1e2a38;"/>
+        </HBox>
+    </top>
 
-    <HBox alignment="CENTER_LEFT" spacing="10">
-        <Button text="← Back"
-                onAction="#handleBack"
-                style="-fx-background-color: #ff6666; -fx-text-fill: white; -fx-font-weight: bold; -fx-background-radius: 8;"/>
-        <Label text="🎁 Create New Coupon"
-               style="-fx-font-size: 26px; -fx-font-weight: bold; -fx-text-fill: #1e2a38;"/>
-    </HBox>
+    <center>
+        <VBox alignment="CENTER" spacing="40">
+            <VBox spacing="25" alignment="CENTER"
+                  style="-fx-background-color: white; -fx-padding: 40; -fx-background-radius: 15; -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.15), 12, 0, 0, 6);"
+                  maxWidth="500">
 
-    <VBox spacing="20" alignment="CENTER"
-          style="-fx-background-color: white; -fx-padding: 30; -fx-background-radius: 12; -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.1), 8, 0, 0, 4);">
+                <GridPane hgap="20" vgap="18">
+                    <columnConstraints>
+                        <ColumnConstraints halignment="RIGHT" minWidth="140"/>
+                        <ColumnConstraints halignment="LEFT" minWidth="240"/>
+                    </columnConstraints>
 
-        <TextField fx:id="codeField" promptText="Coupon Code"
-                   style="-fx-font-size: 14px; -fx-padding: 10; -fx-background-radius: 6;"/>
+                    <Label text="Coupon Code:" GridPane.rowIndex="0" GridPane.columnIndex="0"
+                           style="-fx-font-weight: bold; -fx-text-fill: #1e2a38; -fx-font-size: 15px;"/>
+                    <TextField fx:id="codeField" GridPane.rowIndex="0" GridPane.columnIndex="1"
+                               promptText="Enter code" style="-fx-padding: 8; -fx-font-size: 14px;"/>
 
-        <ComboBox fx:id="typeBox" promptText="Type"
-                  style="-fx-font-size: 14px; -fx-padding: 10; -fx-background-radius: 6;" />
+                    <Label text="Type:" GridPane.rowIndex="1" GridPane.columnIndex="0"
+                           style="-fx-font-weight: bold; -fx-text-fill: #1e2a38; -fx-font-size: 15px;"/>
+                    <ComboBox fx:id="typeBox" GridPane.rowIndex="1" GridPane.columnIndex="1"
+                              promptText="fixed or percent" style="-fx-padding: 8; -fx-font-size: 14px;"/>
 
-        <TextField fx:id="valueField" promptText="Value"
-                   style="-fx-font-size: 14px; -fx-padding: 10; -fx-background-radius: 6;"/>
+                    <Label text="Value:" GridPane.rowIndex="2" GridPane.columnIndex="0"
+                           style="-fx-font-weight: bold; -fx-text-fill: #1e2a38; -fx-font-size: 15px;"/>
+                    <TextField fx:id="valueField" GridPane.rowIndex="2" GridPane.columnIndex="1"
+                               promptText="Enter value" style="-fx-padding: 8; -fx-font-size: 14px;"/>
 
-        <TextField fx:id="minPriceField" promptText="Minimum Price"
-                   style="-fx-font-size: 14px; -fx-padding: 10; -fx-background-radius: 6;"/>
+                    <Label text="Minimum Price:" GridPane.rowIndex="3" GridPane.columnIndex="0"
+                           style="-fx-font-weight: bold; -fx-text-fill: #1e2a38; -fx-font-size: 15px;"/>
+                    <TextField fx:id="minPriceField" GridPane.rowIndex="3" GridPane.columnIndex="1"
+                               promptText="Enter minimum price" style="-fx-padding: 8; -fx-font-size: 14px;"/>
 
-        <TextField fx:id="userCountField" promptText="User Count"
-                   style="-fx-font-size: 14px; -fx-padding: 10; -fx-background-radius: 6;"/>
+                    <Label text="User Count:" GridPane.rowIndex="4" GridPane.columnIndex="0"
+                           style="-fx-font-weight: bold; -fx-text-fill: #1e2a38; -fx-font-size: 15px;"/>
+                    <TextField fx:id="userCountField" GridPane.rowIndex="4" GridPane.columnIndex="1"
+                               promptText="Enter user limit" style="-fx-padding: 8; -fx-font-size: 14px;"/>
 
-        <DatePicker fx:id="startDatePicker" promptText="Start Date"
-                    style="-fx-font-size: 14px; -fx-padding: 10; -fx-background-radius: 6;"/>
+                    <Label text="Start Date:" GridPane.rowIndex="5" GridPane.columnIndex="0"
+                           style="-fx-font-weight: bold; -fx-text-fill: #1e2a38; -fx-font-size: 15px;"/>
+                    <DatePicker fx:id="startDatePicker" GridPane.rowIndex="5" GridPane.columnIndex="1"
+                                promptText="Select start date" style="-fx-padding: 8; -fx-font-size: 14px;"/>
 
-        <DatePicker fx:id="endDatePicker" promptText="End Date"
-                    style="-fx-font-size: 14px; -fx-padding: 10; -fx-background-radius: 6;"/>
+                    <Label text="End Date:" GridPane.rowIndex="6" GridPane.columnIndex="0"
+                           style="-fx-font-weight: bold; -fx-text-fill: #1e2a38; -fx-font-size: 15px;"/>
+                    <DatePicker fx:id="endDatePicker" GridPane.rowIndex="6" GridPane.columnIndex="1"
+                                promptText="Select end date" style="-fx-padding: 8; -fx-font-size: 14px;"/>
+                </GridPane>
 
-        <Button text="Create Coupon"
-                onAction="#handleCreate"
-                style="-fx-background-color: #0077cc; -fx-text-fill: white; -fx-font-size: 14px; -fx-font-weight: bold; -fx-background-radius: 8;"
-                prefWidth="200"/>
-    </VBox>
-</VBox>
+                <Button text="Create Coupon"
+                        onAction="#handleCreate"
+                        style="-fx-background-color: linear-gradient(to right, #0077cc, #00aa88); -fx-text-fill: white; -fx-font-size: 16px; -fx-font-weight: bold; -fx-background-radius: 10; -fx-cursor: hand;"
+                        prefWidth="260" prefHeight="45"/>
+            </VBox>
+        </VBox>
+    </center>
+</BorderPane>

@@ -57,12 +57,18 @@ public class AllCouponsController {
 
         for (Coupon coupon : coupons) {
             VBox card = new VBox(5);
-            card.setPadding(new Insets(15));
-            card.setStyle("-fx-background-color: white; -fx-background-radius: 12; -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.1), 6, 0, 0, 2);");
+            card.setPadding(new Insets(20));
+            card.setStyle("-fx-background-color: white; -fx-background-radius: 12; " +
+                    "-fx-effect: dropshadow(gaussian, rgba(0,0,0,0.1), 8, 0.1, 0, 2);");
             card.setMaxWidth(600);
-            card.setOnMouseClicked(event -> handleCardClick(coupon)); // 🔁 Card click
 
-            // Labels
+            card.setOnMouseEntered(e -> card.setStyle("-fx-background-color: #f9f9f9; -fx-background-radius: 12;" +
+                    "-fx-effect: dropshadow(gaussian, rgba(0,150,136,0.4), 15, 0.3, 0, 4); -fx-scale-x: 1.02; -fx-scale-y: 1.02;"));
+            card.setOnMouseExited(e -> card.setStyle("-fx-background-color: white; -fx-background-radius: 12;" +
+                    "-fx-effect: dropshadow(gaussian, rgba(0,0,0,0.1), 8, 0.1, 0, 2); -fx-scale-x: 1; -fx-scale-y: 1;"));
+
+            card.setOnMouseClicked(event -> handleCardClick(coupon));
+
             Label codeLabel = new Label("Code: " + coupon.getCouponCode());
             Label typeLabel = new Label("Type: " + coupon.getType());
             Label valueLabel = new Label("Value: " + coupon.getValue());
@@ -74,23 +80,27 @@ public class AllCouponsController {
                 label.setStyle("-fx-font-size: 14px; -fx-text-fill: #333;");
             }
 
-            // 🔴 Delete Button
             Button deleteButton = new Button("Delete");
             deleteButton.setStyle("-fx-background-color: #e74c3c; -fx-text-fill: white; -fx-font-weight: bold; -fx-background-radius: 8;");
             deleteButton.setOnAction(e -> {
-                e.consume(); // Prevent card click from triggering
-                handleDeleteCoupon(coupon); // 💥 Your delete logic
+                e.consume();
+
+                Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+                alert.setTitle("Delete Confirmation");
+                alert.setHeaderText("Are you sure you want to delete this coupon?");
+                alert.setContentText("Code: " + coupon.getCouponCode());
+
+                alert.showAndWait().ifPresent(response -> {
+                    if (response == ButtonType.OK) {
+                        handleDeleteCoupon(coupon);
+                    }
+                });
             });
 
             HBox buttonContainer = new HBox(deleteButton);
             buttonContainer.setAlignment(Pos.CENTER_RIGHT);
 
-            // Add all to card
-            card.getChildren().addAll(
-                    codeLabel, typeLabel, valueLabel, minLabel, userCountLabel, dateLabel,
-                    buttonContainer
-            );
-
+            card.getChildren().addAll(codeLabel, typeLabel, valueLabel, minLabel, userCountLabel, dateLabel, buttonContainer);
             couponContainer.getChildren().add(card);
         }
     }
@@ -109,23 +119,38 @@ public class AllCouponsController {
 
     private void handleDeleteCoupon(Coupon coupon) {
         HttpRequest request = HttpRequest.newBuilder()
-                .uri(URI.create("http://localhost:8080/admin/coupons/"+coupon.getId()))
+                .uri(URI.create("http://localhost:8080/admin/coupons/" + coupon.getId()))
                 .header("Authorization", "Bearer " + SessionManager.getAuthToken())
                 .DELETE()
                 .build();
 
         HttpClient.newHttpClient().sendAsync(request, HttpResponse.BodyHandlers.ofString())
                 .thenAccept(response -> {
-                    loadCoupons();
-                    if (response.statusCode() == 200 || response.statusCode() == 204) {
-                        System.out.println("Deleted coupon: " + coupon.getCouponCode());
-                        Platform.runLater(this::loadCoupons);
-                    } else {
-                        System.err.println("Failed to delete coupon: HTTP " + response.statusCode());
-                    }
+                    Platform.runLater(() -> {
+                        if (response.statusCode() == 200 || response.statusCode() == 204) {
+                            Alert successAlert = new Alert(Alert.AlertType.INFORMATION);
+                            successAlert.setTitle("Coupon Deleted");
+                            successAlert.setHeaderText(null);
+                            successAlert.setContentText("Coupon \"" + coupon.getCouponCode() + "\" has been successfully deleted.");
+                            successAlert.showAndWait();
+                            loadCoupons();
+                        } else {
+                            Alert errorAlert = new Alert(Alert.AlertType.ERROR);
+                            errorAlert.setTitle("Delete Failed");
+                            errorAlert.setHeaderText("Failed to delete coupon");
+                            errorAlert.setContentText("HTTP " + response.statusCode() + ": " + response.body());
+                            errorAlert.showAndWait();
+                        }
+                    });
                 })
                 .exceptionally(e -> {
-                    e.printStackTrace();
+                    Platform.runLater(() -> {
+                        Alert errorAlert = new Alert(Alert.AlertType.ERROR);
+                        errorAlert.setTitle("Error");
+                        errorAlert.setHeaderText("Unexpected error occurred");
+                        errorAlert.setContentText(e.getMessage());
+                        errorAlert.showAndWait();
+                    });
                     return null;
                 });
     }
