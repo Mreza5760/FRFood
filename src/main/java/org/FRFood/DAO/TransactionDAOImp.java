@@ -9,7 +9,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class TransactionDAOImp implements TransactionDAO {
-
     @Override
     public List<Transaction> getUserTransactions(int userId) throws SQLException {
         String sql = "SELECT * FROM Transactions WHERE user_id = ?";
@@ -50,7 +49,7 @@ public class TransactionDAOImp implements TransactionDAO {
             else
                 stmt.setNull(1, Types.INTEGER);
             stmt.setInt(2, transaction.getUserID());
-            stmt.setString(3, transaction.getMethod().name());
+            stmt.setString(3, transaction.getMethod().toString());
             stmt.setInt(4, transaction.getAmount());
 
             int rows = stmt.executeUpdate();
@@ -68,7 +67,8 @@ public class TransactionDAOImp implements TransactionDAO {
         }
     }
 
-    // Helper to map a ResultSet row to Transaction object
+
+
     private Transaction mapTransaction(ResultSet rs) throws SQLException {
         Transaction transaction = new Transaction();
         transaction.setId(rs.getInt("id"));
