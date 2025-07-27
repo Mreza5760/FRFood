@@ -196,7 +196,7 @@ public class BuyerHandler implements HttpHandler {
                 if (!rates.isEmpty())
                     foodRate /= rates.size();
 
-                if ((req.keywords == null || foodDAO.doesHaveKeywords(req.keywords, food.getId())) && (req.minPrice <= food.getPrice() && food.getPrice() <= req.maxPrice) && (req.minRate <= foodRate && foodRate <= req.maxRate)) {
+                if ((req.keywords == null || foodDAO.doesHaveKeywords(req.keywords, food.getId())) && (req.minPrice <= food.getPrice() && food.getPrice() <= req.maxPrice)) {
                     foodsFiltered.add(food);
                 }
             }
