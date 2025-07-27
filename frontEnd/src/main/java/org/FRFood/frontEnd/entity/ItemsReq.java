@@ -1,4 +1,4 @@
-package org.FRFood.entity;
+package org.FRFood.frontEnd.entity;
 
 import java.util.List;
 
