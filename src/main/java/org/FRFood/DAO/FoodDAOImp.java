@@ -78,7 +78,7 @@ public class FoodDAOImp implements FoodDAO {
             if (food.getPicture() != null && !food.getPicture().isEmpty()) {
                 preparedStatement.setString(3, food.getPicture());
             } else {
-                byte[] fileContent = Files.readAllBytes(Paths.get("src/main/resources/imageUrls/restaurant.png"));
+                byte[] fileContent = Files.readAllBytes(Paths.get("src/main/resources/imageUrls/food.png"));
                 String base64String = Base64.getEncoder().encodeToString(fileContent);
                 preparedStatement.setString(3, base64String);
             }
@@ -127,7 +127,13 @@ public class FoodDAOImp implements FoodDAO {
         ) {
             preparedStatement.setInt(1, food.getRestaurantId());
             preparedStatement.setString(2, food.getName());
-            preparedStatement.setString(3, food.getPicture());
+            if (food.getPicture() != null && !food.getPicture().isEmpty()) {
+                preparedStatement.setString(3, food.getPicture());
+            } else {
+                byte[] fileContent = Files.readAllBytes(Paths.get("src/main/resources/imageUrls/food.png"));
+                String base64String = Base64.getEncoder().encodeToString(fileContent);
+                preparedStatement.setString(3, base64String);
+            }
             preparedStatement.setString(4, food.getDescription());
             preparedStatement.setInt(5, food.getPrice());
             preparedStatement.setInt(6, food.getSupply());
@@ -159,6 +165,8 @@ public class FoodDAOImp implements FoodDAO {
             }
             preparedStatement2.close();
 
+        }catch (Exception e){
+            throw new SQLException("Update failed.", e);
         }
     }
 

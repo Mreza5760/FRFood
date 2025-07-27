@@ -126,7 +126,7 @@ public class FoodDetailsController {
                 JsonNode root = mapper.readTree(is);
 
                 Platform.runLater(() -> {
-                    itemAvgRating.setText(root.get("avg_rating").asText());
+                    itemAvgRating.setText(String.valueOf(root.get("avg_rating").asDouble()));
                     rateListContainer.getChildren().clear();
                     for (JsonNode comment : root.get("comments")) {
                         Rate rate = mapper.convertValue(comment, Rate.class);

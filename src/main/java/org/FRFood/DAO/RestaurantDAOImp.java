@@ -32,7 +32,7 @@ public class RestaurantDAOImp implements RestaurantDAO {
             if (restaurant.getLogo() != null && !restaurant.getLogo().isEmpty()) {
                 preparedStatement.setString(5, restaurant.getLogo());
             } else {
-                byte[] fileContent = Files.readAllBytes(Paths.get("src/main/resources/imageUrls/food.png"));
+                byte[] fileContent = Files.readAllBytes(Paths.get("src/main/resources/imageUrls/restaurant.png"));
                 String base64String = Base64.getEncoder().encodeToString(fileContent);
                 preparedStatement.setString(5, base64String);
             }
@@ -180,13 +180,21 @@ public class RestaurantDAOImp implements RestaurantDAO {
             preparedStatement.setString(1, restaurant.getName());
             preparedStatement.setString(2, restaurant.getAddress());
             preparedStatement.setString(3, restaurant.getPhone());
-            preparedStatement.setString(4, restaurant.getLogo());
+            if (restaurant.getLogo() != null && !restaurant.getLogo().isEmpty()) {
+                preparedStatement.setString(4, restaurant.getLogo());
+            } else {
+                byte[] fileContent = Files.readAllBytes(Paths.get("src/main/resources/imageUrls/restaurant.png"));
+                String base64String = Base64.getEncoder().encodeToString(fileContent);
+                preparedStatement.setString(4, base64String);
+            }
             preparedStatement.setInt(5, restaurant.getTaxFee());
             preparedStatement.setInt(6, restaurant.getAdditionalFee());
             int rows = preparedStatement.executeUpdate();
             if (rows == 0) {
                 throw new SQLException("Insert failed, no rows affected.");
             }
+        }catch (Exception e){
+            throw new SQLException(e.getMessage());
         }
     }
 
