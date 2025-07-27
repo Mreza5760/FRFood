@@ -10,7 +10,6 @@
             style="-fx-background-color: linear-gradient(to bottom, #f8fafc, #e5ebf3);"
             prefWidth="800" prefHeight="600">
 
-    <!-- Top Bar -->
     <top>
         <HBox spacing="15" alignment="CENTER_LEFT"
               style="-fx-padding: 15; -fx-background-color: #eef3f9; -fx-border-color: #ccd4e0; -fx-border-width: 0 0 1 0;">
@@ -23,7 +22,6 @@
         </HBox>
     </top>
 
-    <!-- Center Content -->
     <center>
         <StackPane>
             <VBox alignment="CENTER" spacing="25" style="-fx-padding: 0 40 100 40;">

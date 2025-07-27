@@ -53,10 +53,10 @@ public class OrderHistoryController {
 
     @FXML
     public void initialize() {
-        if(mode == 1){
+        if (mode == 1) {
             buyerFilterList.setVisible(true);
             buyerFilterList.setManaged(true);
-        }else if(mode == 5){
+        } else if (mode == 5){
             statusComboBox.getItems().addAll("", "waiting", "preparing", "cancelled", "findingCourier", "onTheWay", "completed");
             adminFilterList.setVisible(true);
             adminFilterList.setManaged(true);
@@ -186,19 +186,17 @@ public class OrderHistoryController {
         card.setStyle("-fx-background-color: white; -fx-background-radius: 12; -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.1), 10, 0, 0, 6);");
         card.setPrefWidth(600);
 
-        // Logo
         ImageView logo = new ImageView();
         try {
             byte[] imageData = Base64.getDecoder().decode(r.getLogo());
             logo.setImage(new Image(new ByteArrayInputStream(imageData)));
         } catch (Exception e) {
-            logo.setImage(null); // fallback if needed
+            logo.setImage(null);
         }
         logo.setFitWidth(80);
         logo.setFitHeight(80);
         logo.setPreserveRatio(true);
 
-        // Info
         VBox info = new VBox(8);
         info.setAlignment(Pos.CENTER_LEFT);
 
@@ -219,7 +217,7 @@ public class OrderHistoryController {
         Region spacer = new Region();
         HBox.setHgrow(spacer, Priority.ALWAYS);
 
-        card.setOnMouseClicked(e -> handleClick(r, order)); // full card click
+        card.setOnMouseClicked(e -> handleClick(r, order));
 
 
         Label temp = new Label("💰 raw price: " + order.getRawPrice() + " | Total: " + order.getPayPrice() + " | Status: " + order.getStatus());
@@ -239,7 +237,6 @@ public class OrderHistoryController {
                 PayOrderController.class
         );
 
-
         if (controller != null) {
             if (mode == 2 || mode == 3 || mode == 4 || mode == 5) {
                 controller.setOrder(theOrder, r, 4);
@@ -248,7 +245,6 @@ public class OrderHistoryController {
             }
         }
     }
-
 
     @FXML
     private void goBack() {

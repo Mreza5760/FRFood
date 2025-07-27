@@ -16,7 +16,6 @@
         <Insets top="30" right="30" bottom="30" left="30"/>
     </padding>
 
-    <!-- Top Bar -->
     <HBox alignment="CENTER_LEFT" spacing="10">
         <Button text="⬅ Back" onAction="#handleBack"
                 style="-fx-background-color: #e74c3c; -fx-text-fill: white; -fx-font-weight: bold; -fx-background-radius: 8;"/>
@@ -24,7 +23,6 @@
                style="-fx-font-size: 24px; -fx-font-weight: bold; -fx-text-fill: #1e2a38;"/>
     </HBox>
 
-    <!-- Filters Section -->
     <VBox spacing="15" alignment="CENTER" style="-fx-background-color: white; -fx-background-radius: 12; -fx-padding: 30; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.1), 10, 0, 0, 4);">
 
         <HBox spacing="20" alignment="CENTER">
@@ -50,7 +48,6 @@
         </HBox>
     </VBox>
 
-    <!-- Results -->
     <ScrollPane fitToWidth="true" style="-fx-background: transparent;">
         <VBox fx:id="ordersContainer" spacing="15" alignment="TOP_CENTER"/>
     </ScrollPane>

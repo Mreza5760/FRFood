@@ -34,9 +34,6 @@ public class RestaurantOrdersController {
     private final ObjectMapper mapper = new ObjectMapper();
     private static Restaurant restaurant;
 
-    /**
-     * Call this after loading FXML to set the restaurant context
-     **/
     public static void setRestaurant(Restaurant inRestaurant) {
         restaurant = inRestaurant;
     }
@@ -47,9 +44,6 @@ public class RestaurantOrdersController {
         fetchOrders();
     }
 
-    /**
-     * Fetch list of orders from backend
-     **/
     private void fetchOrders() {
         new Thread(() -> {
             try {
@@ -117,12 +111,10 @@ public class RestaurantOrdersController {
                 PayOrderController.class
         );
 
-
         if (controller != null) {
             controller.setOrder(order, restaurant, 3);
         }
     }
-
 
     @FXML
     private void handleBack(ActionEvent event) {

@@ -131,7 +131,7 @@ public class OrderHandler implements HttpHandler {
                 }
                 Food food = optionalFood.get();
                 if (food.getSupply() < orderItem.getQuantity()) {
-                    HttpError.badRequest(exchange, "Supply less than order quantity");
+                    HttpError.badRequest(exchange, "Food supply not enough");
                     return;
                 }
             }

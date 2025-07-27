@@ -38,27 +38,6 @@ public class CartController {
         displayRestaurants();
     }
 
-//    private void fetchRestaurants() {
-//        HttpRequest request = HttpRequest.newBuilder()
-//                .uri(URI.create("http://localhost:8080/restaurants/mine"))
-//                .header("Authorization", "Bearer " + SessionManager.getAuthToken())
-//                .GET()
-//                .build();
-//
-//        HttpClient.newHttpClient().sendAsync(request, HttpResponse.BodyHandlers.ofString())
-//                .thenAccept(response -> {
-//                    if (response.statusCode() == 200) {
-//                        displayRestaurants(response.body());
-//                    } else {
-//                        System.err.println("Failed to fetch restaurants: HTTP " + response.statusCode());
-//                    }
-//                })
-//                .exceptionally(e -> {
-//                    e.printStackTrace();
-//                    return null;
-//                });
-//    }
-
     private void displayRestaurants() {
         try {
             Map<Integer, Order> orderList = SessionManager.getOrderList();
@@ -129,19 +108,17 @@ public class CartController {
         card.setStyle("-fx-background-color: white; -fx-background-radius: 12; -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.1), 10, 0, 0, 6);");
         card.setPrefWidth(600);
 
-        // Logo
         ImageView logo = new ImageView();
         try {
             byte[] imageData = Base64.getDecoder().decode(r.getLogo());
             logo.setImage(new Image(new ByteArrayInputStream(imageData)));
         } catch (Exception e) {
-            logo.setImage(null); // fallback if needed
+            logo.setImage(null);
         }
         logo.setFitWidth(80);
         logo.setFitHeight(80);
         logo.setPreserveRatio(true);
 
-        // Info
         VBox info = new VBox(8);
         info.setAlignment(Pos.CENTER_LEFT);
 
@@ -162,7 +139,7 @@ public class CartController {
         Region spacer = new Region();
         HBox.setHgrow(spacer, Priority.ALWAYS);
 
-        card.setOnMouseClicked(e -> handleClick(r,order)); // full card click
+        card.setOnMouseClicked(e -> handleClick(r,order));
 
 
         Label temp = new Label("💰 raw price: " + order.getRawPrice() + " | Total: " + order.getPayPrice());
@@ -175,11 +152,6 @@ public class CartController {
         return card;
     }
 
-    private void handleOrder(Restaurant r) {
-        RestaurantOrdersController.setRestaurant(r);
-        SceneNavigator.switchTo("/frontEnd/restaurantOrders.fxml", restaurantList);
-    }
-
     private void handleClick(Restaurant r,Order theOrder) {
         PayOrderController controller = SceneNavigator.switchToWithController(
                 "/frontEnd/payOrder.fxml",
@@ -187,70 +159,13 @@ public class CartController {
                 PayOrderController.class
         );
 
-
         if (controller != null) {
             controller.setOrder(theOrder, r,1);
         }
     }
 
-    private void handleUpdate(Restaurant r) {
-        FXMLLoader loader = new FXMLLoader(getClass().getResource("/frontEnd/updateRestaurant.fxml"));
-        try {
-            Parent root = loader.load();
-
-            UpdateRestaurantController controller = loader.getController();
-
-            controller.setRestaurantData(
-                    r.getId(),
-                    r.getName(),
-                    r.getAddress(),
-                    r.getPhone(),
-                    r.getTaxFee(),
-                    r.getAdditionalFee(),
-                    r.getLogo()
-            );
-
-            Stage stage = (Stage) restaurantList.getScene().getWindow();
-            double currentWidth = stage.getWidth();
-            double currentHeight = stage.getHeight();
-            stage.setScene(new Scene(root));
-            stage.setWidth(currentWidth);
-            stage.setHeight(currentHeight);
-            stage.show();
-        } catch (Exception e) {
-            System.out.println(e.getMessage());
-        }
-
-    }
-
     @FXML
     private void goBack() {
         SceneNavigator.switchTo("/frontEnd/buyerOrderPage.fxml", restaurantList);
-    }
-
-    private void handleDelete(Restaurant r) {
-        String url = "http://localhost:8080/restaurants/" + r.getId();
-
-        HttpRequest request = HttpRequest.newBuilder()
-                .uri(URI.create(url))
-                .header("Authorization", "Bearer " + SessionManager.getAuthToken())
-                .DELETE()
-                .build();
-
-        HttpClient.newHttpClient().sendAsync(request, HttpResponse.BodyHandlers.ofString())
-                .thenAccept(response -> {
-                    displayRestaurants();
-                    if (response.statusCode() == 200 || response.statusCode() == 204) {
-                        System.out.println("Deleted restaurant: " + r.getName());
-                        // Optionally refresh the list on UI thread
-                        Platform.runLater(this::displayRestaurants);
-                    } else {
-                        System.err.println("Failed to delete restaurant: HTTP " + response.statusCode());
-                    }
-                })
-                .exceptionally(e -> {
-                    e.printStackTrace();
-                    return null;
-                });
     }
 }

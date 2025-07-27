@@ -9,7 +9,6 @@
            fx:controller="org.FRFood.frontEnd.controller.topOffersController"
            style="-fx-background-color: linear-gradient(to bottom, #eef3f9, #dbe5f1);">
 
-    <!-- Centered Card -->
     <VBox alignment="CENTER" spacing="25"
           maxWidth="600" maxHeight="400"
           style="-fx-background-color: white; -fx-padding: 30;

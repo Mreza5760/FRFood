@@ -57,7 +57,6 @@ public class PayOrderController {
         this.restaurant = restaurant;
         this.mode = inMode;
 
-
         if (mode == 1) {
             payCardButton.setVisible(true);
             payCardButton.setManaged(true);
@@ -91,7 +90,7 @@ public class PayOrderController {
             finishButton.setVisible(true);
             finishButton.setManaged(true);
         }
-        // Populate details
+
         detailsBox.getChildren().clear();
         detailsBox.getChildren().addAll(
                 new Label("📍 Delivery Address: " + order.getDeliveryAddress()),
@@ -110,11 +109,10 @@ public class PayOrderController {
         if (mode != 1) {
             detailsBox.getChildren().add(new Label("⏱ Created at: " + order.getCreatedAt()));
         }
-        if(currentOrder.getStatus() == Status.completed||currentOrder.getStatus() == Status.onTheWay){
+        if (currentOrder.getStatus() == Status.completed||currentOrder.getStatus() == Status.onTheWay){
             detailsBox.getChildren().add(new Label("⏱ Courier Name: " + getNameById(currentOrder.getCourierId())));
         }
 
-        // Populate order items
         itemsBox.getChildren().clear();
         for (OrderItem item : order.getItems()) {
             Food food = fetchItemDetails(item.getItemId());
@@ -160,10 +158,8 @@ public class PayOrderController {
             connection.setRequestProperty("Authorization", "Bearer " + SessionManager.getAuthToken());
             connection.setDoOutput(true);
 
-            // Prepare the payload
             ObjectMapper mapper = new ObjectMapper();
 
-            // Create a wrapper object
             var rootNode = mapper.createObjectNode();
             rootNode.set("order", mapper.valueToTree(currentOrder));
             rootNode.put("method", method);
@@ -180,7 +176,7 @@ public class PayOrderController {
                 SessionManager.getOrderList().remove(currentOrder.getRestaurantId());
                 handleBack();
             } else {
-                showAlert("Failed", "Payment failed! Status: " + responseCode + connection.getResponseMessage(), Alert.AlertType.ERROR);
+                showAlert("Failed", "Payment failed! Status: " + responseCode + ": " + connection.getResponseMessage(), Alert.AlertType.ERROR);
             }
 
         } catch (Exception e) {
@@ -241,7 +237,6 @@ public class PayOrderController {
                 int code = conn.getResponseCode();
                 System.out.println("PATCH status code: " + code);
 
-                // Refresh on success
                 if (code >= 200 && code < 300) {
                     Platform.runLater(this::handleBack);
                 }
@@ -326,7 +321,7 @@ public class PayOrderController {
         return null;
     }
 
-    public void handlevalidateToken(ActionEvent actionEvent) {
+    public void handleValidateToken(ActionEvent actionEvent) {
         String code = CouponCodeField.getText().trim();
 
         try {
@@ -355,9 +350,9 @@ public class PayOrderController {
                         SessionManager.getOrderList().get(restaurant.getId()).setRawPrice(currentRawPrice - coupon.getValue());
                     }
                 } else {
-
-                    SessionManager.getOrderList().get(restaurant.getId()).setRawPrice(currentRawPrice * (1 - coupon.getValue() / 100));
+                    SessionManager.getOrderList().get(restaurant.getId()).setRawPrice(currentRawPrice * ((100 - coupon.getValue()) / 100));
                 }
+
                 SessionManager.getOrderList().get(restaurant.getId()).setCouponId(coupon.getId());
                 SessionManager.getOrderList().get(restaurant.getId()).calculatePayPrice();
                 Platform.runLater(() ->
@@ -368,6 +363,5 @@ public class PayOrderController {
         } catch (Exception e) {
             e.printStackTrace();
         }
-
     }
 }
