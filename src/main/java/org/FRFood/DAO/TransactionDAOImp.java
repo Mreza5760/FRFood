@@ -77,6 +77,7 @@ public class TransactionDAOImp implements TransactionDAO {
         transaction.setUserID(rs.getInt("user_id"));
         transaction.setMethod(TransactionMethod.valueOf(rs.getString("method")));
         transaction.setAmount(rs.getInt("amount"));
+        transaction.setPayedAt(rs.getString("created_at"));
         return transaction;
     }
 }

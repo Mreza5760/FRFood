@@ -10,6 +10,8 @@ public class Transaction {
     private Integer userID;
     private TransactionMethod method;
     private Integer amount;
+    @JsonProperty("payed_at")
+    private String payedAt;
 
     public Integer getId() {
         return id;
@@ -49,5 +51,13 @@ public class Transaction {
 
     public void setAmount(Integer amount) {
         this.amount = amount;
+    }
+
+    public String getPayedAt() {
+        return payedAt;
+    }
+
+    public void setPayedAt(String payedAt) {
+        this.payedAt = payedAt;
     }
 }
