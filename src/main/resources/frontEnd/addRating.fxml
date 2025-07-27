@@ -2,51 +2,48 @@
 
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.control.*?>
-<?import javafx.scene.image.*?>
 <?import javafx.geometry.Insets?>
 <?import javafx.geometry.Pos?>
 
 <VBox xmlns="http://javafx.com/javafx"
       xmlns:fx="http://javafx.com/fxml"
       fx:controller="org.FRFood.frontEnd.controller.AddRatingController"
-      alignment="CENTER" spacing="30"
+      alignment="TOP_CENTER" spacing="30"
       style="-fx-background-color: linear-gradient(to bottom, #eef3f9, #dbe5f1);">
 
-    <HBox alignment="TOP_LEFT">
-        <Button text="⬅ Back"
-                onAction="#handleBack"
-                style="-fx-background-color: #d9534f; -fx-text-fill: white; -fx-font-weight: bold; -fx-background-radius: 8;"
-                prefWidth="100" prefHeight="30"/>
-    </HBox>
-
     <padding>
-        <Insets top="60" right="50" bottom="60" left="50"/>
+        <Insets top="40" left="50" right="50" bottom="40"/>
     </padding>
 
-    <Label text="📝 Submit Your Review"
-           style="-fx-font-size: 30px; -fx-font-weight: bold; -fx-text-fill: #1e2a38;"/>
+    <HBox alignment="CENTER_LEFT" spacing="10">
+        <Button text="← Back"
+                onAction="#handleBack"
+                style="-fx-background-color: #ff6666; -fx-text-fill: white; -fx-font-weight: bold; -fx-background-radius: 8;"
+                prefWidth="100"/>
+        <Label text="📝 Submit Your Review"
+               style="-fx-font-size: 26px; -fx-font-weight: bold; -fx-text-fill: #1e2a38;"/>
+    </HBox>
 
-    <VBox spacing="20" alignment="CENTER" style="-fx-background-color: white; -fx-padding: 30; -fx-background-radius: 12; -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.1), 10, 0, 0, 4);">
+    <VBox spacing="20" alignment="CENTER"
+          style="-fx-background-color: white; -fx-padding: 30; -fx-background-radius: 12; -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.1), 8, 0, 0, 4);"
+          maxWidth="600">
 
-        <Label text="Rate your experience:"
-               style="-fx-font-size: 14px; -fx-text-fill: #1e2a38;"/>
-        <HBox fx:id="starBox" alignment="CENTER" spacing="10"
-              xmlns="http://javafx.com/javafx"
-              xmlns:fx="http://javafx.com/fxml">
-        </HBox>
+        <Label text="Rate your experience:" style="-fx-font-size: 16px; -fx-text-fill: #1e2a38;"/>
+        <HBox fx:id="starBox" alignment="CENTER" spacing="10"/>
 
-        <Label text="Your Comment:"
-               style="-fx-font-size: 14px; -fx-text-fill: #1e2a38;"/>
+        <Label text="Your Comment:" style="-fx-font-size: 16px; -fx-text-fill: #1e2a38;"/>
         <TextArea fx:id="commentArea" prefRowCount="4" wrapText="true"
-                  style="-fx-font-size: 14px; -fx-padding: 10; -fx-background-radius: 6;"/>
+                  style="-fx-font-size: 14px; -fx-padding: 10; -fx-background-radius: 6;"
+                  maxWidth="500"/>
 
-        <Button text="➕ Add Images" fx:id="addImageButton" onAction="#handleAddImages"
-                style="-fx-background-color: #00aa88; -fx-text-fill: white; -fx-font-size: 14px; -fx-font-weight: bold; -fx-background-radius: 8;"/>
-
+        <Button text="＋ Add Images" fx:id="addImageButton" onAction="#handleAddImages"
+                style="-fx-background-color: #00aa88; -fx-text-fill: white; -fx-font-size: 14px; -fx-font-weight: bold; -fx-background-radius: 8;"
+                prefWidth="180"/>
         <FlowPane fx:id="imagePreviewPane" hgap="10" vgap="10" prefHeight="140"
-                  style="-fx-background-color: #f0f4f8; -fx-padding: 10; -fx-background-radius: 8;" />
+                  style="-fx-background-color: #f7f9fc; -fx-padding: 10; -fx-background-radius: 8;"/>
 
-        <Button text="✅ Submit Review" fx:id="submitButton" onAction="#handleSubmitReview"
-                style="-fx-background-color: #0077cc; -fx-text-fill: white; -fx-font-size: 14px; -fx-font-weight: bold; -fx-background-radius: 8;"/>
+        <Button text="Submit Review" fx:id="submitButton" onAction="#handleSubmitReview"
+                style="-fx-background-color: #0077cc; -fx-text-fill: white; -fx-font-size: 16px; -fx-font-weight: bold; -fx-background-radius: 8;"
+                prefWidth="200"/>
     </VBox>
 </VBox>

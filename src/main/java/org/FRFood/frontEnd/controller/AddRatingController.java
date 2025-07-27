@@ -1,12 +1,10 @@
 package org.FRFood.frontEnd.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import javafx.event.ActionEvent;
+import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.geometry.Insets;
 import javafx.scene.control.*;
-import javafx.scene.image.Image;
-import javafx.scene.image.ImageView;
 import javafx.scene.layout.*;
 import javafx.stage.FileChooser;
 import org.FRFood.frontEnd.Util.SceneNavigator;
@@ -27,7 +25,7 @@ public class AddRatingController {
 
     private final List<String> base64Images = new ArrayList<>();
     private final List<Button> starButtons = new ArrayList<>();
-    private int selectedRating = 5;
+    private int selectedRating = 0;
     private static int orderId;
 
     public static void setOrderId(int InOrderId) {
@@ -40,6 +38,7 @@ public class AddRatingController {
     }
 
     private void setupStars() {
+        starBox.getChildren().clear();
         for (int i = 1; i <= 5; i++) {
             Button star = new Button("☆");
             star.setStyle("-fx-font-size: 28px; -fx-background-color: transparent; -fx-text-fill: #888; -fx-cursor: hand;");
@@ -52,12 +51,12 @@ public class AddRatingController {
                 updateStars(selectedRating);
             });
 
-            star.setFocusTraversable(false); // prevents keyboard focus border
+            star.setFocusTraversable(false);
             star.setPadding(new Insets(5));
             starButtons.add(star);
             starBox.getChildren().add(star);
         }
-        updateStars(selectedRating); // show initial rating
+        updateStars(0);
     }
 
     private void updateStars(int ratingValue) {
@@ -86,7 +85,7 @@ public class AddRatingController {
                     byte[] bytes = fis.readAllBytes();
                     String encoded = Base64.getEncoder().encodeToString(bytes);
                     base64Images.add(encoded);
-                    addImagePreview(file);
+                    addImagePreview(file, encoded);
                 } catch (Exception e) {
                     showAlert(Alert.AlertType.ERROR, "Image Error", "Couldn't load: " + file.getName());
                 }
@@ -94,14 +93,27 @@ public class AddRatingController {
         }
     }
 
-    private void addImagePreview(File file) {
+    private void addImagePreview(File file, String encoded) {
         try {
-            Image img = new Image(file.toURI().toString(), 80, 80, true, true);
-            ImageView imgView = new ImageView(img);
+            javafx.scene.image.Image img = new javafx.scene.image.Image(file.toURI().toString(), 80, 80, true, true);
+            javafx.scene.image.ImageView imgView = new javafx.scene.image.ImageView(img);
             imgView.setFitWidth(80);
             imgView.setFitHeight(80);
             imgView.setStyle("-fx-border-color: #ccc; -fx-border-radius: 6; -fx-background-radius: 6;");
-            imagePreviewPane.getChildren().add(imgView);
+
+            Button removeBtn = new Button("✖");
+            removeBtn.setStyle("-fx-background-color: #ff6666; -fx-text-fill: white; -fx-font-weight: bold; -fx-background-radius: 6;");
+            VBox wrapper = new VBox(imgView, removeBtn);
+            wrapper.setSpacing(5);
+            wrapper.setAlignment(javafx.geometry.Pos.CENTER);
+            wrapper.setPadding(new Insets(5));
+
+            removeBtn.setOnAction(e -> {
+                base64Images.remove(encoded);
+                imagePreviewPane.getChildren().remove(wrapper);
+            });
+
+            imagePreviewPane.getChildren().add(wrapper);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -109,14 +121,22 @@ public class AddRatingController {
 
     @FXML
     private void handleSubmitReview() {
-        String comment = commentArea.getText();
+        String comment = commentArea.getText() != null ? commentArea.getText().trim() : "";
+
+        if (selectedRating <= 0) {
+            showAlert(Alert.AlertType.ERROR, "Invalid Rating", "Please select a star rating.");
+            return;
+        }
+        if (comment.isEmpty()) {
+            showAlert(Alert.AlertType.ERROR, "Invalid Comment", "Please write a review.");
+            return;
+        }
 
         Map<String, Object> body = new HashMap<>();
         body.put("order_id", orderId);
         body.put("rating", selectedRating);
         body.put("comment", comment);
         body.put("imageBase64", base64Images);
-
 
         try {
             URL url = new URL("http://localhost:8080/ratings");
@@ -129,16 +149,18 @@ public class AddRatingController {
             ObjectMapper mapper = new ObjectMapper();
             String json = mapper.writeValueAsString(body);
 
-
             try (OutputStream os = conn.getOutputStream()) {
                 os.write(json.getBytes());
             }
 
             int code = conn.getResponseCode();
             if (code == 200 || code == 201) {
-                showAlert(Alert.AlertType.INFORMATION, "Success", "Review submitted!");
+                Platform.runLater(() -> {
+                    showAlert(Alert.AlertType.INFORMATION, "Success", "Review submitted!");
+                    SceneNavigator.switchTo("/frontend/orderHistory.fxml", imagePreviewPane);
+                });
             } else {
-                showAlert(Alert.AlertType.ERROR, "Error", "Failed. Code: " + code+ conn.getResponseMessage());
+                showAlert(Alert.AlertType.ERROR, "Error", "Failed. Code: " + code);
             }
 
         } catch (Exception e) {
@@ -148,14 +170,16 @@ public class AddRatingController {
     }
 
     private void showAlert(Alert.AlertType type, String title, String message) {
-        Alert alert = new Alert(type);
-        alert.setTitle(title);
-        alert.setHeaderText(null);
-        alert.setContentText(message);
-        alert.showAndWait();
+        Platform.runLater(() -> {
+            Alert alert = new Alert(type);
+            alert.setTitle(title);
+            alert.setHeaderText(null);
+            alert.setContentText(message);
+            alert.showAndWait();
+        });
     }
 
-    public void handleBack(ActionEvent actionEvent) {
-        SceneNavigator.switchTo("/frontend/orderHistory.fxml",imagePreviewPane);
+    public void handleBack(javafx.event.ActionEvent event) {
+        SceneNavigator.switchTo("/frontend/orderHistory.fxml", imagePreviewPane);
     }
 }
