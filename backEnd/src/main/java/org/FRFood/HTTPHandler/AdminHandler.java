@@ -234,7 +234,6 @@ public class AdminHandler implements HttpHandler {
         }
     }
 
-    // TODO has query
     private void handleGetTransactions(HttpExchange exchange) throws IOException {
         Optional<User> optionalUser = authenticate(exchange);
         if (optionalUser.isEmpty()) return;
@@ -244,11 +243,61 @@ public class AdminHandler implements HttpHandler {
             return;
         }
 
+        String query = exchange.getRequestURI().getQuery();
+        FoodDAO foodDAO = new FoodDAOImp();
+
         try {
             List<Transaction> transactions = transactionDAO.getAllTransactions();
-            JsonResponse.sendJsonResponse(exchange, 200, objectMapper.writeValueAsString(transactions));
-        } catch (SQLException e) {
-            HttpError.internal(exchange, "Internal server error while updating profile");
+            List<Transaction> finalTransactions = new ArrayList<>(transactions);
+
+            if (query != null && !query.isEmpty()) {
+                String[] parts = query.split("&");
+                Map<String, String> params = new HashMap<>();
+                for (String part : parts) {
+                    String[] keyValue = part.split("=");
+                    if (keyValue.length == 2)
+                        params.put(keyValue[0], keyValue[1]);
+                }
+                for (Transaction transaction : transactions) {
+                    if (params.containsKey("user") && !params.get("user").isEmpty()) {
+                        Optional<User> optionalUser2 = userDAO.getById(transaction.getUserID());
+                        if (optionalUser2.isPresent() && !optionalUser2.get().getFullName().contains(params.get("user")))
+                            finalTransactions.remove(transaction);
+                    }
+                    if (params.containsKey("method") && !params.get("method").equals("null") && !params.get("method").isEmpty() && !transaction.getMethod().toString().equals(params.get("method"))) {
+                        finalTransactions.remove(transaction);
+                    }
+                    if (transaction.getOrderID() != 0 && params.containsKey("search")) {
+                        Optional<Order> optionalOrder = orderDAO.getById(transaction.getOrderID());
+                        if (optionalOrder.isEmpty()) {
+                            HttpError.notFound(exchange, "Order not found");
+                            return;
+                        }
+                        Order order = optionalOrder.get();
+                        List<OrderItem> items = order.getItems();
+                        boolean found = false;
+                        for (OrderItem item : items) {
+                            Optional<Food> optionalFood = foodDAO.getById(item.getItemId());
+                            if (optionalFood.isEmpty()) {
+                                HttpError.notFound(exchange, "Food not found");
+                                return;
+                            }
+                            Food food = optionalFood.get();
+                            if (food.getName().contains(params.get("search"))) {
+                                found = true;
+                                break;
+                            }
+                        }
+                        if (!found) {
+                            finalTransactions.remove(transaction);
+                        }
+                    }
+                }
+            }
+
+            JsonResponse.sendJsonResponse(exchange, 200, objectMapper.writeValueAsString(finalTransactions));
+        } catch(SQLException e) {
+                HttpError.internal(exchange, "Internal server error while updating profile");
         }
     }
 
