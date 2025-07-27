@@ -30,9 +30,10 @@
                    style="-fx-background-radius: 8; -fx-border-radius: 8;
                           -fx-border-color: #cccccc; -fx-border-width: 1;">
             <columns>
-                <TableColumn fx:id="orderIdColumn" text="Order / Type" prefWidth="250"/>
-                <TableColumn fx:id="methodColumn" text="Method" prefWidth="200"/>
-                <TableColumn fx:id="amountColumn" text="Amount (Toman)" prefWidth="250"/>
+                <TableColumn fx:id="orderIdColumn" text="Order / Type" prefWidth="180"/>
+                <TableColumn fx:id="methodColumn" text="Method" prefWidth="140"/>
+                <TableColumn fx:id="amountColumn" text="Amount (Toman)" prefWidth="160"/>
+                <TableColumn fx:id="payedAtColumn" text="Paid At" prefWidth="220"/>
             </columns>
         </TableView>
 

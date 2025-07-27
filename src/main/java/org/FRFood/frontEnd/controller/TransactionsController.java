@@ -6,11 +6,11 @@ import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
+import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.util.Callback;
-import javafx.scene.control.TableCell;
 import org.FRFood.entity.Transaction;
 import org.FRFood.frontEnd.Util.SceneNavigator;
 import org.FRFood.frontEnd.Util.SessionManager;
@@ -18,6 +18,8 @@ import org.FRFood.frontEnd.Util.SessionManager;
 import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 public class TransactionsController {
@@ -26,6 +28,7 @@ public class TransactionsController {
     @FXML private TableColumn<Transaction, Integer> orderIdColumn;
     @FXML private TableColumn<Transaction, String> methodColumn;
     @FXML private TableColumn<Transaction, Integer> amountColumn;
+    @FXML private TableColumn<Transaction, String> payedAtColumn;
     @FXML private Button backButton;
 
     private final String token = SessionManager.getAuthToken();
@@ -35,7 +38,9 @@ public class TransactionsController {
         orderIdColumn.setCellValueFactory(new PropertyValueFactory<>("orderID"));
         methodColumn.setCellValueFactory(new PropertyValueFactory<>("method"));
         amountColumn.setCellValueFactory(new PropertyValueFactory<>("amount"));
+        payedAtColumn.setCellValueFactory(new PropertyValueFactory<>("payedAt"));
 
+        // Order/Type column logic (Deposit, Withdraw, Wallet Update, or order ID)
         orderIdColumn.setCellFactory(new Callback<>() {
             @Override
             public TableCell<Transaction, Integer> call(TableColumn<Transaction, Integer> param) {
@@ -66,6 +71,35 @@ public class TransactionsController {
             }
         });
 
+        // PayedAt column (format SQL datetime -> human readable)
+        payedAtColumn.setCellFactory(new Callback<>() {
+            @Override
+            public TableCell<Transaction, String> call(TableColumn<Transaction, String> param) {
+                return new TableCell<>() {
+                    private final DateTimeFormatter inputFormatter =
+                            DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+                    private final DateTimeFormatter outputFormatter =
+                            DateTimeFormatter.ofPattern("dd MMM yyyy, HH:mm");
+
+                    @Override
+                    protected void updateItem(String item, boolean empty) {
+                        super.updateItem(item, empty);
+                        if (empty || item == null || item.isBlank()) {
+                            setText(null);
+                        } else {
+                            try {
+                                LocalDateTime dateTime = LocalDateTime.parse(item, inputFormatter);
+                                setText(dateTime.format(outputFormatter)); // e.g., "26 Jul 2025, 14:30"
+                            } catch (Exception e) {
+                                setText(item); // fallback: raw string if parsing fails
+                            }
+                        }
+                    }
+                };
+            }
+        });
+
+        // Absolute amount values (remove minus sign)
         amountColumn.setCellFactory(new Callback<>() {
             @Override
             public TableCell<Transaction, Integer> call(TableColumn<Transaction, Integer> param) {
