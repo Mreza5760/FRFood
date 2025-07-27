@@ -193,6 +193,12 @@ public class ProfileController {
     }
 
     @FXML
+    public void handleDeletePicture(ActionEvent event) {
+        profileImage.setImage(null);
+        profileImageBase64 = "";
+    }
+
+    @FXML
     public void handleCancel(ActionEvent event) {
         try {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/frontend/Panel.fxml"));

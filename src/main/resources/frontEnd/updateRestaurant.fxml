@@ -23,9 +23,14 @@
                fitHeight="120" fitWidth="120"
                style="-fx-effect: dropshadow(gaussian, rgba(0,0,0,0.15), 10, 0, 0, 2); -fx-background-radius: 60;"/>
 
-    <Button text="Change Logo" onAction="#handleChangeLogo"
-            prefWidth="140" prefHeight="36"
-            style="-fx-background-color: #0077cc; -fx-text-fill: white; -fx-font-weight: bold; -fx-background-radius: 8;"/>
+    <HBox alignment="CENTER" spacing="15">
+        <Button text="Change Logo" onAction="#handleChangeLogo"
+                prefWidth="140" prefHeight="36"
+                style="-fx-background-color: #0077cc; -fx-text-fill: white; -fx-font-weight: bold; -fx-background-radius: 8;"/>
+        <Button text="Delete Logo" onAction="#handleDeleteLogo"
+                prefWidth="140" prefHeight="36"
+                style="-fx-background-color: #d9534f; -fx-text-fill: white; -fx-font-weight: bold; -fx-background-radius: 8;"/>
+    </HBox>
 
     <GridPane hgap="15" vgap="15" maxWidth="500">
         <columnConstraints>
@@ -53,7 +58,6 @@
         <Button text="Cancel" onAction="#handleCancel"
                 prefWidth="120" prefHeight="40"
                 style="-fx-background-color: #999999; -fx-text-fill: white; -fx-font-weight: bold; -fx-background-radius: 8;"/>
-
         <Button text="Save" onAction="#handleSave"
                 prefWidth="140" prefHeight="40"
                 style="-fx-background-color: #00aa88; -fx-text-fill: white; -fx-font-weight: bold; -fx-background-radius: 8;"/>

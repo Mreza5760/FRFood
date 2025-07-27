@@ -78,7 +78,7 @@ public class FoodDAOImp implements FoodDAO {
             if (food.getPicture() != null && !food.getPicture().isEmpty()) {
                 preparedStatement.setString(3, food.getPicture());
             } else {
-                byte[] fileContent = Files.readAllBytes(Paths.get("src/main/resources/imageUrls/chef-logo-design-illustration-restaurant-logo-vector.png"));
+                byte[] fileContent = Files.readAllBytes(Paths.get("src/main/resources/imageUrls/restaurant.png"));
                 String base64String = Base64.getEncoder().encodeToString(fileContent);
                 preparedStatement.setString(3, base64String);
             }

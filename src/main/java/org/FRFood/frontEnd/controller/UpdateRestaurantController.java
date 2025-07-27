@@ -146,6 +146,13 @@ public class UpdateRestaurantController {
     }
 
     @FXML
+    public void handleDeleteLogo(ActionEvent event) {
+        restaurantLogo.setImage(null);
+        logoBase64 = "";
+        showAlert(Alert.AlertType.INFORMATION, "Deleted", "Restaurant logo removed. Click Save to confirm changes.");
+    }
+
+    @FXML
     public void handleCancel(ActionEvent event) {
         SceneNavigator.switchTo("/frontend/myRestaurants.fxml", (Node) event.getSource());
     }
