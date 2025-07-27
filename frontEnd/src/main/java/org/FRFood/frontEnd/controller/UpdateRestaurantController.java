@@ -116,7 +116,7 @@ public class UpdateRestaurantController {
 
                 if (responseCode == 200) {
                     Platform.runLater(() -> {
-                        SceneNavigator.switchTo("/frontend/myRestaurants.fxml", (Node) event.getSource());
+                        SceneNavigator.switchTo("/frontEnd/myRestaurants.fxml", (Node) event.getSource());
                     });
                 } else if (responseCode == 400) {
                     Platform.runLater(() -> {showAlert(Alert.AlertType.ERROR, "Bad Request", "Invalid phone number");});
@@ -154,6 +154,6 @@ public class UpdateRestaurantController {
 
     @FXML
     public void handleCancel(ActionEvent event) {
-        SceneNavigator.switchTo("/frontend/myRestaurants.fxml", (Node) event.getSource());
+        SceneNavigator.switchTo("/frontEnd/myRestaurants.fxml", (Node) event.getSource());
     }
 }

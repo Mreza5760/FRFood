@@ -220,7 +220,7 @@ public class AllRestaurantsController {
 
     private void handleClick(Restaurant r) {
         RestaurantController.setValues(r);
-        FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/restaurant.fxml"));
+        FXMLLoader loader = new FXMLLoader(getClass().getResource("/frontEnd/restaurant.fxml"));
         try {
             Parent root = loader.load();
 
@@ -239,11 +239,11 @@ public class AllRestaurantsController {
     @FXML
     private void goBack() {
         if (mode == 2)
-            SceneNavigator.switchTo("/frontend/panel.fxml", backButton);
+            SceneNavigator.switchTo("/frontEnd/panel.fxml", backButton);
         else if(mode ==1)
-            SceneNavigator.switchTo("/frontend/buyerOrderPage.fxml", backButton);
+            SceneNavigator.switchTo("/frontEnd/buyerOrderPage.fxml", backButton);
         else if(mode == 3)
-            SceneNavigator.switchTo("/frontend/topOffers.fxml", backButton);
+            SceneNavigator.switchTo("/frontEnd/topOffers.fxml", backButton);
     }
 
     private void handleSearch1() {
@@ -279,7 +279,7 @@ public class AllRestaurantsController {
         itemsReq.maxPrice = maxPriceValue;
         itemsReq.keywords = keywords;
         AllFoodsController.setData(0, "Foods :", 2, itemsReq);
-        SceneNavigator.switchTo("/frontend/allFoods.fxml", restaurantList);
+        SceneNavigator.switchTo("/frontEnd/allFoods.fxml", restaurantList);
     }
 
     private List<Restaurant> getFavoriteRestaurants() {

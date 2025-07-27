@@ -26,13 +26,11 @@ import java.net.URL;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
-import java.security.cert.PolicyNode;
 import java.util.Base64;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.atomic.AtomicBoolean;
 
 public class FoodDetailsController {
 
@@ -226,7 +224,7 @@ public class FoodDetailsController {
         data.imageBase64 = rating.getImages();
 
         UpdateRatingController.setRatingData(data);
-        SceneNavigator.switchTo("/frontend/updateRating.fxml", itemDescriptionLabel);
+        SceneNavigator.switchTo("/frontEnd/updateRating.fxml", itemDescriptionLabel);
     }
 
     private void handleDeleteButton(Rate rate) {
@@ -289,6 +287,6 @@ public class FoodDetailsController {
 
 
     public void handleBack(ActionEvent actionEvent) {
-        SceneNavigator.switchTo("/frontend/menu.fxml", itemNameLabel);
+        SceneNavigator.switchTo("/frontEnd/menu.fxml", itemNameLabel);
     }
 }

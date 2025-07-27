@@ -19,14 +19,14 @@ public class BuyerOrderPageController {
     @FXML
     private void initialize() {
         backButton.setOnAction(event ->
-                SceneNavigator.switchTo("/fxml/Panel.fxml", backButton)
+                SceneNavigator.switchTo("/frontEnd/Panel.fxml", backButton)
         );
 
         orderHistoryButton.setOnAction(event ->
                 handleOrderHistoryButtonClick()
         );
         myOrdersButton.setOnAction(event ->
-                SceneNavigator.switchTo("/fxml/cart.fxml", myOrdersButton)
+                SceneNavigator.switchTo("/frontEnd/cart.fxml", myOrdersButton)
         );
         restaurantButton.setOnAction(event ->
                 handleRestaurantButton()
@@ -36,11 +36,11 @@ public class BuyerOrderPageController {
 
     private void handleRestaurantButton() {
         AllRestaurantsController.setMode(1);
-        SceneNavigator.switchTo("/fxml/allRestaurants.fxml", restaurantButton);
+        SceneNavigator.switchTo("/frontEnd/allRestaurants.fxml", restaurantButton);
     }
 
     private void handleOrderHistoryButtonClick() {
         OrderHistoryController.setMode(1);
-        SceneNavigator.switchTo("/fxml/orderHistory.fxml", orderHistoryButton);
+        SceneNavigator.switchTo("/frontEnd/orderHistory.fxml", orderHistoryButton);
     }
 }

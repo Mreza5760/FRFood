@@ -121,7 +121,7 @@ public class UpdateFoodController {
                 if (responseCode == 200) {
                     Platform.runLater(() -> {
                         showAlert(Alert.AlertType.INFORMATION, "Success", "Food updated successfully.");
-                        SceneNavigator.switchTo("/frontend/allFoods.fxml", (Node) event.getSource());
+                        SceneNavigator.switchTo("/frontEnd/allFoods.fxml", (Node) event.getSource());
                     });
                 }
 
@@ -134,7 +134,7 @@ public class UpdateFoodController {
 
     @FXML
     public void handleCancel(ActionEvent event) {
-        SceneNavigator.switchTo("/frontend/allFoods.fxml", descriptionField);
+        SceneNavigator.switchTo("/frontEnd/allFoods.fxml", descriptionField);
     }
 
     private void showAlert(Alert.AlertType type, String title, String content) {

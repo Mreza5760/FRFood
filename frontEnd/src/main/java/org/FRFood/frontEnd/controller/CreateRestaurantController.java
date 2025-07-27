@@ -153,6 +153,6 @@ public class CreateRestaurantController {
 
     @FXML
     private void goBack() {
-        SceneNavigator.switchTo("/frontend/panel.fxml", nameField);
+        SceneNavigator.switchTo("/frontEnd/panel.fxml", nameField);
     }
 }

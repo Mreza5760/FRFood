@@ -85,9 +85,9 @@ public class SignUpController {
                 SessionManager.setAuthToken(token);
                 SessionManager.saveSession();
                 if (user.getRole() == Role.buyer) {
-                    SceneNavigator.switchTo("/frontend/panel.fxml", messageLabel);
+                    SceneNavigator.switchTo("/frontEnd/panel.fxml", messageLabel);
                 } else {
-                    SceneNavigator.switchTo("/frontend/login.fxml", messageLabel);
+                    SceneNavigator.switchTo("/frontEnd/login.fxml", messageLabel);
                 }
             } else {
                 handleError(conn);
@@ -101,7 +101,7 @@ public class SignUpController {
 
     @FXML
     private void goToLogin() {
-        SceneNavigator.switchTo("/frontend/Login.fxml", messageLabel);
+        SceneNavigator.switchTo("/frontEnd/Login.fxml", messageLabel);
     }
 
     @FXML

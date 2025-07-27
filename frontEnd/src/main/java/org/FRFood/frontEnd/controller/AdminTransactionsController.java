@@ -6,18 +6,18 @@ import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
-import javafx.scene.control.Button;
-import javafx.scene.control.TableCell;
-import javafx.scene.control.TableColumn;
-import javafx.scene.control.TableView;
+import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
-import org.FRFood.frontEnd.entity.*;
 import org.FRFood.frontEnd.Util.SceneNavigator;
 import org.FRFood.frontEnd.Util.SessionManager;
+import org.FRFood.frontEnd.entity.Transaction;
+import org.FRFood.frontEnd.entity.TransactionMethod;
 
 import java.io.InputStream;
 import java.net.HttpURLConnection;
+import java.net.URLEncoder;
 import java.net.URL;
+import java.nio.charset.StandardCharsets;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
@@ -31,6 +31,11 @@ public class AdminTransactionsController {
     @FXML private TableColumn<Transaction, String> methodColumn;
     @FXML private TableColumn<Transaction, Integer> amountColumn;
     @FXML private TableColumn<Transaction, String> payedAtColumn;
+
+    @FXML private TextField searchUserField;
+    @FXML private ComboBox<TransactionMethod> methodFilterCombo;
+    @FXML private TextField keywordSearchField;
+    @FXML private Button searchButton;
     @FXML private Button backButton;
 
     private final String token = SessionManager.getAuthToken();
@@ -103,15 +108,47 @@ public class AdminTransactionsController {
             }
         });
 
-        loadTransactions();
+        methodFilterCombo.getItems().clear();
+        methodFilterCombo.getItems().addAll(TransactionMethod.values());
+        methodFilterCombo.getItems().add(null);
+        methodFilterCombo.setPromptText("All");
+
+        loadTransactions(null, null, null);
+
+        searchButton.setOnAction(e -> {
+            String user = searchUserField.getText().trim();
+            TransactionMethod method = methodFilterCombo.getValue();
+            String keyword = keywordSearchField.getText().trim();
+            loadTransactions(user.isEmpty() ? null : user,
+                    method,
+                    keyword.isEmpty() ? null : keyword);
+        });
 
         backButton.setOnAction(e -> SceneNavigator.switchTo("/frontend/panel.fxml", backButton));
     }
 
-    private void loadTransactions() {
+    private void loadTransactions(String user, TransactionMethod method, String keyword) {
         new Thread(() -> {
             try {
-                URL url = new URL("http://localhost:8080/admin/transactions");
+                StringBuilder urlBuilder = new StringBuilder("http://localhost:8080/admin/transactions");
+                boolean first = true;
+
+                if (user != null) {
+                    urlBuilder.append(first ? "?" : "&")
+                            .append("user=").append(URLEncoder.encode(user, StandardCharsets.UTF_8));
+                    first = false;
+                }
+                if (method != null) {
+                    urlBuilder.append(first ? "?" : "&")
+                            .append("method=").append(method.name());
+                    first = false;
+                }
+                if (keyword != null) {
+                    urlBuilder.append(first ? "?" : "&")
+                            .append("search=").append(URLEncoder.encode(keyword, StandardCharsets.UTF_8));
+                }
+
+                URL url = new URL(urlBuilder.toString());
                 HttpURLConnection conn = (HttpURLConnection) url.openConnection();
                 conn.setRequestMethod("GET");
                 conn.setRequestProperty("Authorization", "Bearer " + token);
@@ -120,7 +157,6 @@ public class AdminTransactionsController {
                     ObjectMapper mapper = new ObjectMapper();
                     List<Transaction> transactions = mapper.readValue(responseStream, new TypeReference<>() {});
                     ObservableList<Transaction> observableList = FXCollections.observableArrayList(transactions);
-
                     Platform.runLater(() -> transactionsTable.setItems(observableList));
                 }
             } catch (Exception e) {

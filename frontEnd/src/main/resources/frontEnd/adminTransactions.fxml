@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import javafx.geometry.Insets?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
+<?import javafx.geometry.Insets?>
 
 <AnchorPane xmlns="http://javafx.com/javafx/20.0.2"
             xmlns:fx="http://javafx.com/fxml/1"
@@ -10,7 +10,7 @@
             prefWidth="950" prefHeight="600"
             style="-fx-background-color: linear-gradient(to bottom, #eef3f9, #dbe5f1);">
 
-    <VBox spacing="20" alignment="TOP_CENTER"
+    <VBox spacing="15" alignment="TOP_CENTER"
           AnchorPane.topAnchor="20" AnchorPane.leftAnchor="20"
           AnchorPane.rightAnchor="20" AnchorPane.bottomAnchor="20"
           style="-fx-padding: 20;">
@@ -23,6 +23,16 @@
                            -fx-font-size: 14px; -fx-background-radius: 5; -fx-cursor: hand;"/>
             <Label text="Admin Transaction Management"
                    style="-fx-font-size: 22px; -fx-font-weight: bold; -fx-text-fill: white;"/>
+        </HBox>
+
+        <HBox spacing="10" alignment="CENTER_LEFT"
+              style="-fx-padding: 10; -fx-background-color: #f4f7fb; -fx-background-radius: 8;">
+            <TextField fx:id="searchUserField" promptText="Search by User Name" prefWidth="200"/>
+            <ComboBox fx:id="methodFilterCombo" prefWidth="180"/>
+            <TextField fx:id="keywordSearchField" promptText="Search by Food Item" prefWidth="200"/>
+            <Button fx:id="searchButton" text="Search"
+                    style="-fx-background-color: #0077cc; -fx-text-fill: white;
+                           -fx-background-radius: 5; -fx-cursor: hand;"/>
         </HBox>
 
         <TableView fx:id="transactionsTable" prefHeight="500" prefWidth="900"

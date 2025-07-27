@@ -104,7 +104,7 @@ public class UpdateCouponController {
                         if (status == 200) {
                             Platform.runLater(() -> {
                                 showAlert(AlertType.INFORMATION, "Success", "Coupon updated successfully!");
-                                SceneNavigator.switchTo("/frontend/allCoupons.fxml", codeField);
+                                SceneNavigator.switchTo("/frontEnd/allCoupons.fxml", codeField);
                             });
                         } else if (status == 403) {
                             showAlert(AlertType.ERROR, "Duplicate Coupon", "This coupon code already exists.");
@@ -124,7 +124,7 @@ public class UpdateCouponController {
 
     @FXML
     private void handleCancel() {
-        SceneNavigator.switchTo("/frontend/allCoupons.fxml", codeField);
+        SceneNavigator.switchTo("/frontEnd/allCoupons.fxml", codeField);
     }
 
     private void showAlert(AlertType type, String title, String message) {

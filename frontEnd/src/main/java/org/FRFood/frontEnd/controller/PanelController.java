@@ -70,31 +70,31 @@ public class PanelController {
     }
 
     private void handleTopOffers() {
-        SceneNavigator.switchTo("/frontend/topOffers.fxml",restaurantButton);
+        SceneNavigator.switchTo("/frontEnd/topOffers.fxml",restaurantButton);
     }
 
     private void handleCouponsButton() {
-        SceneNavigator.switchTo("/frontend/allCoupons.fxml",restaurantButton);
+        SceneNavigator.switchTo("/frontEnd/allCoupons.fxml",restaurantButton);
     }
 
     private void adminOrderButtonClick() {
         OrderHistoryController.setMode(5);
-        SceneNavigator.switchTo("/frontend/orderHistory.fxml",restaurantButton);
+        SceneNavigator.switchTo("/frontEnd/orderHistory.fxml",restaurantButton);
     }
 
     private void handleDeliveriesHistory() {
         OrderHistoryController.setMode(4);
-        SceneNavigator.switchTo("/frontend/orderHistory.fxml",restaurantButton);
+        SceneNavigator.switchTo("/frontEnd/orderHistory.fxml",restaurantButton);
     }
 
     private void handleActiveOrders() {
         OrderHistoryController.setMode(3);
-        SceneNavigator.switchTo("/frontend/orderHistory.fxml",restaurantButton);
+        SceneNavigator.switchTo("/frontEnd/orderHistory.fxml",restaurantButton);
     }
 
     private void handleDeliveriesButton() {
         OrderHistoryController.setMode(2);
-        SceneNavigator.switchTo("/frontend/orderHistory.fxml",restaurantButton);
+        SceneNavigator.switchTo("/frontEnd/orderHistory.fxml",restaurantButton);
     }
 
     private void setRoleBasedButtons() {
@@ -143,41 +143,41 @@ public class PanelController {
     }
 
     private void handleCreateRestaurant() {
-        SceneNavigator.switchTo("/frontend/createRestaurant.fxml", addRestaurantButton);
+        SceneNavigator.switchTo("/frontEnd/createRestaurant.fxml", addRestaurantButton);
     }
 
     private void handleLogout() {
         SessionManager.logout();
-        SceneNavigator.switchTo("/frontend/home.fxml", logoutButton);
+        SceneNavigator.switchTo("/frontEnd/home.fxml", logoutButton);
     }
 
     private void handleOrders() {
-        SceneNavigator.switchTo("/fxml/buyerOrderPage.fxml", orderFoodButton);
+        SceneNavigator.switchTo("/frontEnd/buyerOrderPage.fxml", orderFoodButton);
     }
 
     private void handleFavorites() {
         AllRestaurantsController.setMode(2);
-        SceneNavigator.switchTo("/fxml/allRestaurants.fxml", favoriteRestaurantsButton);
+        SceneNavigator.switchTo("/frontEnd/allRestaurants.fxml", favoriteRestaurantsButton);
         System.out.println("Navigated to Favorite Restaurants");
     }
 
     private void handleWallet() {
-        SceneNavigator.switchTo("/fxml/wallet.fxml", walletButton);
+        SceneNavigator.switchTo("/frontEnd/wallet.fxml", walletButton);
     }
 
     private void handleProfile() {
-        SceneNavigator.switchTo("/frontend/profile.fxml", profileButton);
+        SceneNavigator.switchTo("/frontEnd/profile.fxml", profileButton);
     }
 
     private void handleRestaurants() {
-        SceneNavigator.switchTo("/frontend/myRestaurants.fxml", restaurantButton);
+        SceneNavigator.switchTo("/frontEnd/myRestaurants.fxml", restaurantButton);
     }
 
     private void handleTransactions() {
-        SceneNavigator.switchTo("/fxml/adminTransactions.fxml", transactionsButton);
+        SceneNavigator.switchTo("/frontEnd/adminTransactions.fxml", transactionsButton);
     }
 
     private void handleAllUsers() {
-        SceneNavigator.switchTo("/fxml/allUsers.fxml", usersButton);
+        SceneNavigator.switchTo("/frontEnd/allUsers.fxml", usersButton);
     }
 }

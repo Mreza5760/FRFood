@@ -177,12 +177,12 @@ public class CartController {
 
     private void handleOrder(Restaurant r) {
         RestaurantOrdersController.setRestaurant(r);
-        SceneNavigator.switchTo("/frontend/restaurantOrders.fxml", restaurantList);
+        SceneNavigator.switchTo("/frontEnd/restaurantOrders.fxml", restaurantList);
     }
 
     private void handleClick(Restaurant r,Order theOrder) {
         PayOrderController controller = SceneNavigator.switchToWithController(
-                "/frontend/payOrder.fxml",
+                "/frontEnd/payOrder.fxml",
                 restaurantList,
                 PayOrderController.class
         );
@@ -194,7 +194,7 @@ public class CartController {
     }
 
     private void handleUpdate(Restaurant r) {
-        FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/updateRestaurant.fxml"));
+        FXMLLoader loader = new FXMLLoader(getClass().getResource("/frontEnd/updateRestaurant.fxml"));
         try {
             Parent root = loader.load();
 
@@ -225,7 +225,7 @@ public class CartController {
 
     @FXML
     private void goBack() {
-        SceneNavigator.switchTo("/frontend/buyerOrderPage.fxml", restaurantList);
+        SceneNavigator.switchTo("/frontEnd/buyerOrderPage.fxml", restaurantList);
     }
 
     private void handleDelete(Restaurant r) {

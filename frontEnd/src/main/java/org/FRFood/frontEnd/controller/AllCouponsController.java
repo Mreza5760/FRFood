@@ -107,7 +107,7 @@ public class AllCouponsController {
 
     private void handleCardClick(Coupon coupon) {
         UpdateCouponController controller = SceneNavigator.switchToWithController(
-                "/frontend/updateCoupon.fxml",
+                "/frontEnd/updateCoupon.fxml",
                 backButton,
                 UpdateCouponController.class
         );
@@ -157,10 +157,10 @@ public class AllCouponsController {
 
     @FXML
     private void handleBack() {
-        SceneNavigator.switchTo("/frontend/panel.fxml",backButton);
+        SceneNavigator.switchTo("/frontEnd/panel.fxml",backButton);
     }
 
     public void handleAddCoupon(ActionEvent actionEvent) {
-        SceneNavigator.switchTo("/frontend/createCoupon.fxml",backButton);
+        SceneNavigator.switchTo("/frontEnd/createCoupon.fxml",backButton);
     }
 }

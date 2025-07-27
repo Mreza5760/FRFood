@@ -140,13 +140,13 @@ public class PayOrderController {
 
     public void handleBack() {
         if (mode == 2) {
-            SceneNavigator.switchTo("/frontend/orderHistory.fxml", payCardButton);
+            SceneNavigator.switchTo("/frontEnd/orderHistory.fxml", payCardButton);
         } else if (mode == 1) {
-            SceneNavigator.switchTo("/frontend/cart.fxml", payCardButton);
+            SceneNavigator.switchTo("/frontEnd/cart.fxml", payCardButton);
         } else if (mode == 3) {
-            SceneNavigator.switchTo("/frontend/restaurantOrders.fxml", payWalletButton);
+            SceneNavigator.switchTo("/frontEnd/restaurantOrders.fxml", payWalletButton);
         } else if (mode == 4) {
-            SceneNavigator.switchTo("/frontend/orderHistory.fxml", payWalletButton);
+            SceneNavigator.switchTo("/frontEnd/orderHistory.fxml", payWalletButton);
         }
     }
 
@@ -254,7 +254,7 @@ public class PayOrderController {
 
     public void handleAddRating(ActionEvent actionEvent) {
         AddRatingController.setOrderId(currentOrder.getId());
-        SceneNavigator.switchTo("/frontend/addRating.fxml", payWalletButton);
+        SceneNavigator.switchTo("/frontEnd/addRating.fxml", payWalletButton);
     }
 
     private CompletableFuture<Boolean> isOwnedByCurrentUser(int orderId) {

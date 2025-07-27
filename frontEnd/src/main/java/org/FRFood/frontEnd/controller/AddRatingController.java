@@ -153,7 +153,7 @@ public class AddRatingController {
             if (code == 200 || code == 201) {
                 Platform.runLater(() -> {
                     showAlert(Alert.AlertType.INFORMATION, "Success", "Review submitted!");
-                    SceneNavigator.switchTo("/frontend/orderHistory.fxml", imagePreviewPane);
+                    SceneNavigator.switchTo("/frontEnd/orderHistory.fxml", imagePreviewPane);
                 });
             } else {
                 showAlert(Alert.AlertType.ERROR, "Error", "Failed. Code: " + code);
@@ -176,6 +176,6 @@ public class AddRatingController {
     }
 
     public void handleBack(javafx.event.ActionEvent event) {
-        SceneNavigator.switchTo("/frontend/orderHistory.fxml", imagePreviewPane);
+        SceneNavigator.switchTo("/frontEnd/orderHistory.fxml", imagePreviewPane);
     }
 }

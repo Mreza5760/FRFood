@@ -10,15 +10,15 @@ public class topOffersController {
 
     public void bestFoodsHandler(ActionEvent actionEvent) {
         MenuController.setData("Top Foods",new Restaurant(),2);
-        SceneNavigator.switchTo("/frontend/menu.fxml",foodsButton);
+        SceneNavigator.switchTo("/frontEnd/menu.fxml",foodsButton);
     }
 
     public void bestRestaurantsHandler(ActionEvent actionEvent) {
         AllRestaurantsController.setMode(3);
-        SceneNavigator.switchTo("/frontend/allRestaurants.fxml",foodsButton);
+        SceneNavigator.switchTo("/frontEnd/allRestaurants.fxml",foodsButton);
     }
 
     public void handleCancel(ActionEvent actionEvent) {
-        SceneNavigator.switchTo("/frontend/panel.fxml",foodsButton);
+        SceneNavigator.switchTo("/frontEnd/panel.fxml",foodsButton);
     }
 }

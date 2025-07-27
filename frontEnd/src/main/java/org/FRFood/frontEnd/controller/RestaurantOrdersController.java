@@ -13,8 +13,6 @@ import org.FRFood.frontEnd.Util.SessionManager;
 
 import java.net.HttpURLConnection;
 import java.net.URL;
-import java.net.URLEncoder;
-import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.List;
 
@@ -114,7 +112,7 @@ public class RestaurantOrdersController {
 
     private void handleOrderClick(Order order) {
         PayOrderController controller = SceneNavigator.switchToWithController(
-                "/frontend/payOrder.fxml",
+                "/frontEnd/payOrder.fxml",
                 ordersContainer,
                 PayOrderController.class
         );
@@ -128,7 +126,7 @@ public class RestaurantOrdersController {
 
     @FXML
     private void handleBack(ActionEvent event) {
-        SceneNavigator.switchTo("/frontend/MyRestaurants.fxml", ordersContainer);
+        SceneNavigator.switchTo("/frontEnd/MyRestaurants.fxml", ordersContainer);
     }
 
     public void handleSearch(ActionEvent actionEvent) {

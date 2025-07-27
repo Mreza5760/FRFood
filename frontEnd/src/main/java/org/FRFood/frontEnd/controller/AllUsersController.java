@@ -49,7 +49,7 @@ public class AllUsersController {
 
         loadUsers();
 
-        backButton.setOnAction(e -> SceneNavigator.switchTo("/frontend/panel.fxml", backButton));
+        backButton.setOnAction(e -> SceneNavigator.switchTo("/frontEnd/panel.fxml", backButton));
     }
 
     private void setupConfirmedColumn() {

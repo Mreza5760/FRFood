@@ -66,11 +66,11 @@ public class RestaurantController {
             addMenuButton.setVisible(false);
             addMenuButton.setManaged(false);
             backButton.setOnAction((event) -> {
-                SceneNavigator.switchTo("/frontend/allRestaurants.fxml", restaurant_name_label);
+                SceneNavigator.switchTo("/frontEnd/allRestaurants.fxml", restaurant_name_label);
             });
         } else {
             backButton.setOnAction((event) -> {
-                SceneNavigator.switchTo("/frontend/myRestaurants.fxml", restaurant_name_label);
+                SceneNavigator.switchTo("/frontEnd/myRestaurants.fxml", restaurant_name_label);
             });
         }
         fetchMenus();
@@ -191,7 +191,7 @@ public class RestaurantController {
 
     private void handleClick(Menu menu) {
         MenuController.setData(menu.getTitle(), restaurant,1);
-        SceneNavigator.switchTo("/frontend/menu.fxml", restaurant_name_label);
+        SceneNavigator.switchTo("/frontEnd/menu.fxml", restaurant_name_label);
     }
 
     private void handleDelete(Menu menu) {
@@ -231,7 +231,7 @@ public class RestaurantController {
 
     public void addFood(ActionEvent actionEvent) {
         CreteFoodController.setRestaurantId(restaurant.getId());
-        SceneNavigator.switchTo("/frontend/createFood.fxml", restaurant_name_label);
+        SceneNavigator.switchTo("/frontEnd/createFood.fxml", restaurant_name_label);
     }
 
     public void submitMenu(ActionEvent actionEvent) {
@@ -274,6 +274,6 @@ public class RestaurantController {
 
     public void viewFoods(ActionEvent actionEvent) {
         AllFoodsController.setData(restaurant.getId(), restaurantName,1,null);
-        SceneNavigator.switchTo("/frontend/allFoods.fxml", restaurant_name_label);
+        SceneNavigator.switchTo("/frontEnd/allFoods.fxml", restaurant_name_label);
     }
 }

@@ -80,7 +80,7 @@ public class LoginController {
                         alert.setHeaderText(null);
                         alert.setContentText("Welcome, " + currentUser.getFullName() + "!");
                         alert.showAndWait();
-                        SceneNavigator.switchTo("/frontend/panel.fxml", messageLabel);
+                        SceneNavigator.switchTo("/frontEnd/panel.fxml", messageLabel);
                     });
 
                 } else {
@@ -111,6 +111,6 @@ public class LoginController {
 
     @FXML
     private void goToSignUp() {
-        SceneNavigator.switchTo("/frontend/signup.fxml", messageLabel);
+        SceneNavigator.switchTo("/frontEnd/signup.fxml", messageLabel);
     }
 }

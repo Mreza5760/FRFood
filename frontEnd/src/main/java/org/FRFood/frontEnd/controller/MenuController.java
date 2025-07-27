@@ -28,7 +28,6 @@ import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.nio.charset.StandardCharsets;
-import java.sql.SQLException;
 import java.util.Base64;
 import java.util.List;
 import java.util.Map;
@@ -58,15 +57,15 @@ public class MenuController {
     @FXML
     public void goBack(ActionEvent actionEvent) {
         if (mode == 2) {
-            SceneNavigator.switchTo("/frontend/topOffers.fxml", menu_name_label);
+            SceneNavigator.switchTo("/frontEnd/topOffers.fxml", menu_name_label);
         }else{
-        SceneNavigator.switchTo("/frontend/restaurant.fxml", menu_name_label);}
+        SceneNavigator.switchTo("/frontEnd/restaurant.fxml", menu_name_label);}
     }
 
     @FXML
     public void addFood(ActionEvent actionEvent) {
         AddFoodToMenuController.setData(menuTitle, restaurant.getId());
-        SceneNavigator.switchTo("/frontend/addFoodToMenu.fxml", menu_name_label);
+        SceneNavigator.switchTo("/frontEnd/addFoodToMenu.fxml", menu_name_label);
     }
 
     @FXML
@@ -323,7 +322,7 @@ public class MenuController {
 
     private void handleClick(Food food) {
         FoodDetailsController.setItemId(food.getId());
-        SceneNavigator.switchTo("/frontend/FoodDetail.fxml", menu_name_label);
+        SceneNavigator.switchTo("/frontEnd/FoodDetail.fxml", menu_name_label);
     }
 
     private void handleDelete(Food food) {

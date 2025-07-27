@@ -97,7 +97,7 @@ public class CreateCouponController {
                         if (status == 200 || status == 201) {
                             Platform.runLater(() -> {
                                 showAlert(AlertType.INFORMATION, "Success", "Coupon created successfully!");
-                                SceneNavigator.switchTo("/frontend/allCoupons.fxml", codeField);
+                                SceneNavigator.switchTo("/frontEnd/allCoupons.fxml", codeField);
                             });
                         } else if (status == 403) {
                             showAlert(AlertType.ERROR, "Duplicate Coupon", "This coupon code already exists.");
@@ -117,7 +117,7 @@ public class CreateCouponController {
 
     @FXML
     private void handleBack() {
-        SceneNavigator.switchTo("/frontend/allCoupons.fxml", codeField);
+        SceneNavigator.switchTo("/frontEnd/allCoupons.fxml", codeField);
     }
 
     private void showAlert(AlertType type, String title, String message) {

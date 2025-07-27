@@ -55,7 +55,7 @@ public class AllFoodsController {
 
     @FXML
     public void goBack(ActionEvent actionEvent) {
-        SceneNavigator.switchTo("/frontend/restaurant.fxml", foodList);
+        SceneNavigator.switchTo("/frontEnd/restaurant.fxml", foodList);
     }
 
     @FXML
@@ -231,7 +231,7 @@ public class AllFoodsController {
     }
 
     private void handleEdit(Food food) {
-        FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/updateFood.fxml"));
+        FXMLLoader loader = new FXMLLoader(getClass().getResource("/frontEnd/updateFood.fxml"));
         try {
             Parent root = loader.load();
 

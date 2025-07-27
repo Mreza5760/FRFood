@@ -234,7 +234,7 @@ public class OrderHistoryController {
 
     private void handleClick(Restaurant r, Order theOrder) {
         PayOrderController controller = SceneNavigator.switchToWithController(
-                "/frontend/payOrder.fxml",
+                "/frontEnd/payOrder.fxml",
                 restaurantList,
                 PayOrderController.class
         );
@@ -253,9 +253,9 @@ public class OrderHistoryController {
     @FXML
     private void goBack() {
         if (mode == 2 || mode == 3 || mode == 4 || mode == 5) {
-            SceneNavigator.switchTo("/frontend/panel.fxml", restaurantList);
+            SceneNavigator.switchTo("/frontEnd/panel.fxml", restaurantList);
         } else {
-            SceneNavigator.switchTo("/frontend/buyerOrderPage.fxml", restaurantList);
+            SceneNavigator.switchTo("/frontEnd/buyerOrderPage.fxml", restaurantList);
         }
     }
 

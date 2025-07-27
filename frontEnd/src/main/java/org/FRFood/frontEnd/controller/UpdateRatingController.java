@@ -169,7 +169,7 @@ public class UpdateRatingController {
             if (code == 200 || code == 204) {
                 Platform.runLater(() -> {
                     showAlert(Alert.AlertType.INFORMATION, "Success", "Review updated!");
-                    SceneNavigator.switchTo("/frontend/foodDetail.fxml", commentArea);
+                    SceneNavigator.switchTo("/frontEnd/foodDetail.fxml", commentArea);
                 });
             } else {
                 showAlert(Alert.AlertType.ERROR, "Error", "Update failed. Code: " + code);
@@ -182,7 +182,7 @@ public class UpdateRatingController {
 
     @FXML
     private void handleCancel() {
-        SceneNavigator.switchTo("/frontend/foodDetail.fxml", commentArea);
+        SceneNavigator.switchTo("/frontEnd/foodDetail.fxml", commentArea);
     }
 
     private void showAlert(Alert.AlertType type, String title, String message) {

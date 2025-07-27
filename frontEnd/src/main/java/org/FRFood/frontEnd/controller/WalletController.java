@@ -50,7 +50,7 @@ public class WalletController {
     }
 
     private void handleBack() {
-        SceneNavigator.switchTo("/frontend/panel.fxml",backButton);
+        SceneNavigator.switchTo("/frontEnd/panel.fxml",backButton);
     }
 
     private void loadWalletBalance() {
@@ -124,7 +124,7 @@ public class WalletController {
     }
 
     private void handleHistory() {
-        SceneNavigator.switchTo("/frontend/transactions.fxml",historyButton);
+        SceneNavigator.switchTo("/frontEnd/transactions.fxml",historyButton);
         System.out.println("Navigate to history");
     }
 

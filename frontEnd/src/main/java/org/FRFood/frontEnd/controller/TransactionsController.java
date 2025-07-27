@@ -116,7 +116,7 @@ public class TransactionsController {
 
         loadTransactions();
 
-        backButton.setOnAction(e -> SceneNavigator.switchTo("/frontend/wallet.fxml", backButton));
+        backButton.setOnAction(e -> SceneNavigator.switchTo("/frontEnd/wallet.fxml", backButton));
     }
 
     private void loadTransactions() {

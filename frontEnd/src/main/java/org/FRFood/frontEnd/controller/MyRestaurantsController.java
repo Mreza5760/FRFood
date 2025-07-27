@@ -165,12 +165,12 @@ public class MyRestaurantsController {
 
     private void handleOrder(Restaurant r) {
         RestaurantOrdersController.setRestaurant(r);
-        SceneNavigator.switchTo("/frontend/restaurantOrders.fxml",restaurantList);
+        SceneNavigator.switchTo("/frontEnd/restaurantOrders.fxml",restaurantList);
     }
 
     private void handleClick(Restaurant r) {
         RestaurantController.setValues(r);
-        FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/restaurant.fxml"));
+        FXMLLoader loader = new FXMLLoader(getClass().getResource("/frontEnd/restaurant.fxml"));
         try {
             Parent root = loader.load();
 
@@ -187,7 +187,7 @@ public class MyRestaurantsController {
     }
 
     private void handleUpdate(Restaurant r) {
-        FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/updateRestaurant.fxml"));
+        FXMLLoader loader = new FXMLLoader(getClass().getResource("/frontEnd/updateRestaurant.fxml"));
         try {
             Parent root = loader.load();
 
@@ -218,7 +218,7 @@ public class MyRestaurantsController {
 
     @FXML
     private void goBack() {
-        SceneNavigator.switchTo("/frontend/panel.fxml", restaurantList);
+        SceneNavigator.switchTo("/frontEnd/panel.fxml", restaurantList);
     }
 
     private void handleDelete(Restaurant r) {

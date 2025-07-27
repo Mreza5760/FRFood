@@ -19,9 +19,9 @@ public class App extends Application {
         SessionManager.loadSession();
         FXMLLoader loader = null;
         if (SessionManager.isLoggedIn()) {
-            loader = new FXMLLoader(getClass().getResource("/fxml/panel.fxml"));
+            loader = new FXMLLoader(getClass().getResource("/frontEnd/panel.fxml"));
         } else {
-            loader = new FXMLLoader(getClass().getResource("/fxml/home.fxml"));
+            loader = new FXMLLoader(getClass().getResource("/frontEnd/home.fxml"));
         }
         Scene scene = new Scene(loader.load(), 900, 700);
 

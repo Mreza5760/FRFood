@@ -51,7 +51,7 @@ public class AddFoodToMenuController {
 
     @FXML
     public void goBack(ActionEvent actionEvent) {
-        SceneNavigator.switchTo("/frontend/menu.fxml", menu_name_label);
+        SceneNavigator.switchTo("/frontEnd/menu.fxml", menu_name_label);
     }
 
     @FXML
