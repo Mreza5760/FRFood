@@ -7,7 +7,7 @@
 <AnchorPane xmlns="http://javafx.com/javafx/20.0.2"
             xmlns:fx="http://javafx.com/fxml/1"
             fx:controller="org.FRFood.frontEnd.controller.AdminTransactionsController"
-            prefWidth="900" prefHeight="600"
+            prefWidth="950" prefHeight="600"
             style="-fx-background-color: linear-gradient(to bottom, #eef3f9, #dbe5f1);">
 
     <VBox spacing="20" alignment="TOP_CENTER"
@@ -25,14 +25,15 @@
                    style="-fx-font-size: 22px; -fx-font-weight: bold; -fx-text-fill: white;"/>
         </HBox>
 
-        <TableView fx:id="transactionsTable" prefHeight="500" prefWidth="850"
+        <TableView fx:id="transactionsTable" prefHeight="500" prefWidth="900"
                    style="-fx-background-color: white; -fx-border-color: #ccc; -fx-border-radius: 8; -fx-background-radius: 8;">
             <columns>
-                <TableColumn fx:id="idColumn" text="TransactionID" prefWidth="150"/>
-                <TableColumn fx:id="orderIdColumn" text="OrderID / Type" prefWidth="150"/>
-                <TableColumn fx:id="userIdColumn" text="UserID" prefWidth="150"/>
-                <TableColumn fx:id="methodColumn" text="Method" prefWidth="150"/>
-                <TableColumn fx:id="amountColumn" text="Amount" prefWidth="150"/>
+                <TableColumn fx:id="idColumn" text="TransactionID" prefWidth="120"/>
+                <TableColumn fx:id="orderIdColumn" text="OrderID / Type" prefWidth="140"/>
+                <TableColumn fx:id="userIdColumn" text="UserID" prefWidth="100"/>
+                <TableColumn fx:id="methodColumn" text="Method" prefWidth="120"/>
+                <TableColumn fx:id="amountColumn" text="Amount" prefWidth="120"/>
+                <TableColumn fx:id="payedAtColumn" text="Paid At" prefWidth="250"/>
             </columns>
         </TableView>
     </VBox>

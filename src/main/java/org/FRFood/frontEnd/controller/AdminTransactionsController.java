@@ -18,6 +18,8 @@ import org.FRFood.frontEnd.Util.SessionManager;
 import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 public class AdminTransactionsController {
@@ -28,6 +30,7 @@ public class AdminTransactionsController {
     @FXML private TableColumn<Transaction, Integer> userIdColumn;
     @FXML private TableColumn<Transaction, String> methodColumn;
     @FXML private TableColumn<Transaction, Integer> amountColumn;
+    @FXML private TableColumn<Transaction, String> payedAtColumn;
     @FXML private Button backButton;
 
     private final String token = SessionManager.getAuthToken();
@@ -39,6 +42,7 @@ public class AdminTransactionsController {
         methodColumn.setCellValueFactory(new PropertyValueFactory<>("method"));
         amountColumn.setCellValueFactory(new PropertyValueFactory<>("amount"));
         orderIdColumn.setCellValueFactory(new PropertyValueFactory<>("orderID"));
+        payedAtColumn.setCellValueFactory(new PropertyValueFactory<>("payedAt"));
 
         orderIdColumn.setCellFactory(column -> new TableCell<>() {
             @Override
@@ -60,6 +64,28 @@ public class AdminTransactionsController {
                         }
                     } else {
                         setText(orderId.toString());
+                    }
+                }
+            }
+        });
+
+        payedAtColumn.setCellFactory(column -> new TableCell<>() {
+            private final DateTimeFormatter inputFormatter =
+                    DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+            private final DateTimeFormatter outputFormatter =
+                    DateTimeFormatter.ofPattern("dd MMM yyyy, HH:mm");
+
+            @Override
+            protected void updateItem(String item, boolean empty) {
+                super.updateItem(item, empty);
+                if (empty || item == null || item.isBlank()) {
+                    setText(null);
+                } else {
+                    try {
+                        LocalDateTime dateTime = LocalDateTime.parse(item, inputFormatter);
+                        setText(dateTime.format(outputFormatter));
+                    } catch (Exception e) {
+                        setText(item);
                     }
                 }
             }

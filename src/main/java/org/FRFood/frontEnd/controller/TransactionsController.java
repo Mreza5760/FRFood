@@ -40,7 +40,6 @@ public class TransactionsController {
         amountColumn.setCellValueFactory(new PropertyValueFactory<>("amount"));
         payedAtColumn.setCellValueFactory(new PropertyValueFactory<>("payedAt"));
 
-        // Order/Type column logic (Deposit, Withdraw, Wallet Update, or order ID)
         orderIdColumn.setCellFactory(new Callback<>() {
             @Override
             public TableCell<Transaction, Integer> call(TableColumn<Transaction, Integer> param) {
@@ -71,7 +70,6 @@ public class TransactionsController {
             }
         });
 
-        // PayedAt column (format SQL datetime -> human readable)
         payedAtColumn.setCellFactory(new Callback<>() {
             @Override
             public TableCell<Transaction, String> call(TableColumn<Transaction, String> param) {
@@ -89,9 +87,9 @@ public class TransactionsController {
                         } else {
                             try {
                                 LocalDateTime dateTime = LocalDateTime.parse(item, inputFormatter);
-                                setText(dateTime.format(outputFormatter)); // e.g., "26 Jul 2025, 14:30"
+                                setText(dateTime.format(outputFormatter));
                             } catch (Exception e) {
-                                setText(item); // fallback: raw string if parsing fails
+                                setText(item);
                             }
                         }
                     }
@@ -99,7 +97,6 @@ public class TransactionsController {
             }
         });
 
-        // Absolute amount values (remove minus sign)
         amountColumn.setCellFactory(new Callback<>() {
             @Override
             public TableCell<Transaction, Integer> call(TableColumn<Transaction, Integer> param) {
