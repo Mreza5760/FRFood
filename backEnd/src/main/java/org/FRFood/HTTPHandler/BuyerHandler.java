@@ -160,10 +160,43 @@ public class BuyerHandler implements HttpHandler {
         ItemsReq req = objectMapper.readValue(exchange.getRequestBody(), ItemsReq.class);
 
         try {
+            List<Rate> rates = rateDAO.getAllRates();
             List<Food> foodsFiltered = new ArrayList<>();
             List<Food> foods = foodDAO.searchFood(req.search);
             for (Food food : foods) {
-                if ((req.keywords == null || foodDAO.doesHaveKeywords(req.keywords, food.getId())) && (req.minPrice <= food.getPrice() && food.getPrice() <= req.maxPrice)) {
+                List<Rate> foodRates = new ArrayList<>();
+                for (Rate rate : rates) {
+                    Optional<Order> optionalOrder = orderDAO.getById(rate.getOrderId());
+                    if (optionalOrder.isEmpty()) {
+                        HttpError.notFound(exchange, "Order not found");
+                        return;
+                    }
+                    Order order = optionalOrder.get();
+                    boolean found = false;
+                    for (OrderItem orderItem : order.getItems()) {
+                        Optional<Food> optionalTempFood = foodDAO.getById(orderItem.getItemId());
+                        if (optionalTempFood.isEmpty()) {
+                            HttpError.notFound(exchange, "Food not found");
+                            return;
+                        }
+                        Food tempFood = optionalTempFood.get();
+                        if (tempFood.getId().equals(food.getId())) {
+                            found = true;
+                            break;
+                        }
+                    }
+                    if (found) {
+                        foodRates.add(rate);
+                    }
+                }
+
+                double foodRate = 0;
+                for (Rate rate : foodRates)
+                    foodRate += rate.getRating();
+                if (!rates.isEmpty())
+                    foodRate /= rates.size();
+
+                if ((req.keywords == null || foodDAO.doesHaveKeywords(req.keywords, food.getId())) && (req.minPrice <= food.getPrice() && food.getPrice() <= req.maxPrice) && (req.minRate <= foodRate && foodRate <= req.maxRate)) {
                     foodsFiltered.add(food);
                 }
             }
@@ -439,7 +472,7 @@ public class BuyerHandler implements HttpHandler {
                 }
             }
 
-            int avg = 0;
+            double avg = 0;
             for (Rate rate : foodRates)
                 avg += rate.getRating();
             if (!rates.isEmpty())
