@@ -334,8 +334,10 @@ public class PayOrderController {
                         SessionManager.getOrderList().get(restaurant.getId()).setRawPrice(currentRawPrice - coupon.getValue());
                     }
                 } else {
+
                     SessionManager.getOrderList().get(restaurant.getId()).setRawPrice(currentRawPrice * (1 - coupon.getValue() / 100));
                 }
+                SessionManager.getOrderList().get(restaurant.getId()).setCouponId(coupon.getId());
                 SessionManager.getOrderList().get(restaurant.getId()).calculatePayPrice();
                 Platform.runLater(() ->
                         setOrder(SessionManager.getOrderList().get(restaurant.getId()), restaurant, 1));
