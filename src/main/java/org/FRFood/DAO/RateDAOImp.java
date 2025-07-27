@@ -70,7 +70,8 @@ public class RateDAOImp implements RateDAO {
                 PreparedStatement preparedStatement = connection.prepareStatement(sql);
                 ){
             preparedStatement.setInt(1, rate.getRating());
-            preparedStatement.setString(2,rate.getComment());
+            preparedStatement.setString(2, rate.getComment());
+            preparedStatement.setInt(3, id);
             int rows = preparedStatement.executeUpdate();
             if(rows == 0){
                 throw new SQLException("no rows changed !");
@@ -82,7 +83,7 @@ public class RateDAOImp implements RateDAO {
                 Connection connection = DBConnector.gConnection();
                 PreparedStatement stmt = connection.prepareStatement(deleteSql);
         ){
-            stmt.setInt(1,id);
+            stmt.setInt(1, id);
             stmt.executeUpdate();
         }
 
