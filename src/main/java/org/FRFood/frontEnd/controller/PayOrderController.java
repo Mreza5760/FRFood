@@ -24,7 +24,6 @@ import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.nio.charset.StandardCharsets;
 import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.atomic.AtomicReference;
 
 public class PayOrderController {
 
@@ -93,6 +92,7 @@ public class PayOrderController {
             finishButton.setManaged(true);
         }
         // Populate details
+        detailsBox.getChildren().clear();
         detailsBox.getChildren().addAll(
                 new Label("📍 Delivery Address: " + order.getDeliveryAddress()),
                 new Label("📍 Restaurant Address: " + restaurant.getAddress()),
@@ -112,6 +112,7 @@ public class PayOrderController {
         }
 
         // Populate order items
+        itemsBox.getChildren().clear();
         for (OrderItem item : order.getItems()) {
             Food food = fetchItemDetails(item.getItemId());
             String itemText = "🍔food Name:" + food.getName() + " | " + "quantity :" +
@@ -306,42 +307,44 @@ public class PayOrderController {
 
     public void handlevalidateToken(ActionEvent actionEvent) {
         String code = CouponCodeField.getText().trim();
-        new Thread(() -> {
-            try {
-                String temp = "http://localhost:8080/coupons?" +
-                        "coupon_code=" + code;
-                URL url = new URL(temp);
-                HttpURLConnection conn = (HttpURLConnection) url.openConnection();
-                conn.setRequestMethod("GET");
-                conn.setRequestProperty("Authorization", "Bearer " + SessionManager.getAuthToken());
-                conn.setRequestProperty("Content-Type", "application/json");
-                conn.setDoOutput(true);
 
-                int resCode = conn.getResponseCode();
+        try {
+            String temp = "http://localhost:8080/coupons?" +
+                    "coupon_code=" + code;
+            URL url = new URL(temp);
+            HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+            conn.setRequestMethod("GET");
+            conn.setRequestProperty("Authorization", "Bearer " + SessionManager.getAuthToken());
+            conn.setRequestProperty("Content-Type", "application/json");
+            conn.setDoOutput(true);
 
-                if (resCode >= 200 && resCode < 300) {
-                    ObjectMapper mapper = new ObjectMapper();
-                    Coupon coupon = mapper.readValue(conn.getInputStream(), Coupon.class);
-                    int currentRawPrice = SessionManager.getOrderList().get(restaurant.getId()).getRawPrice();
-                    if (coupon.getMinPrice() >= currentRawPrice) {
-                        showAlert("error", "you have to at least buy" + coupon.getMinPrice() + "to use this", Alert.AlertType.ERROR);
-                    }
-                    if (coupon.getType() == CouponType.fixed) {
-                        if (currentRawPrice - coupon.getValue() < 0) {
-                            SessionManager.getOrderList().get(restaurant.getId()).setRawPrice(0);
-                        } else {
-                            SessionManager.getOrderList().get(restaurant.getId()).setRawPrice(currentRawPrice - coupon.getValue());
-                        }
-                    } else {
-                        SessionManager.getOrderList().get(restaurant.getId()).setRawPrice(currentRawPrice * (1 - coupon.getValue() / 100));
-                    }
-                    Platform.runLater(() -> setOrder(SessionManager.getOrderList().get(restaurant.getId()), restaurant, 5));
-                } else {
-                    showAlert("error", conn.getResponseMessage(), Alert.AlertType.ERROR);
+            int resCode = conn.getResponseCode();
+
+            if (resCode >= 200 && resCode < 300) {
+                ObjectMapper mapper = new ObjectMapper();
+                Coupon coupon = mapper.readValue(conn.getInputStream(), Coupon.class);
+                int currentRawPrice = SessionManager.getOrderList().get(restaurant.getId()).getRawPrice();
+                if (coupon.getMinPrice() >= currentRawPrice) {
+                    showAlert("error", "you have to at least buy" + coupon.getMinPrice() + "to use this", Alert.AlertType.ERROR);
                 }
-            } catch (Exception e) {
-                e.printStackTrace();
+                if (coupon.getType() == CouponType.fixed) {
+                    if (currentRawPrice - coupon.getValue() < 0) {
+                        SessionManager.getOrderList().get(restaurant.getId()).setRawPrice(0);
+                    } else {
+                        SessionManager.getOrderList().get(restaurant.getId()).setRawPrice(currentRawPrice - coupon.getValue());
+                    }
+                } else {
+                    SessionManager.getOrderList().get(restaurant.getId()).setRawPrice(currentRawPrice * (1 - coupon.getValue() / 100));
+                }
+                SessionManager.getOrderList().get(restaurant.getId()).calculatePayPrice();
+                Platform.runLater(() ->
+                        setOrder(SessionManager.getOrderList().get(restaurant.getId()), restaurant, 1));
+            } else {
+                showAlert("error", conn.getResponseMessage(), Alert.AlertType.ERROR);
             }
-        }).start();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
     }
 }

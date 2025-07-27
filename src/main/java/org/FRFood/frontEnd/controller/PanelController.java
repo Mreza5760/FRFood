@@ -19,6 +19,8 @@ public class PanelController {
     @FXML
     public Button couponsButton;
     @FXML
+    public Button topOffers;
+    @FXML
     private Label welcomeLabel;
     @FXML
     private Button logoutButton;
@@ -61,12 +63,16 @@ public class PanelController {
         deliveriesButton.setOnAction(e -> handleDeliveriesButton());
         activeOrdersButton.setOnAction(e -> handleActiveOrders());
         deliveryHistoryButton.setOnAction(e -> handleDeliveriesHistory());
-
+        topOffers.setOnAction(e -> handleTopOffers());
         // Admin placeholders
         usersButton.setOnAction(e -> handleAllUsers());
         ordersButton.setOnAction(e -> adminOrderButtonClick());
         transactionsButton.setOnAction(e -> handleTransactions());
         couponsButton.setOnAction(e -> handleCouponsButton());
+    }
+
+    private void handleTopOffers() {
+        SceneNavigator.switchTo("/frontend/topOffers.fxml",restaurantButton);
     }
 
     private void handleCouponsButton() {
@@ -103,6 +109,8 @@ public class PanelController {
                 orderFoodButton.setManaged(true);
                 favoriteRestaurantsButton.setVisible(true);
                 favoriteRestaurantsButton.setManaged(true);
+                topOffers.setVisible(true);
+                topOffers.setManaged(true);
             }
             case seller -> {
                 restaurantButton.setVisible(true);

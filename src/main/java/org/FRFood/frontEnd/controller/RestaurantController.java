@@ -192,7 +192,7 @@ public class RestaurantController {
     }
 
     private void handleClick(Menu menu) {
-        MenuController.setData(menu.getTitle(), restaurant);
+        MenuController.setData(menu.getTitle(), restaurant,1);
         SceneNavigator.switchTo("/frontend/menu.fxml", restaurant_name_label);
     }
 

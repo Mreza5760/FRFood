@@ -57,7 +57,7 @@ public class AllRestaurantsController {
     @FXML
     public void initialize() {
         backButton.setOnAction(e -> goBack());
-        if (mode == 2) {
+        if (mode == 2 || mode == 3) {
             minPrice.setVisible(false);
             minPrice.setManaged(false);
             maxPrice.setVisible(false);
@@ -79,7 +79,14 @@ public class AllRestaurantsController {
     }
 
     void fetchRestaurants2() {
-        List<Restaurant> restaurants = getFavoriteRestaurants();
+        List<Restaurant> restaurants;
+        if (mode == 2) {
+            restaurants = getFavoriteRestaurants();
+        }else if(mode == 3){
+            restaurants = getBestRestaurants();
+        } else {
+            restaurants = null;
+        }
         Platform.runLater(() -> {
             restaurantList.getChildren().clear();
             for (Restaurant r : restaurants) {
@@ -233,8 +240,10 @@ public class AllRestaurantsController {
     private void goBack() {
         if (mode == 2)
             SceneNavigator.switchTo("/frontend/panel.fxml", backButton);
-        else
+        else if(mode ==1)
             SceneNavigator.switchTo("/frontend/buyerOrderPage.fxml", backButton);
+        else if(mode == 3)
+            SceneNavigator.switchTo("/frontend/topOffers.fxml", backButton);
     }
 
     private void handleSearch1() {
@@ -286,6 +295,32 @@ public class AllRestaurantsController {
         }
 
         return favoriteRestaurants;
+    }
+
+    private List<Restaurant> getBestRestaurants() {
+        List<Restaurant> bestRestaurants = new ArrayList<>();
+
+        HttpRequest request = HttpRequest.newBuilder()
+                .uri(URI.create("http://localhost:8080/top/restaurants"))
+                .header("Authorization", "Bearer " + SessionManager.getAuthToken())
+                .GET()
+                .build();
+
+        try {
+            HttpResponse<String> response = HttpClient.newHttpClient()
+                    .send(request, HttpResponse.BodyHandlers.ofString());
+
+            if (response.statusCode() == 200) {
+                bestRestaurants = mapper.readValue(response.body(), new TypeReference<List<Restaurant>>() {
+                });
+            } else {
+                System.err.println("Failed to fetch restaurants: HTTP " + response.statusCode());
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return bestRestaurants;
     }
 
     private void handleRemoveFromFavorites(Restaurant restaurant) {

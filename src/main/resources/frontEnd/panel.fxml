@@ -21,14 +21,19 @@
     <VBox spacing="15" alignment="CENTER" maxWidth="250">
 
         <!-- Buyer-only -->
-        <Button fx:id="orderFoodButton" text="Order Food"
-                visible="false" managed="false"
-                prefWidth="250" prefHeight="45"
-                style="-fx-background-color: #0077cc; -fx-text-fill: white; -fx-font-size: 16px; -fx-font-weight: bold; -fx-background-radius: 8;"/>
         <Button fx:id="favoriteRestaurantsButton" text="Favorite Restaurants"
                 visible="false" managed="false"
                 prefWidth="250" prefHeight="45"
                 style="-fx-background-color: #cc0077; -fx-text-fill: white; -fx-font-size: 16px; -fx-font-weight: bold; -fx-background-radius: 8;"/>
+
+        <Button fx:id="orderFoodButton" text="Order Food"
+                visible="false" managed="false"
+                prefWidth="250" prefHeight="45"
+                style="-fx-background-color: #0077cc; -fx-text-fill: white; -fx-font-size: 16px; -fx-font-weight: bold; -fx-background-radius: 8;"/>
+        <Button fx:id="topOffers" text="Top of FRfood"
+                visible="false" managed="false"
+                prefWidth="250" prefHeight="45"
+                style="-fx-background-color: #ff9900; -fx-text-fill: white; -fx-font-size: 16px; -fx-font-weight: bold; -fx-background-radius: 8;"/>
 
         <!-- Seller-only -->
         <Button fx:id="addRestaurantButton" text="Add Restaurant"

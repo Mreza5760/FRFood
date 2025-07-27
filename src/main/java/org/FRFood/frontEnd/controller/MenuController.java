@@ -48,16 +48,21 @@ public class MenuController {
     private static User currentUser;
     private static String menuTitle;
     private static Restaurant restaurant;
+    private static int mode;
     public Button addFoodsButton;
 
-    public static void setData(String menuTitle, Restaurant inRestaurant) {
+    public static void setData(String menuTitle, Restaurant inRestaurant, int inMode) {
         MenuController.menuTitle = menuTitle;
         MenuController.restaurant = inRestaurant;
+        MenuController.mode = inMode;
     }
 
     @FXML
     public void goBack(ActionEvent actionEvent) {
-        SceneNavigator.switchTo("/frontend/restaurant.fxml", menu_name_label);
+        if (mode == 2) {
+            SceneNavigator.switchTo("/frontend/topOffers.fxml", menu_name_label);
+        }else{
+        SceneNavigator.switchTo("/frontend/restaurant.fxml", menu_name_label);}
     }
 
     @FXML
@@ -79,7 +84,15 @@ public class MenuController {
     }
 
     private void fetchFoods() {
-        String safeUrl = "http://localhost:8080/restaurants/" + restaurant.getId() + "/items/" + URLEncoder.encode(menuTitle, StandardCharsets.UTF_8);
+        String safeUrl = "";
+        if (mode == 1) {
+            safeUrl = "http://localhost:8080/restaurants/" + restaurant.getId() + "/items/" + URLEncoder.encode(menuTitle, StandardCharsets.UTF_8);
+
+        }
+        if (mode == 2) {
+            safeUrl = "http://localhost:8080/top/foods";
+        }
+
         URI uri = URI.create(safeUrl);
         HttpRequest request = HttpRequest.newBuilder()
                 .uri(uri)
@@ -264,7 +277,7 @@ public class MenuController {
 
         order.setRawPrice(order.getRawPrice() - food.getPrice());
 
-        order.setPayPrice(order.getCourierFee() + order.getRawPrice() + order.getTaxFee() + order.getAdditionalFee());
+        order.calculatePayPrice();
 
         Platform.runLater(this::fetchFoods);
     }
@@ -304,7 +317,7 @@ public class MenuController {
 
         order.setRawPrice(order.getRawPrice() + food.getPrice());
 
-        order.setPayPrice(order.getCourierFee() + order.getRawPrice() + order.getTaxFee() + order.getAdditionalFee());
+        order.calculatePayPrice();
 
         Platform.runLater(this::fetchFoods);
 

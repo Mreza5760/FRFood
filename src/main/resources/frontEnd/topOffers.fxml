@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<StackPane xmlns="http://javafx.com/javafx"
+           xmlns:fx="http://javafx.com/fxml"
+           fx:controller="org.FRFood.frontEnd.controller.topOffersController"
+           style="-fx-background-color: linear-gradient(to bottom, #eef3f9, #dbe5f1);">
+
+    <!-- Centered Card -->
+    <VBox alignment="CENTER" spacing="25"
+          maxWidth="600" maxHeight="400"
+          style="-fx-background-color: white; -fx-padding: 30;
+                 -fx-background-radius: 15;
+                 -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.15), 15, 0, 0, 5);">
+
+        <HBox alignment="CENTER_LEFT" spacing="10" maxWidth="600">
+            <Button text="← Back"
+                    onAction="#handleCancel"
+                    style="-fx-background-color: #ff6666; -fx-text-fill: white; -fx-font-weight: bold; -fx-background-radius: 8;"/>
+        </HBox>
+
+        <Label text="FRFood App"
+               style="-fx-font-size: 36px; -fx-font-weight: bold; -fx-text-fill: #1e2a38;"/>
+
+        <Label text="See and choose the bests on FRfood"
+               style="-fx-font-size: 18px; -fx-text-fill: #4a5a6a;"/>
+
+        <HBox spacing="30" alignment="CENTER">
+            <Button fx:id="foodsButton" text="Best Foods"
+                    onAction="#bestFoodsHandler"
+                    prefWidth="140" prefHeight="45"
+                    style="-fx-background-color: #0077cc; -fx-text-fill: white;
+                           -fx-font-size: 15px; -fx-font-weight: bold;
+                           -fx-background-radius: 10;"/>
+
+            <Button fx:id="restaurantsButton" text="Best Restaurants"
+                    onAction="#bestRestaurantsHandler"
+                    prefWidth="140" prefHeight="45"
+                    style="-fx-background-color: #00aa88; -fx-text-fill: white;
+                           -fx-font-size: 15px; -fx-font-weight: bold;
+                           -fx-background-radius: 10;"/>
+        </HBox>
+    </VBox>
+</StackPane>

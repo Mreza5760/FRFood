@@ -97,6 +97,10 @@ public class Order {
         return additionalFee;
     }
 
+    public void calculatePayPrice() {
+        payPrice =  courierFee + taxFee + additionalFee + rawPrice;
+    }
+
     public void setAdditionalFee(Integer additionalFee) {
         this.additionalFee = additionalFee;
     }

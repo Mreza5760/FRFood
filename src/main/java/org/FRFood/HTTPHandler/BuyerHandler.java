@@ -65,8 +65,8 @@ public class BuyerHandler implements HttpHandler {
                     else if (path.matches("^/orders/\\d+$")) handleGetOrder(exchange);
                     else if (path.matches("^/ratings/\\d+$")) handleGetRate(exchange);
                     else if (path.equals("/coupons")) checkCoupon(exchange);
-                    else if (path.equals("top/restaurants")) topRestaurants(exchange);
-                    else if (path.equals("top/foods")) topFoods(exchange);
+                    else if (path.equals("/top/restaurants")) topRestaurants(exchange);
+                    else if (path.equals("/top/foods")) topFoods(exchange);
                     else HttpError.notFound(exchange, "Not Found");
                 }
                 case "PUT" -> {
