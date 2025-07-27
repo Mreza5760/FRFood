@@ -97,7 +97,7 @@ public class PayOrderController {
                 new Label("📍 Delivery Address: " + order.getDeliveryAddress()),
                 new Label("📍 Restaurant Address: " + restaurant.getAddress()),
                 new Label("📦 Status: " + order.getStatus()),
-                new Label("👤 Customer ID: " + order.getCustomerId()),
+                new Label("👤 Customer Name: " + getNameById(order.getCustomerId())),
                 new Label("🍽 Restaurant : " + restaurant.getName()),
                 new Label("🎟 Coupon ID: " + (order.getCouponId() != null ? order.getCouponId() : "None")),
                 new Label("💰 Raw Price: " + order.getRawPrice()),
@@ -109,6 +109,9 @@ public class PayOrderController {
 
         if (mode != 1) {
             detailsBox.getChildren().add(new Label("⏱ Created at: " + order.getCreatedAt()));
+        }
+        if(currentOrder.getStatus() == Status.completed||currentOrder.getStatus() == Status.onTheWay){
+            detailsBox.getChildren().add(new Label("⏱ Courier Name: " + getNameById(currentOrder.getCourierId())));
         }
 
         // Populate order items
@@ -304,6 +307,24 @@ public class PayOrderController {
         return null;
     }
 
+    private String getNameById(int userId){
+        try {
+            ObjectMapper mapper = new ObjectMapper();
+
+            URL url = new URL("http://localhost:8080/auth/name/" + userId);
+            HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+            conn.setRequestMethod("GET");
+            conn.setRequestProperty("Authorization", "Bearer " + SessionManager.getAuthToken());
+
+            InputStream is = conn.getInputStream();
+            JsonNode root = mapper.readTree(is);
+
+            return root.get("name").asText();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
 
     public void handlevalidateToken(ActionEvent actionEvent) {
         String code = CouponCodeField.getText().trim();

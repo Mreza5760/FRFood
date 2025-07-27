@@ -3,6 +3,8 @@ package org.FRFood.entity;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
+import java.util.Objects;
+
 public class Restaurant {
     private Integer id;
     @JsonIgnore
@@ -95,9 +97,14 @@ public class Restaurant {
 
     @Override
     public boolean equals(Object obj) {
-        if(!(obj instanceof Restaurant)) {
-            return false;
-        }
-        return this.getId().equals(((Restaurant)obj).getId());
+        if (this == obj) return true;
+        if (obj == null || getClass() != obj.getClass()) return false;
+        Restaurant restaurant = (Restaurant) obj;
+        return Objects.equals(id, restaurant.id);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id);
     }
 }
