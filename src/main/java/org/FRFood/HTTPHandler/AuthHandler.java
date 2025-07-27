@@ -45,6 +45,8 @@ public class AuthHandler implements HttpHandler {
                 case "GET" -> {
                     if (path.equals("/auth/profile")) {
                         handleGetProfile(exchange);
+                    } else if (path.matches("^/auth/name/\\d+$")) {
+                        handleGetName(exchange);
                     } else {
                         HttpError.notFound(exchange, "Not Found");
                     }
@@ -229,6 +231,27 @@ public class AuthHandler implements HttpHandler {
             HttpError.badRequest(exchange, "Invalid JSON input");
         } catch (SQLException e) {
             HttpError.internal(exchange, "Internal server error while updating profile");
+        }
+    }
+
+    private void handleGetName(HttpExchange exchange) throws IOException {
+        Optional<User> authenticatedUserOptional = authenticate(exchange);
+        if (authenticatedUserOptional.isEmpty()) return;
+        User user = authenticatedUserOptional.get();
+
+        String[] parts = exchange.getRequestURI().getPath().split("/");
+        int id = Integer.parseInt(parts[3]);
+
+        try {
+            Optional<User> optionalUser = userDAO.getById(id);
+            if (optionalUser.isEmpty()) {
+                HttpError.notFound(exchange, "User not found");
+                return;
+            }
+            User user2 = optionalUser.get();
+            JsonResponse.sendJsonResponse(exchange, 200, "{\"name\":\"" + user2.getFullName() + "\"}");
+        } catch (SQLException e) {
+            HttpError.internal(exchange, "Internal server error while retrieving user");
         }
     }
 }
