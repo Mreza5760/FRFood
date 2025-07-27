@@ -9,43 +9,57 @@
 <VBox xmlns="http://javafx.com/javafx"
       xmlns:fx="http://javafx.com/fxml"
       fx:controller="org.FRFood.frontEnd.controller.FoodDetailsController"
-      spacing="25"
-      alignment="TOP_CENTER"
-      style="-fx-background-color: linear-gradient(to bottom, #eef3f9, #dbe5f1);"
-      prefWidth="900" prefHeight="700">
+      spacing="30"
+      alignment="CENTER"
+      style="-fx-background-color: linear-gradient(to bottom, #f9fbfd, #e5edf7);"
+      prefWidth="1000" prefHeight="750">
 
     <padding>
-        <Insets top="40" left="50" right="50" bottom="40"/>
+        <Insets top="25" left="40" right="40" bottom="25"/>
     </padding>
 
-    <!-- Back button row -->
     <HBox alignment="TOP_LEFT" prefWidth="Infinity">
         <Button text="⬅ Back"
                 onAction="#handleBack"
-                style="-fx-background-color: #e74c3c; -fx-text-fill: white; -fx-font-size: 14px; -fx-font-weight: bold; -fx-background-radius: 8;"/>
-    </HBox>
-    <HBox prefWidth="Infinity">
-        <Label fx:id="itemNameLabel" style="-fx-font-size: 28px; -fx-font-weight: bold; -fx-text-fill: #1e2a38;"/>
-        <Label fx:id="itemAvgRating" style="-fx-font-size: 28px; -fx-font-weight: bold; -fx-text-fill: #1e2a38;"/>
+                style="-fx-background-color: #e74c3c; -fx-text-fill: white;
+                       -fx-font-size: 14px; -fx-font-weight: bold;
+                       -fx-background-radius: 8; -fx-cursor: hand;"/>
     </HBox>
 
+    <VBox spacing="25" alignment="CENTER">
+        <HBox spacing="15" alignment="CENTER">
+            <Label fx:id="itemNameLabel"
+                   style="-fx-font-size: 32px; -fx-font-weight: bold; -fx-text-fill: #2c3e50;"/>
+            <HBox spacing="5" alignment="CENTER_LEFT">
+                <Label text="★" style="-fx-font-size: 30px; -fx-text-fill: #f39c12;"/>
+                <Label fx:id="itemAvgRating"
+                       style="-fx-font-size: 28px; -fx-font-weight: bold; -fx-text-fill: #f39c12;"/>
+            </HBox>
+        </HBox>
 
-    <ImageView fx:id="itemImage" fitHeight="200" fitWidth="200" preserveRatio="true"
-               style="-fx-effect: dropshadow(gaussian, rgba(0,0,0,0.1), 10, 0, 0, 2);" />
+        <ImageView fx:id="itemImage" fitHeight="280" fitWidth="280" preserveRatio="true"
+                   style="-fx-effect: dropshadow(gaussian, rgba(0,0,0,0.2), 16, 0, 0, 6);
+                          -fx-background-radius: 15; -fx-border-radius: 15;"/>
 
-    <Label fx:id="itemKeywordsLabel" wrapText="true"
-           style="-fx-font-size: 16px; -fx-text-fill: #4a5a6a; -fx-padding: 0 0 10 0;"/>
-    <Label fx:id="itemDescriptionLabel" wrapText="true"
-           style="-fx-font-size: 16px; -fx-text-fill: #4a5a6a; -fx-padding: 0 0 10 0;" />
+        <Label fx:id="itemKeywordsLabel" wrapText="true"
+               style="-fx-font-size: 16px; -fx-text-fill: #34495e; -fx-padding: 0 0 5 0;"/>
 
-    <HBox spacing="20" alignment="CENTER">
-        <Label text="💰 Price:" style="-fx-font-size: 16px; -fx-font-weight: bold;"/>
-        <Label fx:id="itemPriceLabel" style="-fx-font-size: 16px;"/>
-        <Label text="📦 Supply:" style="-fx-font-size: 16px; -fx-font-weight: bold;"/>
-        <Label fx:id="itemSupplyLabel" style="-fx-font-size: 16px;"/>
-    </HBox>
+        <Label fx:id="itemDescriptionLabel" wrapText="true"
+               maxWidth="700"
+               style="-fx-font-size: 15px; -fx-text-fill: #555; -fx-padding: 0 10 15 10;
+                      -fx-background-color: #ffffffcc; -fx-background-radius: 10;
+                      -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.05), 5, 0, 0, 2);"/>
 
-    <Label text="⭐ Reviews" style="-fx-font-size: 20px; -fx-font-weight: bold; -fx-text-fill: #1e2a38;"/>
+        <HBox spacing="40" alignment="CENTER">
+            <Label text="💰 Price:" style="-fx-font-size: 17px; -fx-font-weight: bold;"/>
+            <Label fx:id="itemPriceLabel" style="-fx-font-size: 17px;"/>
+            <Label text="📦 Supply:" style="-fx-font-size: 17px; -fx-font-weight: bold;"/>
+            <Label fx:id="itemSupplyLabel" style="-fx-font-size: 17px;"/>
+        </HBox>
+    </VBox>
+
+    <Label text="⭐ Customer Reviews"
+           style="-fx-font-size: 24px; -fx-font-weight: bold; -fx-text-fill: #1e2a38; -fx-padding: 10;"/>
 
     <ScrollPane fx:id="rateScrollPane"
                 fitToWidth="true"
@@ -53,10 +67,9 @@
                 vbarPolicy="AS_NEEDED"
                 style="-fx-background-color: transparent;">
         <VBox fx:id="rateListContainer"
-              spacing="20"
+              spacing="25"
               alignment="TOP_CENTER"
-              style="-fx-background-color: transparent; -fx-padding: 20;"
-              prefWidth="700"/>
+              style="-fx-background-color: transparent; -fx-padding: 25;"
+              prefWidth="850"/>
     </ScrollPane>
-
 </VBox>

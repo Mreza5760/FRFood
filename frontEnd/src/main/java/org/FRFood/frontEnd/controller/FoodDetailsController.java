@@ -34,6 +34,7 @@ import java.util.concurrent.CompletableFuture;
 
 public class FoodDetailsController {
 
+    @FXML
     public Label itemAvgRating;
     @FXML
     public VBox rateListContainer;
@@ -72,38 +73,34 @@ public class FoodDetailsController {
                 conn.setRequestMethod("GET");
                 conn.setRequestProperty("Authorization", "Bearer " + token);
 
-                InputStream is = conn.getInputStream();
-                JsonNode root = mapper.readTree(is);
+                try (InputStream is = conn.getInputStream()) {
+                    JsonNode root = mapper.readTree(is);
 
-                System.out.println(conn.getResponseCode() + conn.getResponseMessage());
-                Platform.runLater(() -> {
-                    itemNameLabel.setText(root.get("name").asText());
-                    itemDescriptionLabel.setText(root.get("description").asText());
-                    itemPriceLabel.setText("$" + root.get("price").asDouble());
-                    itemSupplyLabel.setText(String.valueOf(root.get("supply").asInt()));
+                    Platform.runLater(() -> {
+                        itemNameLabel.setText(root.get("name").asText());
+                        itemDescriptionLabel.setText(root.get("description").asText());
+                        itemPriceLabel.setText(root.get("price").asInt() + " Toman");
+                        itemSupplyLabel.setText(String.valueOf(root.get("supply").asInt()));
 
-                    List<Keyword> keywords;
-                    try {
-                        keywords = mapper.readValue(
-                                root.get("keywords").traverse(),
-                                new TypeReference<List<Keyword>>() {
-                                });
-                    } catch (IOException e) {
-                        throw new RuntimeException(e);
-                    }
-                    String keys = "";
-                    for (Keyword temp : keywords){
-                        keys += temp.getName() + ",";
-                    }
-                    keys = keys.substring(0, keys.length() - 1);
-                    itemKeywordsLabel.setText(keys);
+                        List<Keyword> keywords;
+                        try {
+                            keywords = mapper.readValue(
+                                    root.get("keywords").traverse(),
+                                    new TypeReference<>() {});
+                        } catch (IOException e) {
+                            throw new RuntimeException(e);
+                        }
+                        String keys = String.join(", ", keywords.stream().map(Keyword::getName).toList());
+                        itemKeywordsLabel.setText(keys);
 
-                    String imageBase64 = root.get("imageBase64").asText();
-                    if (!imageBase64.isEmpty()) {
-                        byte[] imageBytes = Base64.getDecoder().decode(imageBase64);
-                        itemImage.setImage(new Image(new ByteArrayInputStream(imageBytes)));
-                    }
-                });
+                        // Decode and display image
+                        String imageBase64 = root.get("imageBase64").asText();
+                        if (!imageBase64.isEmpty()) {
+                            byte[] imageBytes = Base64.getDecoder().decode(imageBase64);
+                            itemImage.setImage(new Image(new ByteArrayInputStream(imageBytes)));
+                        }
+                    });
+                }
 
             } catch (Exception e) {
                 e.printStackTrace();
@@ -119,17 +116,20 @@ public class FoodDetailsController {
                 conn.setRequestMethod("GET");
                 conn.setRequestProperty("Authorization", "Bearer " + token);
 
-                InputStream is = conn.getInputStream();
-                JsonNode root = mapper.readTree(is);
+                try (InputStream is = conn.getInputStream()) {
+                    JsonNode root = mapper.readTree(is);
 
-                Platform.runLater(() -> {
-                    itemAvgRating.setText(String.valueOf(root.get("avg_rating").asDouble()));
-                    rateListContainer.getChildren().clear();
-                    for (JsonNode comment : root.get("comments")) {
-                        Rate rate = mapper.convertValue(comment, Rate.class);
-                        showRateCard(rate);
-                    }
-                });
+                    Platform.runLater(() -> {
+                        double avg = root.get("avg_rating").asDouble();
+                        itemAvgRating.setText(String.format("%.1f", avg));
+                        rateListContainer.getChildren().clear();
+
+                        for (JsonNode comment : root.get("comments")) {
+                            Rate rate = mapper.convertValue(comment, Rate.class);
+                            showRateCard(rate);
+                        }
+                    });
+                }
 
             } catch (Exception e) {
                 e.printStackTrace();
@@ -138,57 +138,63 @@ public class FoodDetailsController {
     }
 
     private void showRateCard(Rate rate) {
-        VBox card = new VBox(10);
-        card.setPadding(new Insets(15));
-        card.setStyle("-fx-background-color: white; -fx-background-radius: 12; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.1), 6, 0, 0, 2);");
-        card.setMaxWidth(600);
-        card.setPrefWidth(600);
+        VBox card = new VBox(12);
+        card.setPadding(new Insets(20));
+        card.setStyle("""
+            -fx-background-color: white;
+            -fx-background-radius: 15;
+            -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.1), 10, 0, 0, 4);
+            """);
+        card.setMaxWidth(700);
+        card.setPrefWidth(700);
 
-        // Top row: Rating + Buttons
-        HBox topRow = new HBox();
-        topRow.setAlignment(Pos.TOP_RIGHT);
-        topRow.setSpacing(10);
-        topRow.setPrefWidth(600);
+        HBox topRow = new HBox(10);
+        topRow.setAlignment(Pos.CENTER_LEFT);
 
-        Label ratingLabel = new Label("⭐ Rating: " + rate.getRating());
-        ratingLabel.setStyle("-fx-font-size: 16px; -fx-font-weight: bold;");
+        Label ratingLabel = new Label("⭐ " + rate.getRating());
+        ratingLabel.setStyle("-fx-font-size: 18px; -fx-font-weight: bold; -fx-text-fill: #f39c12;");
         HBox.setHgrow(ratingLabel, Priority.ALWAYS);
 
         Button updateButton = new Button("Update");
-        updateButton.setStyle("-fx-background-color: #00aa88; -fx-text-fill: white; -fx-font-weight: bold; -fx-background-radius: 8;");
-        updateButton.setOnAction(e -> {
-            handleUpdateButton(rate);
-        });
+        updateButton.setStyle("""
+            -fx-background-color: #00b894;
+            -fx-text-fill: white;
+            -fx-font-weight: bold;
+            -fx-background-radius: 8;
+            -fx-cursor: hand;
+            """);
+        updateButton.setOnAction(e -> handleUpdateButton(rate));
 
         Button deleteButton = new Button("Delete");
-        deleteButton.setStyle("-fx-background-color: #cc4444; -fx-text-fill: white; -fx-font-weight: bold; -fx-background-radius: 8;");
-        deleteButton.setOnAction(e -> {
-            handleDeleteButton(rate);
-        });
+        deleteButton.setStyle("""
+            -fx-background-color: #e74c3c;
+            -fx-text-fill: white;
+            -fx-font-weight: bold;
+            -fx-background-radius: 8;
+            -fx-cursor: hand;
+            """);
+        deleteButton.setOnAction(e -> handleDeleteButton(rate));
 
         Region spacer = new Region();
         HBox.setHgrow(spacer, Priority.ALWAYS);
 
         isOwnedByCurrentUser(rate.getOrderId()).thenAccept(isOwner -> {
-            if (isOwner) {
-                Platform.runLater(() -> {
+            Platform.runLater(() -> {
+                if (isOwner) {
                     topRow.getChildren().addAll(ratingLabel, spacer, updateButton, deleteButton);
-                });
-            } else {
-                topRow.getChildren().addAll(ratingLabel, spacer);
-            }
+                } else {
+                    topRow.getChildren().addAll(ratingLabel, spacer);
+                }
+            });
         });
 
-        // Comment
-        Label commentLabel = new Label("📝 " + rate.getComment());
+        Label commentLabel = new Label(rate.getComment().isBlank() ? "(No Comment)" : "📝 " + rate.getComment());
         commentLabel.setWrapText(true);
-        commentLabel.setStyle("-fx-font-size: 14px;");
+        commentLabel.setStyle("-fx-font-size: 15px; -fx-text-fill: #2c3e50;");
 
-        // Created At
         Label createdAtLabel = new Label("📅 " + rate.getCreatedAt());
-        createdAtLabel.setStyle("-fx-font-size: 13px; -fx-text-fill: #666666;");
+        createdAtLabel.setStyle("-fx-font-size: 13px; -fx-text-fill: #7f8c8d;");
 
-        // Images
         FlowPane imagePane = new FlowPane(10, 10);
         imagePane.setPadding(new Insets(10, 0, 0, 0));
 
@@ -198,11 +204,11 @@ public class FoodDetailsController {
                 byte[] imageBytes = Base64.getDecoder().decode(base64);
                 Image image = new Image(new ByteArrayInputStream(imageBytes));
                 ImageView imageView = new ImageView(image);
-                imageView.setFitWidth(100);
-                imageView.setFitHeight(100);
+                imageView.setFitWidth(120);
+                imageView.setFitHeight(120);
                 imageView.setPreserveRatio(true);
                 imageView.setSmooth(true);
-                imageView.setStyle("-fx-border-radius: 8;");
+                imageView.setStyle("-fx-background-radius: 8; -fx-border-color: #ddd; -fx-border-radius: 8;");
                 imagePane.getChildren().add(imageView);
             } catch (Exception e) {
                 e.printStackTrace();
@@ -210,8 +216,6 @@ public class FoodDetailsController {
         }
 
         card.getChildren().addAll(topRow, commentLabel, createdAtLabel, imagePane);
-
-        // Add to container
         rateListContainer.getChildren().add(card);
     }
 
@@ -228,7 +232,7 @@ public class FoodDetailsController {
     }
 
     private void handleDeleteButton(Rate rate) {
-        HttpRequest request = null;
+        HttpRequest request;
         try {
             request = HttpRequest.newBuilder()
                     .uri(new URI("http://localhost:8080/ratings/" + rate.getId()))
@@ -237,6 +241,7 @@ public class FoodDetailsController {
                     .build();
         } catch (Exception e) {
             e.printStackTrace();
+            return;
         }
 
         HttpClient.newHttpClient()
@@ -245,7 +250,7 @@ public class FoodDetailsController {
                     if (response.statusCode() == 200 || response.statusCode() == 204) {
                         fetchReviews();
                     } else {
-                        System.err.println("Failed to fetch: HTTP " + response.statusCode() + " " + response.body());
+                        System.err.println("Failed: HTTP " + response.statusCode() + " " + response.body());
                     }
                     return null;
                 }).exceptionally(e -> {
@@ -253,7 +258,6 @@ public class FoodDetailsController {
                     return null;
                 });
     }
-
 
     private CompletableFuture<Boolean> isOwnedByCurrentUser(int orderId) {
         HttpRequest request;
@@ -270,21 +274,12 @@ public class FoodDetailsController {
 
         return HttpClient.newHttpClient()
                 .sendAsync(request, HttpResponse.BodyHandlers.ofString())
-                .thenApply(response -> {
-                    if (response.statusCode() == 200 || response.statusCode() == 204) {
-                        return true;
-                    } else if (response.statusCode() == 469) {
-                        return false;
-                    } else {
-                        System.err.println("Failed to fetch: HTTP " + response.statusCode() + " " + response.body());
-                        return false;
-                    }
-                }).exceptionally(e -> {
+                .thenApply(response -> response.statusCode() == 200 || response.statusCode() == 204)
+                .exceptionally(e -> {
                     e.printStackTrace();
                     return false;
                 });
     }
-
 
     public void handleBack(ActionEvent actionEvent) {
         SceneNavigator.switchTo("/frontEnd/menu.fxml", itemNameLabel);
