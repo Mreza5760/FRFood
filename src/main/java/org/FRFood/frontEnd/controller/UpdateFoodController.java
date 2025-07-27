@@ -152,4 +152,11 @@ public class UpdateFoodController {
             return -1;
         }
     }
+
+    @FXML
+    public void handleDeleteLogo(ActionEvent event) {
+        foodLogo.setImage(null);
+        logoBase64 = "";
+        showAlert(Alert.AlertType.INFORMATION, "Deleted", "Food image removed. Click Save to confirm changes.");
+    }
 }
