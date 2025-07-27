@@ -1,14 +1,16 @@
 package org.FRFood.frontEnd.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.geometry.Insets;
 import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
-import javafx.scene.layout.*;
+import javafx.scene.layout.FlowPane;
+import javafx.scene.layout.HBox;
 import javafx.stage.FileChooser;
-import org.FRFood.entity.Restaurant;
+import org.FRFood.frontEnd.Util.SceneNavigator;
 import org.FRFood.frontEnd.Util.SessionManager;
 
 import java.io.ByteArrayInputStream;
@@ -99,16 +101,18 @@ public class UpdateRatingController {
     }
 
     private void addImagePreviewFromBase64(String base64) {
-        Image image = new Image(new ByteArrayInputStream(Base64.getDecoder().decode(base64)));
-        ImageView imgView = createRemovableImageView(image, base64);
-        imagePreviewPane.getChildren().add(imgView);
+        try {
+            Image image = new Image(new ByteArrayInputStream(Base64.getDecoder().decode(base64)));
+            ImageView imgView = createRemovableImageView(image, base64);
+            imagePreviewPane.getChildren().add(imgView);
+        } catch (Exception ignored) {}
     }
 
     private ImageView createRemovableImageView(Image image, String base64ToRemove) {
         ImageView imgView = new ImageView(image);
         imgView.setFitWidth(80);
         imgView.setFitHeight(80);
-        imgView.setStyle("-fx-border-color: #ccc; -fx-cursor: hand;");
+        imgView.setStyle("-fx-border-color: #ccc; -fx-border-radius: 6; -fx-background-radius: 6; -fx-cursor: hand;");
         imgView.setOnMouseClicked(e -> {
             base64Images.remove(base64ToRemove);
             imagePreviewPane.getChildren().remove(imgView);
@@ -139,9 +143,15 @@ public class UpdateRatingController {
 
     @FXML
     private void handleSubmitUpdate() {
+        String comment = commentArea.getText().trim();
+        if (comment.isEmpty()) {
+            showAlert(Alert.AlertType.ERROR, "Invalid Input", "Comment cannot be empty.");
+            return;
+        }
+
         Map<String, Object> body = new HashMap<>();
         body.put("rating", selectedRating);
-        body.put("comment", commentArea.getText());
+        body.put("comment", comment);
         body.put("imageBase64", base64Images);
 
         try {
@@ -161,23 +171,31 @@ public class UpdateRatingController {
 
             int code = conn.getResponseCode();
             if (code == 200 || code == 204) {
-                showAlert(Alert.AlertType.INFORMATION, "Success", "Rating updated!");
+                Platform.runLater(() -> {
+                    showAlert(Alert.AlertType.INFORMATION, "Success", "Review updated!");
+                    SceneNavigator.switchTo("/frontend/foodDetail.fxml", commentArea);
+                });
             } else {
                 showAlert(Alert.AlertType.ERROR, "Error", "Update failed. Code: " + code);
             }
 
         } catch (Exception e) {
-            e.printStackTrace();
             showAlert(Alert.AlertType.ERROR, "Network Error", "Could not update rating.");
         }
     }
 
-    private void showAlert(Alert.AlertType type, String title, String message) {
-        Alert alert = new Alert(type);
-        alert.setTitle(title);
-        alert.setHeaderText(null);
-        alert.setContentText(message);
-        alert.showAndWait();
+    @FXML
+    private void handleCancel() {
+        SceneNavigator.switchTo("/frontend/foodDetail.fxml", commentArea);
     }
 
+    private void showAlert(Alert.AlertType type, String title, String message) {
+        Platform.runLater(() -> {
+            Alert alert = new Alert(type);
+            alert.setTitle(title);
+            alert.setHeaderText(null);
+            alert.setContentText(message);
+            alert.showAndWait();
+        });
+    }
 }
