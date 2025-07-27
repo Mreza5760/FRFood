@@ -144,10 +144,6 @@ public class UpdateRatingController {
     @FXML
     private void handleSubmitUpdate() {
         String comment = commentArea.getText().trim();
-        if (comment.isEmpty()) {
-            showAlert(Alert.AlertType.ERROR, "Invalid Input", "Comment cannot be empty.");
-            return;
-        }
 
         Map<String, Object> body = new HashMap<>();
         body.put("rating", selectedRating);

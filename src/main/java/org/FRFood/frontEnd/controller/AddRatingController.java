@@ -127,10 +127,6 @@ public class AddRatingController {
             showAlert(Alert.AlertType.ERROR, "Invalid Rating", "Please select a star rating.");
             return;
         }
-        if (comment.isEmpty()) {
-            showAlert(Alert.AlertType.ERROR, "Invalid Comment", "Please write a review.");
-            return;
-        }
 
         Map<String, Object> body = new HashMap<>();
         body.put("order_id", orderId);
