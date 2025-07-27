@@ -183,8 +183,7 @@ public class MenuController {
             rightBox.setAlignment(Pos.CENTER_RIGHT);
         }
 
-        if (userRole == Role.buyer) {
-            // remove Button
+        if (userRole == Role.buyer && mode == 1) {
             Button removeBtn = new Button("-");
             removeBtn.setMaxSize(36, 36);
             removeBtn.setStyle("""
@@ -207,7 +206,6 @@ public class MenuController {
                 }
             }
 
-            // add Button
             Button addBtn = new Button("+");
             addBtn.setMaxSize(36, 36);
             addBtn.setStyle("""
@@ -227,11 +225,10 @@ public class MenuController {
             } else {
                 rightBox = new HBox(10, removeBtn, addBtn);
             }
-            // Add both buttons to VBox
 
             rightBox.setAlignment(Pos.CENTER_RIGHT);
         }
-        card.setOnMouseClicked(e -> handleClick(food)); // full card click
+        card.setOnMouseClicked(e -> handleClick(food));
 
         card.getChildren().addAll(logo, info, spacer, rightBox);
         return card;
@@ -245,20 +242,14 @@ public class MenuController {
         }
         Order order = cart.get(restaurant.getId());
 
-        boolean found = false;
-
         for (OrderItem orderItem : order.getItems()) {
             if (orderItem.getItemId().equals(food.getId())) {
                 if (orderItem.getQuantity() == 0) {
                     return;
                 }
                 orderItem.setQuantity(orderItem.getQuantity() - 1);
-                found = true;
+                break;
             }
-        }
-
-        if (!found) {
-            System.out.println("error so bad");
         }
 
         boolean empty = true;
@@ -282,7 +273,7 @@ public class MenuController {
 
     private void handleAdd(Food food) {
         Map<Integer, Order> cart = SessionManager.getOrderList();
-        Order order = new Order();
+        Order order;
         if (!cart.containsKey(restaurant.getId())) {
             Order tempOrder = new Order();
             cart.put(restaurant.getId(), tempOrder);
@@ -307,6 +298,7 @@ public class MenuController {
             if (orderItem.getItemId().equals(food.getId())) {
                 orderItem.setQuantity(orderItem.getQuantity() + 1);
                 found = true;
+                break;
             }
         }
         if (!found) {
