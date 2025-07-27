@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import java.util.List;
+import java.util.Objects;
 
 public class Food {
     private Integer id;
@@ -94,12 +95,15 @@ public class Food {
     }
 
     @Override
-    public boolean equals(Object obj) {
-        if(!(obj instanceof Food)){
-            return false;
-        }
-        Food food = (Food) obj;
-        return food.getId().equals(this.id);
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Food food = (Food) o;
+        return Objects.equals(id, food.id);
     }
 
+    @Override
+    public int hashCode() {
+        return Objects.hash(id);
+    }
 }
