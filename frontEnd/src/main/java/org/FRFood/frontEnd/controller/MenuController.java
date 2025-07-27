@@ -277,6 +277,7 @@ public class MenuController {
 
         order.calculatePayPrice();
 
+        SessionManager.saveSession();
         Platform.runLater(this::fetchFoods);
     }
 
@@ -316,9 +317,8 @@ public class MenuController {
         order.setRawPrice(order.getRawPrice() + food.getPrice());
 
         order.calculatePayPrice();
-
+        SessionManager.saveSession();
         Platform.runLater(this::fetchFoods);
-
     }
 
     private void handleClick(Food food) {

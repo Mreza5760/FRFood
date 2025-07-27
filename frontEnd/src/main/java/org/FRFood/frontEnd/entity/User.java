@@ -2,7 +2,12 @@ package org.FRFood.frontEnd.entity;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-public class User {
+import java.io.Serial;
+import java.io.Serializable;
+
+public class User implements Serializable {
+    @Serial
+    private static final long serialVersionUID = 1L;
     private Integer id;
     @JsonProperty("full_name")
     private String fullName;

@@ -2,7 +2,12 @@ package org.FRFood.frontEnd.entity;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-public class OrderItem {
+import java.io.Serial;
+import java.io.Serializable;
+
+public class OrderItem implements Serializable {
+    @Serial
+    private static final long serialVersionUID = 1L;
     @JsonProperty("item_id")
     private Integer itemId;
     private Integer quantity;

@@ -83,6 +83,7 @@ public class SignUpController {
 
                 SessionManager.setCurrentUser(user);
                 SessionManager.setAuthToken(token);
+                SessionManager.saveSession();
                 if (user.getRole() == Role.buyer) {
                     SceneNavigator.switchTo("/frontend/panel.fxml", messageLabel);
                 } else {

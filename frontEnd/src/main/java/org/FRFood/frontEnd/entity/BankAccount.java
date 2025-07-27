@@ -2,7 +2,12 @@ package org.FRFood.frontEnd.entity;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-public class BankAccount {
+import java.io.Serial;
+import java.io.Serializable;
+
+public class BankAccount implements Serializable {
+    @Serial
+    private static final long serialVersionUID = 1L;
     private Integer id;
     @JsonProperty("bank_name")
     private String name;

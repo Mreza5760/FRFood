@@ -5,6 +5,7 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
 import javafx.stage.WindowEvent;
+import org.FRFood.frontEnd.Util.SessionManager;
 
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -16,7 +17,13 @@ public class App extends Application {
         Logger logger = Logger.getLogger("javafx.scene.CssStyleHelper");
         logger.setLevel(Level.SEVERE);
 
-        FXMLLoader loader = new FXMLLoader(getClass().getResource("/frontEnd/home.fxml"));
+        SessionManager.loadSession();
+        FXMLLoader loader = null;
+        if (SessionManager.isLoggedIn()) {
+            loader = new FXMLLoader(getClass().getResource("/frontEnd/panel.fxml"));
+        } else {
+            loader = new FXMLLoader(getClass().getResource("/frontEnd/home.fxml"));
+        }
         Scene scene = new Scene(loader.load(), 900, 700);
 
         primaryStage.setTitle("FRFood");

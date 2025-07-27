@@ -3,6 +3,8 @@ package org.FRFood.frontEnd.entity;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
+import java.io.Serial;
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -23,7 +25,9 @@ import java.util.List;
         "created_at",
         "updated_at"
 })
-public class Order {
+public class Order implements Serializable {
+    @Serial
+    private static final long serialVersionUID = 1L;
     private Integer id;
     @JsonProperty("delivery_address")
     private String deliveryAddress;

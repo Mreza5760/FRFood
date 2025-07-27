@@ -72,6 +72,7 @@ public class LoginController {
 
                     SessionManager.setAuthToken(token);
                     SessionManager.setCurrentUser(currentUser);
+                    SessionManager.saveSession();
 
                     Platform.runLater(() -> {
                         Alert alert = new Alert(Alert.AlertType.INFORMATION);
