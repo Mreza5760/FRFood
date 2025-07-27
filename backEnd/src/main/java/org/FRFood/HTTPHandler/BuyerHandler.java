@@ -16,6 +16,7 @@ import java.time.LocalDate;
 import java.util.*;
 import java.io.IOException;
 import java.sql.SQLException;
+import java.util.stream.Collectors;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
@@ -154,6 +155,16 @@ public class BuyerHandler implements HttpHandler {
         }
     }
 
+    private static class FoodRatingPair {
+        public Food food;
+        public double avgRating;
+
+        public FoodRatingPair(Food food, double avgRating) {
+            this.food = food;
+            this.avgRating = avgRating;
+        }
+    }
+
     private void handleItemsList(HttpExchange exchange) throws IOException {
         if (authenticate(exchange).isEmpty()) return;
 
@@ -161,8 +172,9 @@ public class BuyerHandler implements HttpHandler {
 
         try {
             List<Rate> rates = rateDAO.getAllRates();
-            List<Food> foodsFiltered = new ArrayList<>();
+            List<FoodRatingPair> foodRatingPairs = new ArrayList<>();
             List<Food> foods = foodDAO.searchFood(req.search);
+
             for (Food food : foods) {
                 List<Rate> foodRates = new ArrayList<>();
                 for (Rate rate : rates) {
@@ -190,17 +202,24 @@ public class BuyerHandler implements HttpHandler {
                     }
                 }
 
-                double foodRate = 0;
+                double avgRating = 0;
                 for (Rate rate : foodRates)
-                    foodRate += rate.getRating();
-                if (!rates.isEmpty())
-                    foodRate /= rates.size();
+                    avgRating += rate.getRating();
+                if (!foodRates.isEmpty())
+                    avgRating /= foodRates.size();
 
                 if ((req.keywords == null || foodDAO.doesHaveKeywords(req.keywords, food.getId())) && (req.minPrice <= food.getPrice() && food.getPrice() <= req.maxPrice)) {
-                    foodsFiltered.add(food);
+                    foodRatingPairs.add(new FoodRatingPair(food, avgRating));
                 }
             }
-            String json = objectMapper.writeValueAsString(foodsFiltered);
+
+            foodRatingPairs.sort((a, b) -> Double.compare(b.avgRating, a.avgRating));
+
+            List<Food> sortedFoods = foodRatingPairs.stream()
+                    .map(pair -> pair.food)
+                    .collect(Collectors.toList());
+
+            String json = objectMapper.writeValueAsString(sortedFoods);
             JsonResponse.sendJsonResponse(exchange, 200, json);
         } catch (SQLException e) {
             HttpError.internal(exchange, "Database error");
