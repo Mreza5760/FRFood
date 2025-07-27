@@ -92,6 +92,8 @@ public class AllFoodsController {
         } else {
             try {
                 String json = mapper.writeValueAsString(itemsReq);
+                //debug
+                System.out.println(json);
                 HttpRequest request = HttpRequest.newBuilder()
                         .uri(URI.create("http://localhost:8080/items"))
                         .header("Authorization", "Bearer " + SessionManager.getAuthToken())
@@ -120,11 +122,7 @@ public class AllFoodsController {
 
     private void displayFoods(String body) {
         try {
-            JsonNode rootNode = mapper.readTree(body);
-
-            JsonNode theThingNode = rootNode.get("menu_title");
-            List<Food> foods = mapper.convertValue(theThingNode, new TypeReference<List<Food>>() {
-            });
+            List<Food> foods = mapper.readValue(body, new TypeReference<List<Food>>() {});
             Platform.runLater(() -> {
                 foodList.getChildren().clear();
                 for (Food food : foods) {

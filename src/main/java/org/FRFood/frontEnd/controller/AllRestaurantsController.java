@@ -31,8 +31,10 @@ import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Base64;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class AllRestaurantsController {
 
@@ -258,15 +260,26 @@ public class AllRestaurantsController {
 
     private void handleSearch2() {
         String name = searchBox1.getText().trim();
-        int minPriceValue = Integer.parseInt(minPrice.getText().trim());
-        int maxPriceValue = Integer.parseInt(maxPrice.getText().trim());
+        int minPriceValue = 0;
+        int maxPriceValue = 10000000;
+        if(!maxPrice.getText().trim().isEmpty()){
+            maxPriceValue = Integer.parseInt(maxPrice.getText().trim());
+        }
+        if(!minPrice.getText().trim().isEmpty()){
+            minPriceValue = Integer.parseInt(minPrice.getText().trim());
+        }
+
         String temp = searchBox2.getText().trim();
         String[] parts = temp.split(",");
+        List<String> keywords = Arrays.stream(parts)
+                .map(String::trim)
+                .filter(s -> !s.isEmpty())
+                .collect(Collectors.toList());
         ItemsReq itemsReq = new ItemsReq();
         itemsReq.search = name;
         itemsReq.minPrice = minPriceValue;
         itemsReq.maxPrice = maxPriceValue;
-        itemsReq.keywords = List.of(parts);
+        itemsReq.keywords = keywords;
         AllFoodsController.setData(0, "Foods :", 2, itemsReq);
         SceneNavigator.switchTo("/frontend/allFoods.fxml", restaurantList);
     }
