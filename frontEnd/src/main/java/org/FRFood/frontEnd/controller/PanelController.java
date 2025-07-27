@@ -152,17 +152,17 @@ public class PanelController {
     }
 
     private void handleOrders() {
-        SceneNavigator.switchTo("/frontEnd/buyerOrderPage.fxml", orderFoodButton);
+        SceneNavigator.switchTo("/fxml/buyerOrderPage.fxml", orderFoodButton);
     }
 
     private void handleFavorites() {
         AllRestaurantsController.setMode(2);
-        SceneNavigator.switchTo("/frontEnd/allRestaurants.fxml", favoriteRestaurantsButton);
+        SceneNavigator.switchTo("/fxml/allRestaurants.fxml", favoriteRestaurantsButton);
         System.out.println("Navigated to Favorite Restaurants");
     }
 
     private void handleWallet() {
-        SceneNavigator.switchTo("/frontEnd/wallet.fxml", walletButton);
+        SceneNavigator.switchTo("/fxml/wallet.fxml", walletButton);
     }
 
     private void handleProfile() {
@@ -174,10 +174,10 @@ public class PanelController {
     }
 
     private void handleTransactions() {
-        SceneNavigator.switchTo("/frontEnd/adminTransactions.fxml", transactionsButton);
+        SceneNavigator.switchTo("/fxml/adminTransactions.fxml", transactionsButton);
     }
 
     private void handleAllUsers() {
-        SceneNavigator.switchTo("/frontEnd/allUsers.fxml", usersButton);
+        SceneNavigator.switchTo("/fxml/allUsers.fxml", usersButton);
     }
 }

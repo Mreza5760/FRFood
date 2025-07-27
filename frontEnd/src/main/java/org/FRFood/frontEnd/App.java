@@ -4,7 +4,6 @@ import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
-import javafx.stage.WindowEvent;
 import org.FRFood.frontEnd.Util.SessionManager;
 
 import java.util.logging.Level;
@@ -20,9 +19,9 @@ public class App extends Application {
         SessionManager.loadSession();
         FXMLLoader loader = null;
         if (SessionManager.isLoggedIn()) {
-            loader = new FXMLLoader(getClass().getResource("/frontEnd/panel.fxml"));
+            loader = new FXMLLoader(getClass().getResource("/fxml/panel.fxml"));
         } else {
-            loader = new FXMLLoader(getClass().getResource("/frontEnd/home.fxml"));
+            loader = new FXMLLoader(getClass().getResource("/fxml/home.fxml"));
         }
         Scene scene = new Scene(loader.load(), 900, 700);
 

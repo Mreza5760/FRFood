@@ -220,7 +220,7 @@ public class AllRestaurantsController {
 
     private void handleClick(Restaurant r) {
         RestaurantController.setValues(r);
-        FXMLLoader loader = new FXMLLoader(getClass().getResource("/frontEnd/restaurant.fxml"));
+        FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/restaurant.fxml"));
         try {
             Parent root = loader.load();
 

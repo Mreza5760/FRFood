@@ -14,11 +14,11 @@ public class HomeController {
 
     @FXML
     public void goToLogin(ActionEvent event) throws IOException {
-        SceneNavigator.switchTo("/frontEnd/Login.fxml", loginButton);
+        SceneNavigator.switchTo("/fxml/Login.fxml", loginButton);
     }
 
     @FXML
     public void goToSignup(ActionEvent event) throws IOException {
-        SceneNavigator.switchTo("/frontEnd/signup.fxml", signupButton);
+        SceneNavigator.switchTo("/fxml/signup.fxml", signupButton);
     }
 }

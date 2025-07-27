@@ -1,7 +1,6 @@
 package org.FRFood.frontEnd.controller;
 
 import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import javafx.application.Platform;
 import javafx.event.ActionEvent;
@@ -232,7 +231,7 @@ public class AllFoodsController {
     }
 
     private void handleEdit(Food food) {
-        FXMLLoader loader = new FXMLLoader(getClass().getResource("/frontEnd/updateFood.fxml"));
+        FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/updateFood.fxml"));
         try {
             Parent root = loader.load();
 

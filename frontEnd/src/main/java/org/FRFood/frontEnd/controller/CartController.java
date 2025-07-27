@@ -194,7 +194,7 @@ public class CartController {
     }
 
     private void handleUpdate(Restaurant r) {
-        FXMLLoader loader = new FXMLLoader(getClass().getResource("/frontEnd/updateRestaurant.fxml"));
+        FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/updateRestaurant.fxml"));
         try {
             Parent root = loader.load();
 

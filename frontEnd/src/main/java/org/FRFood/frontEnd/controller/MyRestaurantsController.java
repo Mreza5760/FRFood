@@ -170,7 +170,7 @@ public class MyRestaurantsController {
 
     private void handleClick(Restaurant r) {
         RestaurantController.setValues(r);
-        FXMLLoader loader = new FXMLLoader(getClass().getResource("/frontEnd/restaurant.fxml"));
+        FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/restaurant.fxml"));
         try {
             Parent root = loader.load();
 
@@ -187,7 +187,7 @@ public class MyRestaurantsController {
     }
 
     private void handleUpdate(Restaurant r) {
-        FXMLLoader loader = new FXMLLoader(getClass().getResource("/frontEnd/updateRestaurant.fxml"));
+        FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/updateRestaurant.fxml"));
         try {
             Parent root = loader.load();
 

@@ -2,7 +2,6 @@ package org.FRFood.frontEnd.controller;
 
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
-import javafx.scene.control.TextField;
 import org.FRFood.frontEnd.Util.SceneNavigator;
 
 public class BuyerOrderPageController {
@@ -20,14 +19,14 @@ public class BuyerOrderPageController {
     @FXML
     private void initialize() {
         backButton.setOnAction(event ->
-                SceneNavigator.switchTo("/frontEnd/Panel.fxml", backButton)
+                SceneNavigator.switchTo("/fxml/Panel.fxml", backButton)
         );
 
         orderHistoryButton.setOnAction(event ->
                 handleOrderHistoryButtonClick()
         );
         myOrdersButton.setOnAction(event ->
-                SceneNavigator.switchTo("/frontEnd/cart.fxml", myOrdersButton)
+                SceneNavigator.switchTo("/fxml/cart.fxml", myOrdersButton)
         );
         restaurantButton.setOnAction(event ->
                 handleRestaurantButton()
@@ -37,11 +36,11 @@ public class BuyerOrderPageController {
 
     private void handleRestaurantButton() {
         AllRestaurantsController.setMode(1);
-        SceneNavigator.switchTo("/frontEnd/allRestaurants.fxml", restaurantButton);
+        SceneNavigator.switchTo("/fxml/allRestaurants.fxml", restaurantButton);
     }
 
     private void handleOrderHistoryButtonClick() {
         OrderHistoryController.setMode(1);
-        SceneNavigator.switchTo("/frontEnd/orderHistory.fxml", orderHistoryButton);
+        SceneNavigator.switchTo("/fxml/orderHistory.fxml", orderHistoryButton);
     }
 }
