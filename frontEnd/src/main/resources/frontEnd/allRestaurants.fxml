@@ -47,7 +47,7 @@
                              min="0" max="1000000" lowValue="0" highValue="900000" blockIncrement="10"
                              style="-fx-pref-width: 300;"/>
                 <Label fx:id="priceLabel"
-                       text="0 - 500"
+                       text="0 - 900000"
                        style="-fx-font-size: 13px; -fx-text-fill: #555555;"/>
             </HBox>
         </VBox>
