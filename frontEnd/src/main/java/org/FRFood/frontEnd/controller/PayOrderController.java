@@ -321,7 +321,7 @@ public class PayOrderController {
         return null;
     }
 
-    public void handleValidateToken(ActionEvent actionEvent) {
+    public void handleValidateCoupon(ActionEvent actionEvent) {
         String code = CouponCodeField.getText().trim();
 
         try {
@@ -339,24 +339,27 @@ public class PayOrderController {
             if (resCode >= 200 && resCode < 300) {
                 ObjectMapper mapper = new ObjectMapper();
                 Coupon coupon = mapper.readValue(conn.getInputStream(), Coupon.class);
-                int currentRawPrice = SessionManager.getOrderList().get(restaurant.getId()).getRawPrice();
+                Order order = SessionManager.getOrderList().get(restaurant.getId());
+                int currentRawPrice = order.getRawPrice();
                 if (coupon.getMinPrice() >= currentRawPrice) {
                     showAlert("error", "you have to at least buy" + coupon.getMinPrice() + "to use this", Alert.AlertType.ERROR);
                 }
-                if (coupon.getType() == CouponType.fixed) {
-                    if (currentRawPrice - coupon.getValue() < 0) {
-                        SessionManager.getOrderList().get(restaurant.getId()).setRawPrice(0);
-                    } else {
-                        SessionManager.getOrderList().get(restaurant.getId()).setRawPrice(currentRawPrice - coupon.getValue());
-                    }
-                } else {
-                    SessionManager.getOrderList().get(restaurant.getId()).setRawPrice(currentRawPrice * ((100 - coupon.getValue()) / 100));
+
+                if (order.getCouponId() != 0) {
+//                    Coupon curCoupon = new Coupon();
+//                    if (curCoupon.)
                 }
 
-                SessionManager.getOrderList().get(restaurant.getId()).setCouponId(coupon.getId());
-                SessionManager.getOrderList().get(restaurant.getId()).calculatePayPrice();
+                if (coupon.getType() == CouponType.fixed) {
+                    order.setRawPrice(Math.max(currentRawPrice - coupon.getValue(), 0));
+                } else {
+                    order.setRawPrice(currentRawPrice * ((100 - coupon.getValue()) / 100));
+                }
+
+                order.setCouponId(coupon.getId());
+                order.calculatePayPrice();
                 Platform.runLater(() ->
-                        setOrder(SessionManager.getOrderList().get(restaurant.getId()), restaurant, 1));
+                        setOrder(order, restaurant, 1));
             } else {
                 showAlert("error", conn.getResponseMessage(), Alert.AlertType.ERROR);
             }
