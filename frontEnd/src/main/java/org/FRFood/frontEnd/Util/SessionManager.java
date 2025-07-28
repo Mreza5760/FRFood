@@ -57,7 +57,7 @@ public class SessionManager {
         currentUser = null;
         File file = new File(SESSION_FILE);
         if (file.exists()) {
-            file.delete(); // Clear session file on logout
+            file.delete();
         }
     }
 

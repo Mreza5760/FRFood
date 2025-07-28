@@ -93,7 +93,7 @@ public class BuyerHandler implements HttpHandler {
 
         try {
             List<Restaurant> restaurantsFiltered = new ArrayList<>();
-            List<Restaurant> restaurants = restaurantDAO.searchByString(req.search);
+            List<Restaurant> restaurants = restaurantDAO.searchByString(req.search.toLowerCase());
             if (req.keywords != null) {
                 for (Restaurant restaurant : restaurants) {
                     boolean haveFood = false;
@@ -173,7 +173,7 @@ public class BuyerHandler implements HttpHandler {
         try {
             List<Rate> rates = rateDAO.getAllRates();
             List<FoodRatingPair> foodRatingPairs = new ArrayList<>();
-            List<Food> foods = foodDAO.searchFood(req.search);
+            List<Food> foods = foodDAO.searchFood(req.search.toLowerCase());
 
             for (Food food : foods) {
                 List<Rate> foodRates = new ArrayList<>();
@@ -312,7 +312,7 @@ public class BuyerHandler implements HttpHandler {
                         return;
                     }
                     Restaurant restaurant = optionalRestaurant.get();
-                    if (params.containsKey("vendor") && !restaurant.getName().contains(params.get("vendor"))) {
+                    if (params.containsKey("vendor") && !restaurant.getName().toLowerCase().contains(params.get("vendor").toLowerCase())) {
                         finalOrders.remove(order);
                     }
                     if (params.containsKey("search") && !params.get("search").isEmpty()) {
@@ -325,7 +325,7 @@ public class BuyerHandler implements HttpHandler {
                                 return;
                             }
                             Food food = optionalFood.get();
-                            if (food.getName().contains(params.get("search"))) {
+                            if (food.getName().toLowerCase().contains(params.get("search").toLowerCase())) {
                                 found = true;
                                 break;
                             }

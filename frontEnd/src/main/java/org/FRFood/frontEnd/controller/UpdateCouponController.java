@@ -56,6 +56,10 @@ public class UpdateCouponController {
                 showAlert(AlertType.ERROR, "Invalid Input", "All fields must be filled in.");
                 return;
             }
+            if (code.contains(" ")) {
+                showAlert(AlertType.ERROR, "Invalid Code", "Coupon Code must not contain spaces.");
+                return;
+            }
 
             int value, minPrice, userCount;
             try {
