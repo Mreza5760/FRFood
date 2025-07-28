@@ -273,7 +273,11 @@ public class RestaurantController {
     }
 
     public void viewFoods(ActionEvent actionEvent) {
+        if(userRole == Role.buyer){
         AllFoodsController.setData(restaurant.getId(), restaurantName,1,null);
-        SceneNavigator.switchTo("/frontEnd/allFoods.fxml", restaurant_name_label);
+        SceneNavigator.switchTo("/frontEnd/allFoods.fxml", restaurant_name_label);}else if(userRole == Role.seller){
+            AllFoodsController.setData(restaurant.getId(), restaurantName,3,null);
+            SceneNavigator.switchTo("/frontEnd/allFoods.fxml", restaurant_name_label);
+        }
     }
 }

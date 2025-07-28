@@ -71,7 +71,7 @@ public class AllFoodsController {
     }
 
     private void fetchFoods() {
-        if (mode == 1) {
+        if (mode == 1 || mode == 3) {
             String safeUrl = "http://localhost:8080/vendors/" + restaurantId;
             URI uri = URI.create(safeUrl);
             HttpRequest request = HttpRequest.newBuilder()
@@ -214,12 +214,12 @@ public class AllFoodsController {
                 """);
         deleteBtn.setOnAction(e -> handleDelete(food));
 
-        if(mode != 1){
+        if(mode == 1  || mode ==2){
+            card.getChildren().addAll(logo, info, spacer);
+        }else{
             HBox rightBox = new HBox(10, editBtn, deleteBtn);
             rightBox.setAlignment(Pos.CENTER_RIGHT);
             card.getChildren().addAll(logo, info, spacer, rightBox);
-        }else{
-            card.getChildren().addAll(logo, info, spacer);
         }
 
         return card;
