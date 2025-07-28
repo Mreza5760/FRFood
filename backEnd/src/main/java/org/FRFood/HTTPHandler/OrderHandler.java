@@ -136,18 +136,6 @@ public class OrderHandler implements HttpHandler {
                 }
             }
 
-            for (OrderItem orderItem : order.getItems()) {
-                Optional<Food> optionalFood = foodDAO.getById(orderItem.getItemId());
-                if (optionalFood.isEmpty()) {
-                    HttpError.notFound(exchange, "Food not found");
-                    return;
-                }
-                Food food = optionalFood.get();
-                food.setSupply(food.getSupply()-orderItem.getQuantity());
-                foodDAO.update(food);
-            }
-            order.setStatus(Status.waiting);
-
             transaction.setUserID(user.getId());
             transaction.setAmount(order.getPayPrice());
 
@@ -159,6 +147,20 @@ public class OrderHandler implements HttpHandler {
                     userDAO.setWallet(user.getId(), user.getWallet() - transaction.getAmount());
                 }
             }
+
+            for (OrderItem orderItem : order.getItems()) {
+                Optional<Food> optionalFood = foodDAO.getById(orderItem.getItemId());
+                if (optionalFood.isEmpty()) {
+                    HttpError.notFound(exchange, "Food not found");
+                    return;
+                }
+                Food food = optionalFood.get();
+                food.setSupply(food.getSupply()-orderItem.getQuantity());
+                foodDAO.update(food);
+            }
+
+            order.setStatus(Status.waiting);
+
             if (order.getCouponId() != 0)
                 new CouponDAOImp().useCoupon(order.getCouponId(), user.getId());
             order.setId(orderDAO.insert(order));
