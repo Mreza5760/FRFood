@@ -35,7 +35,7 @@
                             style="-fx-background-color: #0077cc; -fx-text-fill: white;
                                -fx-font-weight: bold; -fx-background-radius: 10; -fx-font-size: 16px;"/>
 
-                    <Button fx:id="myOrdersButton" text="🛍 My Orders"
+                    <Button fx:id="myOrdersButton" text="🛍 Cart"
                             prefWidth="250" prefHeight="50"
                             style="-fx-background-color: #00aa88; -fx-text-fill: white;
                                -fx-font-weight: bold; -fx-background-radius: 10; -fx-font-size: 16px;"/>
