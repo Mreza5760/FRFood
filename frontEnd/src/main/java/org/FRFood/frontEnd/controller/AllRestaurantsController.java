@@ -40,10 +40,9 @@ public class AllRestaurantsController {
     public Button backButton;
     public TextField searchBox1;
     public TextField searchBox2;
-    public TextField minPrice;
-    public TextField maxPrice;
     public Button searchInFood;
     public Button searchInRestaurant;
+    public HBox boxOfSlider;
     @FXML
     private VBox restaurantList;
 
@@ -66,10 +65,6 @@ public class AllRestaurantsController {
         priceRangeSlider.lowValueProperty().addListener((obs, oldVal, newVal) -> updatePriceLabel());
         priceRangeSlider.highValueProperty().addListener((obs, oldVal, newVal) -> updatePriceLabel());
         if (mode == 2 || mode == 3) {
-            minPrice.setVisible(false);
-            minPrice.setManaged(false);
-            maxPrice.setVisible(false);
-            maxPrice.setManaged(false);
             searchInFood.setVisible(false);
             searchInFood.setManaged(false);
             searchInRestaurant.setVisible(false);
@@ -78,6 +73,8 @@ public class AllRestaurantsController {
             searchBox1.setManaged(false);
             searchBox2.setManaged(false);
             searchBox2.setVisible(false);
+            boxOfSlider.setVisible(false);
+            boxOfSlider.setManaged(false);
             fetchRestaurants2();
         } else {
             searchInRestaurant.setOnAction(e -> handleSearch1());

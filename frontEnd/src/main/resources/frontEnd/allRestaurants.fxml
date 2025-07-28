@@ -40,7 +40,7 @@
                 </HBox>
             </HBox>
 
-            <HBox spacing="10" alignment="CENTER">
+            <HBox spacing="10" alignment="CENTER" fx:id="boxOfSlider">
                 <Label text="💵 Price Range:"
                        style="-fx-font-size: 13px; -fx-text-fill: #333333;"/>
                 <RangeSlider fx:id="priceRangeSlider"
