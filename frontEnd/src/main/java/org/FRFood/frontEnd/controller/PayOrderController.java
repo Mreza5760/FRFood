@@ -109,7 +109,7 @@ public class PayOrderController {
         if (mode != 1) {
             detailsBox.getChildren().add(new Label("⏱ Created at: " + order.getCreatedAt()));
         }
-        if (currentOrder.getStatus() == Status.completed||currentOrder.getStatus() == Status.onTheWay){
+        if (currentOrder.getStatus() == Status.completed || currentOrder.getStatus() == Status.onTheWay) {
             detailsBox.getChildren().add(new Label("⏱ Courier Name: " + getNameById(currentOrder.getCourierId())));
         }
 
@@ -176,7 +176,16 @@ public class PayOrderController {
                 SessionManager.getOrderList().remove(currentOrder.getRestaurantId());
                 handleBack();
             } else {
-                showAlert("Failed", "Payment failed! Status: " + responseCode + ": " + connection.getResponseMessage(), Alert.AlertType.ERROR);
+                InputStream is = connection.getErrorStream();
+                try {
+                    JsonNode errnode = mapper.readTree(is);
+                    String errorMessage = errnode.path("error").asText("Unknown error");
+
+                    showAlert("Failed", errorMessage, Alert.AlertType.ERROR);
+                } catch (Exception e) {
+                    showAlert("Failed", connection.getResponseMessage(), Alert.AlertType.ERROR);
+                }
+
             }
 
         } catch (Exception e) {
@@ -302,7 +311,7 @@ public class PayOrderController {
         return null;
     }
 
-    private String getNameById(int userId){
+    private String getNameById(int userId) {
         try {
             ObjectMapper mapper = new ObjectMapper();
 

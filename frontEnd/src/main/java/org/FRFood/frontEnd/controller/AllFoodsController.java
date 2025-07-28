@@ -214,10 +214,14 @@ public class AllFoodsController {
                 """);
         deleteBtn.setOnAction(e -> handleDelete(food));
 
-        HBox rightBox = new HBox(10, editBtn, deleteBtn);
-        rightBox.setAlignment(Pos.CENTER_RIGHT);
+        if(mode != 1){
+            HBox rightBox = new HBox(10, editBtn, deleteBtn);
+            rightBox.setAlignment(Pos.CENTER_RIGHT);
+            card.getChildren().addAll(logo, info, spacer, rightBox);
+        }else{
+            card.getChildren().addAll(logo, info, spacer);
+        }
 
-        card.getChildren().addAll(logo, info, spacer, rightBox);
         return card;
     }
 
