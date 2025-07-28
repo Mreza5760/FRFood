@@ -1,5 +1,8 @@
 package org.FRFood.HTTPHandler;
 
+import java.net.URLDecoder;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.util.*;
 import java.io.IOException;
 import java.sql.SQLException;
@@ -41,9 +44,9 @@ public class CourierHandler implements HttpHandler {
         try {
             switch (method) {
                 case "GET" -> {
+                    if (path.matches("^/deliveries/history/?$")) handleGetHistory(exchange);
                     switch (path) {
                         case "/deliveries/available" -> handleGetOrders(exchange);
-                        case "/deliveries/history" -> handleGetHistory(exchange);
                         case "/deliveries/order" -> handleActiveOrder(exchange);
                     }
                 }
@@ -152,6 +155,7 @@ public class CourierHandler implements HttpHandler {
             return;
         }
 
+
         String query = exchange.getRequestURI().getQuery();
         FoodDAO foodDAO = new FoodDAOImp();
         RestaurantDAO restaurantDAO = new RestaurantDAOImp();
@@ -166,7 +170,7 @@ public class CourierHandler implements HttpHandler {
                 for (String part : parts) {
                     String[] keyValue = part.split("=");
                     if (keyValue.length == 2)
-                        params.put(keyValue[0], keyValue[1]);
+                        params.put(keyValue[0],URLDecoder.decode(keyValue[1],StandardCharsets.UTF_8) );
                 }
                 for (Order order : orders) {
                     Optional<Restaurant> optionalRestaurant = restaurantDAO.getById(order.getRestaurantId());

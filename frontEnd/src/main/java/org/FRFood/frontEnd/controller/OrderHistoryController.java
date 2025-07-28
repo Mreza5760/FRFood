@@ -20,9 +20,11 @@ import org.FRFood.frontEnd.Util.SessionManager;
 
 import java.io.ByteArrayInputStream;
 import java.net.URI;
+import java.net.URLEncoder;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
+import java.nio.charset.StandardCharsets;
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
 
@@ -34,12 +36,17 @@ public class OrderHistoryController {
     public TextField vendorIdField;
     @FXML
     public VBox buyerFilterList;
+    @FXML
+    public VBox courierFilterList;
     public TextField adminSearchField;
     public TextField adminVendorField;
     public TextField courierIdField;
     public TextField userIdField;
     public ComboBox statusComboBox;
     public VBox adminFilterList;
+    public TextField courierUserField;
+    public TextField courierVendorField;
+    public TextField courierSearchField;
     @FXML
     private VBox restaurantList;
 
@@ -56,10 +63,13 @@ public class OrderHistoryController {
         if (mode == 1) {
             buyerFilterList.setVisible(true);
             buyerFilterList.setManaged(true);
-        } else if (mode == 5){
+        } else if (mode == 5) {
             statusComboBox.getItems().addAll("", "waiting", "preparing", "cancelled", "findingCourier", "onTheWay", "completed");
             adminFilterList.setVisible(true);
             adminFilterList.setManaged(true);
+        } else if (mode == 4) {
+            courierFilterList.setVisible(true);
+            courierFilterList.setManaged(true);
         }
         fetchOrders();
     }
@@ -67,23 +77,25 @@ public class OrderHistoryController {
     private void fetchOrders() {
         String uri = null;
         if (mode == 1) {
-             uri = "http://localhost:8080/orders/history?" +
-                    "search=" + searchField.getText().trim() +
-                    "&vendor=" + vendorIdField.getText().trim();
-        }
-        else if (mode == 2) {
+            String query = "search=" + URLEncoder.encode(searchField.getText().trim(), StandardCharsets.UTF_8) +
+                    "&vendor=" +URLEncoder.encode(vendorIdField.getText().trim() , StandardCharsets.UTF_8) ;
+            uri = "http://localhost:8080/orders/history?" + query;
+        } else if (mode == 2) {
             uri = "http://localhost:8080/deliveries/available";
         } else if (mode == 3) {
             uri = "http://localhost:8080/deliveries/order";
         } else if (mode == 4) {
-            uri = "http://localhost:8080/deliveries/history";
+            String query = "search=" + URLEncoder.encode(courierSearchField.getText().trim(), StandardCharsets.UTF_8) +
+                    "&user=" + URLEncoder.encode(courierUserField.getText().trim(), StandardCharsets.UTF_8) +
+                    "&vendor=" + URLEncoder.encode(courierVendorField.getText().trim(), StandardCharsets.UTF_8);
+            uri = "http://localhost:8080/deliveries/history?" +query;
         } else if (mode == 5) {
-            uri = "http://localhost:8080/admin/orders?" +
-                    "status=" + statusComboBox.getValue() +
-                    "&search=" + adminSearchField.getText().trim() +
-                    "&customer=" + userIdField.getText().trim() +
-                    "&vendor=" + adminVendorField.getText().trim() +
-                    "&courier=" + courierIdField.getText().trim();
+            String query = "status=" +URLEncoder.encode(statusComboBox.getValue().toString(),StandardCharsets.UTF_8)+
+                    "&search=" +URLEncoder.encode( adminSearchField.getText().trim(), StandardCharsets.UTF_8) +
+                    "&customer=" +URLEncoder.encode (userIdField.getText().trim(), StandardCharsets.UTF_8) +
+                    "&vendor=" +URLEncoder.encode (adminVendorField.getText().trim(), StandardCharsets.UTF_8)+
+                    "&courier=" +URLEncoder.encode (courierIdField.getText().trim(),StandardCharsets.UTF_8);
+            uri = "http://localhost:8080/admin/orders?" + query;
         }
         HttpRequest request = HttpRequest.newBuilder()
                 .uri(URI.create(uri))

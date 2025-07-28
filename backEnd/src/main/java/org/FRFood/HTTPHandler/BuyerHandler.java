@@ -12,6 +12,8 @@ import com.sun.net.httpserver.HttpExchange;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import static org.FRFood.util.Authenticate.authenticate;
 
+import java.net.URLDecoder;
+import java.nio.charset.StandardCharsets;
 import java.time.LocalDate;
 import java.util.*;
 import java.io.IOException;
@@ -291,7 +293,7 @@ public class BuyerHandler implements HttpHandler {
             return;
         }
 
-        String query = exchange.getRequestURI().getQuery();
+        String query =exchange.getRequestURI().getQuery();
 
         try {
             List<Order> orders = orderDAO.getUserOrders(user.getId());
@@ -303,7 +305,7 @@ public class BuyerHandler implements HttpHandler {
                 for (String part : parts) {
                     String[] keyValue = part.split("=");
                     if (keyValue.length == 2)
-                        params.put(keyValue[0], keyValue[1]);
+                        params.put(keyValue[0], URLDecoder.decode(keyValue[1],StandardCharsets.UTF_8));
                 }
                 for (Order order : orders) {
                     Optional<Restaurant> optionalRestaurant = restaurantDAO.getById(order.getRestaurantId());

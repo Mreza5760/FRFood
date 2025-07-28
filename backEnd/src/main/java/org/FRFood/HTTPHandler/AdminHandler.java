@@ -10,6 +10,8 @@ import org.FRFood.util.HttpError;
 import org.FRFood.util.JsonResponse;
 
 import java.io.IOException;
+import java.net.URLDecoder;
+import java.nio.charset.StandardCharsets;
 import java.sql.SQLException;
 import java.util.*;
 
@@ -181,7 +183,7 @@ public class AdminHandler implements HttpHandler {
                 for (String part : parts) {
                     String[] keyValue = part.split("=");
                     if (keyValue.length == 2)
-                        params.put(keyValue[0], keyValue[1]);
+                        params.put(keyValue[0], URLDecoder.decode(keyValue[1],StandardCharsets.UTF_8));
                 }
                 for (Order order : orders) {
                     Optional<Restaurant> optionalRestaurant = restaurantDAO.getById(order.getRestaurantId());
