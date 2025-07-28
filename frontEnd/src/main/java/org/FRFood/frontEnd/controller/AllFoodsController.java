@@ -1,6 +1,8 @@
 package org.FRFood.frontEnd.controller;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import javafx.application.Platform;
 import javafx.event.ActionEvent;
@@ -81,7 +83,20 @@ public class AllFoodsController {
             HttpClient.newHttpClient().sendAsync(request, HttpResponse.BodyHandlers.ofString())
                     .thenAccept(response -> {
                         if (response.statusCode() == 200) {
-                            displayFoods(response.body());
+                            JsonNode rootNode = null;
+                            try {
+                                rootNode = mapper.readTree(response.body());
+                            } catch (JsonProcessingException e) {
+                                throw new RuntimeException(e);
+                            }
+                            JsonNode menuTitleNode = rootNode.get("menu_title");
+                            String menuTitleJson;
+                            try {
+                                menuTitleJson = mapper.writeValueAsString(menuTitleNode);
+                            } catch (JsonProcessingException e) {
+                                throw new RuntimeException(e);
+                            }
+                            displayFoods(menuTitleJson);
                         } else {
                             System.err.println("Failed to fetch restaurants: HTTP " + response.statusCode() + response.body());
                         }
