@@ -352,6 +352,7 @@ public class PayOrderController {
                 if (coupon.getMinPrice() >= currentRawPrice) {
                     showAlert("error", "you have to at least buy" + coupon.getMinPrice() + "to use this", Alert.AlertType.ERROR);
                 }
+
                 if (coupon.getType() == CouponType.fixed) {
                     if (currentRawPrice - coupon.getValue() < 0) {
                         SessionManager.getOrderList().get(restaurant.getId()).setRawPrice(0);
