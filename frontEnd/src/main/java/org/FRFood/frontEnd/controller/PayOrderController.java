@@ -255,7 +255,6 @@ public class PayOrderController {
         }).start();
     }
 
-
     public void handleAddRating(ActionEvent actionEvent) {
         AddRatingController.setOrderId(currentOrder.getId());
         SceneNavigator.switchTo("/frontEnd/addRating.fxml", payWalletButton);
@@ -332,7 +331,9 @@ public class PayOrderController {
 
     public void handleValidateCoupon(ActionEvent actionEvent) {
         String code = CouponCodeField.getText().trim();
-
+        if(code.isEmpty()) {
+            return;
+        }
         try {
             String temp = "http://localhost:8080/coupons?" +
                     "coupon_code=" + code;
@@ -355,14 +356,18 @@ public class PayOrderController {
                 }
 
                 if (order.getCouponId() != 0) {
-//                    Coupon curCoupon = new Coupon();
-//                    if (curCoupon.)
+                    Coupon existingCoupon = getCouponById(order.getCouponId());
+                    if(existingCoupon.getType() == CouponType.fixed) {
+                        order.setRawPrice(currentRawPrice + coupon.getValue());
+                    }else{
+                        order.setRawPrice((int)(currentRawPrice * 100.0 /((100.0 - coupon.getValue()))));
+                    }
                 }
 
                 if (coupon.getType() == CouponType.fixed) {
-                    order.setRawPrice(Math.max(currentRawPrice - coupon.getValue(), 0));
+                    order.setRawPrice(Math.max(order.getRawPrice() - coupon.getValue(), 0));
                 } else {
-                    order.setRawPrice((int)(currentRawPrice * ((100.0 - coupon.getValue()) / 100)));
+                    order.setRawPrice((int)(order.getRawPrice() * ((100.0 - coupon.getValue()) / 100)));
                 }
 
                 order.setCouponId(coupon.getId());
@@ -376,4 +381,30 @@ public class PayOrderController {
             e.printStackTrace();
         }
     }
+
+    private Coupon getCouponById(int couponId) {
+        try {
+            ObjectMapper mapper = new ObjectMapper();
+
+            URL url = new URL("http://localhost:8080/admin/coupons/" + couponId);
+            HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+            conn.setRequestMethod("GET");
+            conn.setRequestProperty("Authorization", "Bearer " + SessionManager.getAuthToken());
+            Coupon coupon =null;
+            if(conn.getResponseCode() == 200) {
+                InputStream is = conn.getInputStream();
+                JsonNode root = mapper.readTree(is);
+
+                coupon = mapper.treeToValue(root, Coupon.class);
+            }else{
+                showAlert("error", "failed to load any coupons with that id" + conn.getResponseMessage(), Alert.AlertType.ERROR);
+            }
+            return coupon;
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+
 }
