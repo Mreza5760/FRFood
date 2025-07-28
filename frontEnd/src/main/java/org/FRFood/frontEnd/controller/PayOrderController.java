@@ -350,7 +350,7 @@ public class PayOrderController {
                 Coupon coupon = mapper.readValue(conn.getInputStream(), Coupon.class);
                 Order order = SessionManager.getOrderList().get(restaurant.getId());
                 int currentRawPrice = order.getRawPrice();
-                if (coupon.getMinPrice() >= currentRawPrice) {
+                if (currentRawPrice < coupon.getMinPrice()) {
                     showAlert("error", "you have to at least buy" + coupon.getMinPrice() + "to use this", Alert.AlertType.ERROR);
                 }
 
@@ -362,7 +362,7 @@ public class PayOrderController {
                 if (coupon.getType() == CouponType.fixed) {
                     order.setRawPrice(Math.max(currentRawPrice - coupon.getValue(), 0));
                 } else {
-                    order.setRawPrice(currentRawPrice * ((100 - coupon.getValue()) / 100));
+                    order.setRawPrice((int)(currentRawPrice * ((100.0 - coupon.getValue()) / 100)));
                 }
 
                 order.setCouponId(coupon.getId());
