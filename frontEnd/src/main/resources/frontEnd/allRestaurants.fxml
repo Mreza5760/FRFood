@@ -12,35 +12,39 @@
             prefWidth="800" prefHeight="600">
 
     <top>
-        <HBox spacing="15" alignment="CENTER_LEFT"
-              style="-fx-padding: 15; -fx-background-color: #eef3f9; -fx-border-color: #ccd4e0; -fx-border-width: 0 0 1 0;">
+        <HBox spacing="20" alignment="CENTER_LEFT"
+              style="-fx-padding: 20; -fx-background-color: #eef3f9; -fx-border-color: #ccd4e0; -fx-border-width: 0 0 1 0;">
+
             <Button fx:id="backButton" text="← Back"
                     style="-fx-background-color: #ff5555; -fx-text-fill: white; -fx-font-weight: bold;
-                           -fx-background-radius: 8; -fx-pref-height: 38; -fx-font-size: 14px;"/>
+                       -fx-background-radius: 8; -fx-pref-height: 40; -fx-pref-width: 80; -fx-font-size: 14px;"/>
 
             <Region HBox.hgrow="ALWAYS"/>
 
-            <TextField fx:id="minPrice" promptText="min"
-                       style="-fx-background-radius: 8; -fx-padding: 8; -fx-pref-width: 30; -fx-font-size: 13px;"/>
-
-            <TextField fx:id="maxPrice" promptText="max"
-                       style="-fx-background-radius: 8; -fx-padding: 8; -fx-pref-width: 30; -fx-font-size: 13px;"/>
+            <HBox spacing="10" alignment="CENTER_LEFT">
+                <TextField fx:id="minPrice" promptText="Min Price"
+                           style="-fx-background-radius: 6; -fx-padding: 8; -fx-pref-width: 80; -fx-font-size: 13px;"/>
+                <TextField fx:id="maxPrice" promptText="Max Price"
+                           style="-fx-background-radius: 6; -fx-padding: 8; -fx-pref-width: 80; -fx-font-size: 13px;"/>
+            </HBox>
 
             <TextField fx:id="searchBox1" promptText="🔍 Search vendor/food name..."
-                       style="-fx-background-radius: 8; -fx-padding: 8; -fx-pref-width: 200; -fx-font-size: 13px;"/>
+                       style="-fx-background-radius: 6; -fx-padding: 8; -fx-pref-width: 200; -fx-font-size: 13px;"/>
+
             <TextField fx:id="searchBox2" promptText="🍽 Search food keywords..."
-                       style="-fx-background-radius: 8; -fx-padding: 8; -fx-pref-width: 200; -fx-font-size: 13px;"/>
+                       style="-fx-background-radius: 6; -fx-padding: 8; -fx-pref-width: 200; -fx-font-size: 13px;"/>
 
-            <Button fx:id="searchInFood" text="searchInFood"
-                    style="-fx-background-color: blue; -fx-text-fill: white; -fx-font-weight: bold;
-                           -fx-background-radius: 8; -fx-pref-height: 38; -fx-font-size: 14px;"/>
-
-            <Button fx:id="searchInRestaurant" text="searchInRestaurant"
-                    style="-fx-background-color: blue; -fx-text-fill: white; -fx-font-weight: bold;
-                           -fx-background-radius: 8; -fx-pref-height: 38; -fx-font-size: 14px;"/>
-
+            <HBox spacing="10">
+                <Button fx:id="searchInFood" text="Search Food"
+                        style="-fx-background-color: #0077cc; -fx-text-fill: white; -fx-font-weight: bold;
+                           -fx-background-radius: 8; -fx-pref-height: 40; -fx-font-size: 13px;"/>
+                <Button fx:id="searchInRestaurant" text="Search Vendor"
+                        style="-fx-background-color: #00aa88; -fx-text-fill: white; -fx-font-weight: bold;
+                           -fx-background-radius: 8; -fx-pref-height: 40; -fx-font-size: 13px;"/>
+            </HBox>
         </HBox>
     </top>
+
     <center>
         <VBox xmlns="http://javafx.com/javafx"
               xmlns:fx="http://javafx.com/fxml"

@@ -55,7 +55,11 @@ public class AllFoodsController {
 
     @FXML
     public void goBack(ActionEvent actionEvent) {
-        SceneNavigator.switchTo("/frontEnd/restaurant.fxml", foodList);
+        if(mode == 2){
+            SceneNavigator.switchTo("/frontEnd/allRestaurants.fxml", foodList);
+        }else{
+            SceneNavigator.switchTo("/frontEnd/restaurant.fxml", foodList);
+        }
     }
 
     @FXML
