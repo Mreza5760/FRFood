@@ -190,17 +190,17 @@ public class AdminHandler implements HttpHandler {
                         return;
                     }
                     Restaurant restaurant = optionalRestaurant.get();
-                    if (params.containsKey("vendor") && !restaurant.getName().contains(params.get("vendor"))) {
+                    if (params.containsKey("vendor") && !restaurant.getName().toLowerCase().contains(params.get("vendor").toLowerCase())) {
                         finalOrders.remove(order);
                     }
                     if (params.containsKey("customer") && !params.get("customer").isEmpty()) {
                         Optional<User> optionalUser2 = userDAO.getById(order.getCustomerId());
-                        if (optionalUser2.isPresent() && !optionalUser2.get().getFullName().contains(params.get("customer")))
+                        if (optionalUser2.isPresent() && !optionalUser2.get().getFullName().toLowerCase().contains(params.get("customer").toLowerCase()))
                             finalOrders.remove(order);
                     }
                     if (params.containsKey("courier") && !params.get("courier").isEmpty()) {
                         Optional<User> optionalUser2 = userDAO.getById(order.getCourierId());
-                        if (order.getCourierId() == 0 || (optionalUser2.isPresent() && !optionalUser2.get().getFullName().contains(params.get("courier"))))
+                        if (order.getCourierId() == 0 || (optionalUser2.isPresent() && !optionalUser2.get().getFullName().toLowerCase().contains(params.get("courier").toLowerCase())))
                             finalOrders.remove(order);
                     }
                     if (params.containsKey("status") && !params.get("status").equals("null") && !params.get("status").isEmpty() && !order.getStatus().toString().equals(params.get("status"))) {
@@ -216,7 +216,7 @@ public class AdminHandler implements HttpHandler {
                                 return;
                             }
                             Food food = optionalFood.get();
-                            if (food.getName().contains(params.get("search"))) {
+                            if (food.getName().toLowerCase().contains(params.get("search").toLowerCase())) {
                                 found = true;
                                 break;
                             }
@@ -261,7 +261,7 @@ public class AdminHandler implements HttpHandler {
                 for (Transaction transaction : transactions) {
                     if (params.containsKey("user") && !params.get("user").isEmpty()) {
                         Optional<User> optionalUser2 = userDAO.getById(transaction.getUserID());
-                        if (optionalUser2.isPresent() && !optionalUser2.get().getFullName().contains(params.get("user")))
+                        if (optionalUser2.isPresent() && !optionalUser2.get().getFullName().toLowerCase().contains(params.get("user").toLowerCase()))
                             finalTransactions.remove(transaction);
                     }
                     if (params.containsKey("method") && !params.get("method").equals("null") && !params.get("method").isEmpty() && !transaction.getMethod().toString().equals(params.get("method"))) {
@@ -283,7 +283,7 @@ public class AdminHandler implements HttpHandler {
                                 return;
                             }
                             Food food = optionalFood.get();
-                            if (food.getName().contains(params.get("search"))) {
+                            if (food.getName().toLowerCase().contains(params.get("search").toLowerCase())) {
                                 found = true;
                                 break;
                             }

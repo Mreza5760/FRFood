@@ -430,12 +430,12 @@ public class RestaurantHandler implements HttpHandler {
                     }
                     if (params.containsKey("user") && !params.get("user").isEmpty()) {
                         Optional<User> optionalUser = userDAO.getById(order.getCustomerId());
-                        if (optionalUser.isPresent() && !optionalUser.get().getFullName().contains(params.get("user")))
+                        if (optionalUser.isPresent() && !optionalUser.get().getFullName().toLowerCase().contains(params.get("user").toLowerCase()))
                             finalOrders.remove(order);
                     }
                     if (params.containsKey("courier") && !params.get("courier").isEmpty()) {
                         Optional<User> optionalUser = userDAO.getById(order.getCourierId());
-                        if (order.getCourierId() == 0 || (optionalUser.isPresent() && !optionalUser.get().getFullName().contains(params.get("courier"))))
+                        if (order.getCourierId() == 0 || (optionalUser.isPresent() && !optionalUser.get().getFullName().toLowerCase().contains(params.get("courier").toLowerCase())))
                             finalOrders.remove(order);
                     }
                     if (params.containsKey("search") && !params.get("search").isEmpty()) {
@@ -448,7 +448,7 @@ public class RestaurantHandler implements HttpHandler {
                                 return;
                             }
                             Food food = optionalFood.get();
-                            if (food.getName().contains(params.get("search"))) {
+                            if (food.getName().toLowerCase().contains(params.get("search").toLowerCase())) {
                                 found = true;
                                 break;
                             }

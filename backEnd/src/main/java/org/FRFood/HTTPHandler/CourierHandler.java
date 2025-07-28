@@ -175,12 +175,12 @@ public class CourierHandler implements HttpHandler {
                         return;
                     }
                     Restaurant restaurant = optionalRestaurant.get();
-                    if (params.containsKey("vendor") && !restaurant.getName().contains(params.get("vendor"))) {
+                    if (params.containsKey("vendor") && !restaurant.getName().toLowerCase().contains(params.get("vendor").toLowerCase())) {
                         finalOrders.remove(order);
                     }
                     if (params.containsKey("user") && !params.get("user").isEmpty()) {
                         Optional<User> optionalUser = userDAO.getById(order.getCustomerId());
-                        if (optionalUser.isPresent() && !optionalUser.get().getFullName().contains(params.get("user")))
+                        if (optionalUser.isPresent() && !optionalUser.get().getFullName().toLowerCase().contains(params.get("user").toLowerCase()))
                             finalOrders.remove(order);
                     }
                     if (params.containsKey("search")) {
@@ -193,7 +193,7 @@ public class CourierHandler implements HttpHandler {
                                 return;
                             }
                             Food food = optionalFood.get();
-                            if (food.getName().contains(params.get("search"))) {
+                            if (food.getName().toLowerCase().contains(params.get("search").toLowerCase())) {
                                 found = true;
                                 break;
                             }
