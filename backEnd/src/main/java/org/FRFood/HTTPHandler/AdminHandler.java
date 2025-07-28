@@ -430,11 +430,6 @@ public class AdminHandler implements HttpHandler {
     private void handleGetCoupon(HttpExchange exchange) throws IOException {
         Optional<User> optionalUser = authenticate(exchange);
         if (optionalUser.isEmpty()) return;
-        User user = optionalUser.get();
-        if (!user.getRole().equals(admin)) {
-            HttpError.forbidden(exchange, "Only Admin Allowed");
-            return;
-        }
 
         String path = exchange.getRequestURI().getPath();
         String[] parts = path.split("/");
