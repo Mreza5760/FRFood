@@ -50,14 +50,15 @@ public class FoodDAOImp implements FoodDAO {
             return true;
         }
         List<Keyword> keywords = food.getKeywords();
-        for(String temp : input){
+        for (String temp : input) {
             boolean tempCondition = false;
-            for(Keyword keyword : keywords){
-                if(keyword.getName().equals(temp)){
-                    tempCondition =true;
+            for (Keyword keyword : keywords) {
+                if (keyword.getName().equalsIgnoreCase(temp)) {
+                    tempCondition = true;
+                    break;
                 }
             }
-            if(!tempCondition){
+            if (!tempCondition) {
                 return false;
             }
         }
