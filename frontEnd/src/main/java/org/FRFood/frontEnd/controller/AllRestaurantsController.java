@@ -20,6 +20,7 @@ import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
 import javafx.stage.Stage;
+import org.controlsfx.control.RangeSlider;
 import org.FRFood.frontEnd.entity.*;
 import org.FRFood.frontEnd.Util.SceneNavigator;
 import org.FRFood.frontEnd.Util.SessionManager;
@@ -46,6 +47,11 @@ public class AllRestaurantsController {
     @FXML
     private VBox restaurantList;
 
+    @FXML
+    private RangeSlider priceRangeSlider;
+    @FXML
+    private Label priceLabel;
+
     private final ObjectMapper mapper = new ObjectMapper();
 
     private static int mode;
@@ -57,6 +63,8 @@ public class AllRestaurantsController {
     @FXML
     public void initialize() {
         backButton.setOnAction(e -> goBack());
+        priceRangeSlider.lowValueProperty().addListener((obs, oldVal, newVal) -> updatePriceLabel());
+        priceRangeSlider.highValueProperty().addListener((obs, oldVal, newVal) -> updatePriceLabel());
         if (mode == 2 || mode == 3) {
             minPrice.setVisible(false);
             minPrice.setManaged(false);
@@ -258,14 +266,11 @@ public class AllRestaurantsController {
 
     private void handleSearch2() {
         String name = searchBox1.getText().trim();
-        int minPriceValue = 0;
-        int maxPriceValue = 10000000;
-        if(!maxPrice.getText().trim().isEmpty()){
-            maxPriceValue = Integer.parseInt(maxPrice.getText().trim());
-        }
-        if(!minPrice.getText().trim().isEmpty()){
-            minPriceValue = Integer.parseInt(minPrice.getText().trim());
-        }
+
+
+        int minPriceValue = (int) priceRangeSlider.getLowValue();
+        int maxPriceValue = (int) priceRangeSlider.getHighValue();
+
 
         String temp = searchBox2.getText().trim();
         String[] parts = temp.split(",");
@@ -372,5 +377,11 @@ public class AllRestaurantsController {
         } catch (Exception e) {
             e.printStackTrace();
         }
+    }
+
+    private void updatePriceLabel() {
+        int min = (int) priceRangeSlider.getLowValue();
+        int max = (int) priceRangeSlider.getHighValue();
+        priceLabel.setText(min + " - " + max);
     }
 }
