@@ -258,7 +258,7 @@ public class AdminHandler implements HttpHandler {
                 for (String part : parts) {
                     String[] keyValue = part.split("=");
                     if (keyValue.length == 2)
-                        params.put(keyValue[0], keyValue[1]);
+                        params.put(keyValue[0], URLDecoder.decode(keyValue[1],StandardCharsets.UTF_8));
                 }
                 for (Transaction transaction : transactions) {
                     if (params.containsKey("user") && !params.get("user").isEmpty()) {

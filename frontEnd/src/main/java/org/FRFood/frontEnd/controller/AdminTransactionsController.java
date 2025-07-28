@@ -140,7 +140,7 @@ public class AdminTransactionsController {
                 }
                 if (method != null) {
                     urlBuilder.append(first ? "?" : "&")
-                            .append("method=").append(method.name());
+                            .append("method=").append(URLEncoder.encode(method.name(), StandardCharsets.UTF_8));
                     first = false;
                 }
                 if (keyword != null) {
