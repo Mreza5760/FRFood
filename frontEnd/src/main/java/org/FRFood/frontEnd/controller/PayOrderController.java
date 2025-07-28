@@ -174,6 +174,7 @@ public class PayOrderController {
             if (responseCode == 200 || responseCode == 201) {
                 showAlert("Success", "Payment successful with " + method + "!", Alert.AlertType.INFORMATION);
                 SessionManager.getOrderList().remove(currentOrder.getRestaurantId());
+                SessionManager.saveSession();
                 handleBack();
             } else {
                 InputStream is = connection.getErrorStream();
