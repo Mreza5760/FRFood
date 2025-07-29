@@ -18,12 +18,15 @@
 
     <HBox alignment="CENTER_LEFT" spacing="10">
         <Button text="⬅ Back" onAction="#handleBack"
-                style="-fx-background-color: #e74c3c; -fx-text-fill: white; -fx-font-weight: bold; -fx-background-radius: 8;"/>
+                style="-fx-background-color: #e74c3c; -fx-text-fill: white;
+                       -fx-font-weight: bold; -fx-background-radius: 8;"/>
         <Label text="🔍 Filter &amp; Search Orders"
                style="-fx-font-size: 24px; -fx-font-weight: bold; -fx-text-fill: #1e2a38;"/>
     </HBox>
 
-    <VBox spacing="15" alignment="CENTER" style="-fx-background-color: white; -fx-background-radius: 12; -fx-padding: 30; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.1), 10, 0, 0, 4);">
+    <VBox spacing="15" alignment="CENTER"
+          style="-fx-background-color: white; -fx-background-radius: 12;
+                 -fx-padding: 30; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.1), 10, 0, 0, 4);">
 
         <HBox spacing="20" alignment="CENTER">
             <Label text="Status:" style="-fx-font-size: 14px;"/>
@@ -43,13 +46,18 @@
                        style="-fx-font-size: 14px; -fx-padding: 10; -fx-background-radius: 6;" prefWidth="300"/>
 
             <Button text="Search" onAction="#handleSearch"
-                    style="-fx-background-color: #0077cc; -fx-text-fill: white; -fx-font-weight: bold; -fx-background-radius: 8;"
+                    style="-fx-background-color: #0077cc; -fx-text-fill: white;
+                           -fx-font-weight: bold; -fx-background-radius: 8;"
                     prefWidth="120"/>
         </HBox>
     </VBox>
 
-    <ScrollPane fitToWidth="true" style="-fx-background: transparent;">
-        <VBox fx:id="ordersContainer" spacing="15" alignment="TOP_CENTER"/>
+    <ScrollPane fitToWidth="true" pannable="true" vbarPolicy="AS_NEEDED" hbarPolicy="NEVER"
+                style="-fx-background: transparent; -fx-background-color: transparent;">
+        <content>
+            <VBox fx:id="ordersContainer" spacing="15" alignment="TOP_CENTER"
+                  style="-fx-background-color: transparent;"/>
+        </content>
     </ScrollPane>
 
 </VBox>
