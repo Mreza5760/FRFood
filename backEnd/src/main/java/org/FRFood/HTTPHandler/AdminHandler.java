@@ -269,6 +269,9 @@ public class AdminHandler implements HttpHandler {
                     if (params.containsKey("method") && !params.get("method").equals("null") && !params.get("method").isEmpty() && !transaction.getMethod().toString().equals(params.get("method"))) {
                         finalTransactions.remove(transaction);
                     }
+                    if (transaction.getOrderID() == 0 && params.containsKey("search")) {
+                        finalTransactions.remove(transaction);
+                    }
                     if (transaction.getOrderID() != 0 && params.containsKey("search")) {
                         Optional<Order> optionalOrder = orderDAO.getById(transaction.getOrderID());
                         if (optionalOrder.isEmpty()) {
