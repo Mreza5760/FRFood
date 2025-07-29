@@ -70,8 +70,12 @@ public class UpdateCouponController {
                     showAlert(AlertType.ERROR, "Invalid Numbers", "Value, Min Price, and User Count must be positive.");
                     return;
                 }
-                if (type.equals("percent") && value > 100) {
-                    showAlert(AlertType.ERROR, "Invalid Numbers", "Value can’t be greater than 100 for percent type.");
+                if (type.equals("percent") && value >= 100) {
+                    showAlert(AlertType.ERROR, "Invalid Numbers", "Value can’t be greater than or equal 100 for percent type.");
+                    return;
+                }
+                if (type.equals("fixed") && minPrice <= value) {
+                    showAlert(AlertType.ERROR, "Invalid Numbers", "Value must be less than min price for fixed type.");
                     return;
                 }
             } catch (NumberFormatException e) {
