@@ -197,7 +197,15 @@ public class PayOrderController {
                     currentOrder.calculatePayPrice();
                     Platform.runLater(() ->
                             setOrder(currentOrder, restaurant, 1));
-                    showAlert("error", conn.getResponseMessage(), Alert.AlertType.ERROR);
+                    String response = conn.getResponseMessage();
+                    String errorMessage;
+                    try {
+                        JsonNode root = mapper.readTree(response);
+                        errorMessage = root.path("error").asText("Unknown error");
+                    } catch (Exception e) {
+                        errorMessage = "Invalid response format";
+                    }
+                    showAlert("error", errorMessage, Alert.AlertType.ERROR);
                     return;
                 }
             } catch (Exception e) {
