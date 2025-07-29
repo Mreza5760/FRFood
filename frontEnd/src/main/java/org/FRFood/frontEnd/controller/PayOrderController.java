@@ -14,7 +14,9 @@ import org.FRFood.frontEnd.entity.*;
 import org.FRFood.frontEnd.Util.SceneNavigator;
 import org.FRFood.frontEnd.Util.SessionManager;
 
+import java.io.BufferedReader;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URI;
@@ -24,6 +26,7 @@ import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.nio.charset.StandardCharsets;
 import java.util.concurrent.CompletableFuture;
+import java.util.stream.Collectors;
 
 public class PayOrderController {
 
@@ -197,7 +200,9 @@ public class PayOrderController {
                     currentOrder.calculatePayPrice();
                     Platform.runLater(() ->
                             setOrder(currentOrder, restaurant, 1));
-                    String response = conn.getResponseMessage();
+                    InputStream inputStream =conn.getErrorStream();
+                    String response = new BufferedReader(new InputStreamReader(inputStream))
+                            .lines().collect(Collectors.joining("\n"));
                     String errorMessage;
                     try {
                         JsonNode root = mapper.readTree(response);
@@ -445,7 +450,9 @@ public class PayOrderController {
                 Platform.runLater(() ->
                         setOrder(order, restaurant, 1));
             } else {
-                String response = conn.getResponseMessage();
+                InputStream inputStream =conn.getErrorStream();
+                String response = new BufferedReader(new InputStreamReader(inputStream))
+                        .lines().collect(Collectors.joining("\n"));
                 String errorMessage;
                 try {
                     ObjectMapper mapper = new ObjectMapper();
