@@ -358,10 +358,10 @@ public class PayOrderController {
 
                 if (order.getCouponId() != 0) {
                     Coupon existingCoupon = getCouponById(order.getCouponId());
-                    if(existingCoupon.getType() == CouponType.fixed) {
+                    if (existingCoupon.getType() == CouponType.fixed) {
                         order.setRawPrice(currentRawPrice + coupon.getValue());
-                    }else{
-                        order.setRawPrice((int)(currentRawPrice * 100.0 /((100.0 - coupon.getValue()))));
+                    } else {
+                        order.setRawPrice((int)(currentRawPrice * 100.0 /(100.0 - coupon.getValue())));
                     }
                 }
 
@@ -406,6 +406,4 @@ public class PayOrderController {
         }
         return null;
     }
-
-
 }
