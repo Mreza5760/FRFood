@@ -179,7 +179,7 @@ public class PayOrderController {
                         order.calculatePayPrice();
                         Platform.runLater(() ->
                                 setOrder(order, restaurant, 1));
-                        showAlert("error", "you have to at least buy" + coupon.getMinPrice() + "to use this", Alert.AlertType.ERROR);
+                        showAlert("error", "you have to at least buy " + coupon.getMinPrice() + " Toman to use this", Alert.AlertType.ERROR);
                         return;
                     }
                 } else {
@@ -410,7 +410,7 @@ public class PayOrderController {
                 Order order = SessionManager.getOrderList().get(restaurant.getId());
                 int currentRawPrice = order.getRawPrice();
                 if (currentRawPrice < coupon.getMinPrice()) {
-                    showAlert("error", "you have to at least buy" + coupon.getMinPrice() + "to use this", Alert.AlertType.ERROR);
+                    showAlert("error", "you have to at least buy " + coupon.getMinPrice() + " Toman to use this", Alert.AlertType.ERROR);
                 }
 
                 if (order.getCouponId() != 0) {
