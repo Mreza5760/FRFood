@@ -693,7 +693,7 @@ public class BuyerHandler implements HttpHandler {
         if (userOpt.isEmpty()) return;
         User user = userOpt.get();
         if (!user.getRole().equals(buyer)) {
-            HttpError.unauthorized(exchange, "Only buyers can top restaurants");
+            HttpError.unauthorized(exchange, "Only buyers can get top restaurants");
             return;
         }
 
