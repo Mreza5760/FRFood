@@ -421,9 +421,9 @@ public class PayOrderController {
                 if (order.getCouponId() != 0) {
                     Coupon existingCoupon = getCouponById(order.getCouponId());
                     if (existingCoupon.getType() == CouponType.fixed) {
-                        currentRawPrice += coupon.getValue();
+                        currentRawPrice += existingCoupon.getValue();
                     } else {
-                        currentRawPrice = (int) (currentRawPrice * 100.0 / (100.0 - coupon.getValue()));
+                        currentRawPrice = (int) (currentRawPrice * 100.0 / (100.0 - existingCoupon.getValue()));
                     }
                 }
 
