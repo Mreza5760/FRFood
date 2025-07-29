@@ -90,7 +90,11 @@ public class OrderHistoryController {
                     "&vendor=" + URLEncoder.encode(courierVendorField.getText().trim(), StandardCharsets.UTF_8);
             uri = "http://localhost:8080/deliveries/history?" +query;
         } else if (mode == 5) {
-            String query = "status=" +URLEncoder.encode(statusComboBox.getValue().toString(),StandardCharsets.UTF_8)+
+            String tempStatus = "null";
+            if(statusComboBox.getValue() != null){
+                tempStatus = statusComboBox.getValue().toString();
+            }
+            String query = "status=" +URLEncoder.encode(tempStatus,StandardCharsets.UTF_8)+
                     "&search=" +URLEncoder.encode( adminSearchField.getText().trim(), StandardCharsets.UTF_8) +
                     "&customer=" +URLEncoder.encode (userIdField.getText().trim(), StandardCharsets.UTF_8) +
                     "&vendor=" +URLEncoder.encode (adminVendorField.getText().trim(), StandardCharsets.UTF_8)+
