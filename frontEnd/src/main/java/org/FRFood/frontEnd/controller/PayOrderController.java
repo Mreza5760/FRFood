@@ -149,6 +149,61 @@ public class PayOrderController {
     }
 
     private void sendPaymentRequest(String method) {
+        if (currentOrder.getCouponId() != 0) {
+            Coupon existingCoupon = getCouponById(currentOrder.getCouponId());
+            String code = existingCoupon.getCouponCode();
+            try {
+                String temp = "http://localhost:8080/coupons?" +
+                        "coupon_code=" + code;
+                URL url = new URL(temp);
+                HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+                conn.setRequestMethod("GET");
+                conn.setRequestProperty("Authorization", "Bearer " + SessionManager.getAuthToken());
+                conn.setRequestProperty("Content-Type", "application/json");
+                conn.setDoOutput(true);
+
+                int resCode = conn.getResponseCode();
+
+                if (resCode >= 200 && resCode < 300) {
+                    ObjectMapper mapper = new ObjectMapper();
+                    Coupon coupon = mapper.readValue(conn.getInputStream(), Coupon.class);
+                    Order order = SessionManager.getOrderList().get(restaurant.getId());
+                    int currentRawPrice = order.getRawPrice();
+                    if (currentRawPrice < coupon.getMinPrice()) {
+                        if (existingCoupon.getType() == CouponType.fixed) {
+                            currentOrder.setRawPrice(currentRawPrice + coupon.getValue());
+                        } else {
+                            order.setRawPrice((int)(currentRawPrice * 100.0 /(100.0 - coupon.getValue())));
+                        }
+                        order.setCouponId(0);
+                        order.calculatePayPrice();
+                        Platform.runLater(() ->
+                                setOrder(order, restaurant, 1));
+                        showAlert("error", "you have to at least buy" + coupon.getMinPrice() + "to use this", Alert.AlertType.ERROR);
+                        return;
+                    }
+                } else {
+                    ObjectMapper mapper = new ObjectMapper();
+                    Coupon coupon = mapper.readValue(conn.getInputStream(), Coupon.class);
+                    Order order = SessionManager.getOrderList().get(restaurant.getId());
+                    int currentRawPrice = order.getRawPrice();
+                    if (existingCoupon.getType() == CouponType.fixed) {
+                        currentOrder.setRawPrice(currentRawPrice + coupon.getValue());
+                    } else {
+                        order.setRawPrice((int)(currentRawPrice * 100.0 /(100.0 - coupon.getValue())));
+                    }
+                    order.setCouponId(0);
+                    order.calculatePayPrice();
+                    Platform.runLater(() ->
+                            setOrder(order, restaurant, 1));
+                    showAlert("error", conn.getResponseMessage(), Alert.AlertType.ERROR);
+                    return;
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+
         try {
             URL url = new URL("http://localhost:8080/payment/online");
             HttpURLConnection connection = (HttpURLConnection) url.openConnection();
