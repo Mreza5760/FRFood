@@ -41,6 +41,7 @@
                 <TableColumn fx:id="idColumn" text="TransactionID" prefWidth="120"/>
                 <TableColumn fx:id="orderIdColumn" text="OrderID / Type" prefWidth="140"/>
                 <TableColumn fx:id="userIdColumn" text="UserID" prefWidth="100"/>
+                <TableColumn fx:id="userNameColumn" text="User Name" prefWidth="150"/>
                 <TableColumn fx:id="methodColumn" text="Method" prefWidth="120"/>
                 <TableColumn fx:id="amountColumn" text="Amount" prefWidth="120"/>
                 <TableColumn fx:id="payedAtColumn" text="Paid At" prefWidth="250"/>

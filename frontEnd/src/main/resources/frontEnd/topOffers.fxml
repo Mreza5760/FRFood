@@ -30,14 +30,14 @@
         <HBox spacing="30" alignment="CENTER">
             <Button fx:id="foodsButton" text="Your Favorite Orders"
                     onAction="#bestFoodsHandler"
-                    prefWidth="140" prefHeight="45"
+                    prefWidth="180" prefHeight="45"
                     style="-fx-background-color: #0077cc; -fx-text-fill: white;
                            -fx-font-size: 15px; -fx-font-weight: bold;
                            -fx-background-radius: 10;"/>
 
             <Button fx:id="restaurantsButton" text="Best Restaurants"
                     onAction="#bestRestaurantsHandler"
-                    prefWidth="140" prefHeight="45"
+                    prefWidth="180" prefHeight="45"
                     style="-fx-background-color: #00aa88; -fx-text-fill: white;
                            -fx-font-size: 15px; -fx-font-weight: bold;
                            -fx-background-radius: 10;"/>

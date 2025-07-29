@@ -1,6 +1,7 @@
 package org.FRFood.frontEnd.controller;
 
 import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
@@ -28,6 +29,8 @@ public class AdminTransactionsController {
     @FXML private TableColumn<Transaction, Integer> idColumn;
     @FXML private TableColumn<Transaction, Integer> orderIdColumn;
     @FXML private TableColumn<Transaction, Integer> userIdColumn;
+    // ADD THIS FXML DECLARATION
+    @FXML private TableColumn<Transaction, String> userNameColumn;
     @FXML private TableColumn<Transaction, String> methodColumn;
     @FXML private TableColumn<Transaction, Integer> amountColumn;
     @FXML private TableColumn<Transaction, String> payedAtColumn;
@@ -44,6 +47,15 @@ public class AdminTransactionsController {
     public void initialize() {
         idColumn.setCellValueFactory(new PropertyValueFactory<>("id"));
         userIdColumn.setCellValueFactory(new PropertyValueFactory<>("userID"));
+        userIdColumn.setCellValueFactory(new PropertyValueFactory<>("userID"));
+        userNameColumn.setCellValueFactory(cellData -> {
+            Transaction transaction = cellData.getValue();
+            int userId = transaction.getUserID();
+            String userName = getNameById(userId);
+            return new javafx.beans.property.SimpleStringProperty(userName);
+        });
+
+
         methodColumn.setCellValueFactory(new PropertyValueFactory<>("method"));
         amountColumn.setCellValueFactory(new PropertyValueFactory<>("amount"));
         orderIdColumn.setCellValueFactory(new PropertyValueFactory<>("orderID"));
@@ -164,4 +176,24 @@ public class AdminTransactionsController {
             }
         }).start();
     }
+
+    private String getNameById(int userId) {
+        try {
+            ObjectMapper mapper = new ObjectMapper();
+
+            URL url = new URL("http://localhost:8080/auth/name/" + userId);
+            HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+            conn.setRequestMethod("GET");
+            conn.setRequestProperty("Authorization", "Bearer " + SessionManager.getAuthToken());
+
+            InputStream is = conn.getInputStream();
+            JsonNode root = mapper.readTree(is);
+
+            return root.get("name").asText();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
 }
