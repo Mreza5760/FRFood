@@ -1,6 +1,8 @@
 package org.FRFood.frontEnd.controller;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import javafx.application.Platform;
 import javafx.event.ActionEvent;
@@ -58,8 +60,9 @@ public class MenuController {
     public void goBack(ActionEvent actionEvent) {
         if (mode == 2) {
             SceneNavigator.switchTo("/frontEnd/topOffers.fxml", menu_name_label);
-        }else{
-        SceneNavigator.switchTo("/frontEnd/restaurant.fxml", menu_name_label);}
+        } else {
+            SceneNavigator.switchTo("/frontEnd/restaurant.fxml", menu_name_label);
+        }
     }
 
     @FXML
@@ -89,6 +92,9 @@ public class MenuController {
         if (mode == 2) {
             safeUrl = "http://localhost:8080/top/foods";
         }
+        if (mode == 10) {
+            safeUrl = "http://localhost:8080/vendors/" + restaurant.getId();
+        }
 
         URI uri = URI.create(safeUrl);
         HttpRequest request = HttpRequest.newBuilder()
@@ -113,14 +119,41 @@ public class MenuController {
 
     private void displayFoods(String body) {
         try {
-            List<Food> foods = mapper.readValue(body, new TypeReference<>() {
-            });
-            Platform.runLater(() -> {
-                foodList.getChildren().clear();
-                for (Food food : foods) {
-                    foodList.getChildren().add(createFoodCard(food));
+            if (mode == 10) {
+                JsonNode rootNode = null;
+                try {
+                    rootNode = mapper.readTree(body);
+                } catch (JsonProcessingException e) {
+                    throw new RuntimeException(e);
                 }
-            });
+                JsonNode menuTitleNode = rootNode.get("menu_title");
+                String menuTitleJson;
+                try {
+                    menuTitleJson = mapper.writeValueAsString(menuTitleNode);
+                } catch (JsonProcessingException e) {
+                    throw new RuntimeException(e);
+                }
+                try {
+                    List<Food> foods = mapper.readValue(menuTitleJson, new TypeReference<List<Food>>() {});
+                    Platform.runLater(() -> {
+                        foodList.getChildren().clear();
+                        for (Food food : foods) {
+                            foodList.getChildren().add(createFoodCard(food));
+                        }
+                    });
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            } else {
+                List<Food> foods = mapper.readValue(body, new TypeReference<>() {
+                });
+                Platform.runLater(() -> {
+                    foodList.getChildren().clear();
+                    for (Food food : foods) {
+                        foodList.getChildren().add(createFoodCard(food));
+                    }
+                });
+            }
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -183,7 +216,7 @@ public class MenuController {
             rightBox.setAlignment(Pos.CENTER_RIGHT);
         }
 
-        if (userRole == Role.buyer && mode == 1) {
+        if (userRole == Role.buyer && (mode == 1 || mode ==10)) {
             Button removeBtn = new Button("-");
             removeBtn.setMaxSize(36, 36);
             removeBtn.setStyle("""

@@ -190,7 +190,7 @@ public class RestaurantController {
     }
 
     private void handleClick(Menu menu) {
-        MenuController.setData(menu.getTitle(), restaurant,1);
+        MenuController.setData(menu.getTitle(), restaurant, 1);
         SceneNavigator.switchTo("/frontEnd/menu.fxml", restaurant_name_label);
     }
 
@@ -273,10 +273,11 @@ public class RestaurantController {
     }
 
     public void viewFoods(ActionEvent actionEvent) {
-        if(userRole == Role.buyer){
-        AllFoodsController.setData(restaurant.getId(), restaurantName,1,null);
-        SceneNavigator.switchTo("/frontEnd/allFoods.fxml", restaurant_name_label);}else if(userRole == Role.seller){
-            AllFoodsController.setData(restaurant.getId(), restaurantName,3,null);
+        if (userRole == Role.buyer) {
+            MenuController.setData("All foods",restaurant,10);
+            SceneNavigator.switchTo("/frontEnd/menu.fxml", restaurant_name_label);
+        } else if (userRole == Role.seller) {
+            AllFoodsController.setData(restaurant.getId(), restaurantName, 3, null);
             SceneNavigator.switchTo("/frontEnd/allFoods.fxml", restaurant_name_label);
         }
     }

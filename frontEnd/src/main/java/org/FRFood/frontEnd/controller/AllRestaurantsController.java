@@ -280,7 +280,7 @@ public class AllRestaurantsController {
         itemsReq.minPrice = minPriceValue;
         itemsReq.maxPrice = maxPriceValue;
         itemsReq.keywords = keywords;
-        AllFoodsController.setData(0, "Foods :", 2, itemsReq);
+        AllFoodsController.setData(0,"Foods :", 2, itemsReq);
         SceneNavigator.switchTo("/frontEnd/allFoods.fxml", restaurantList);
     }
 
