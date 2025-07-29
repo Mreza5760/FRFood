@@ -248,7 +248,7 @@ public class MenuController {
                     return;
                 }
                 orderItem.setQuantity(orderItem.getQuantity() - 1);
-                if(orderItem.getQuantity() == 0){
+                if (orderItem.getQuantity() == 0) {
                     order.getItems().remove(orderItem);
                 }
                 break;
