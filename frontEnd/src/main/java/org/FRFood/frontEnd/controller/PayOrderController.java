@@ -172,7 +172,7 @@ public class PayOrderController {
                     if (existingCoupon.getType() == CouponType.fixed) {
                         currentRawPrice += coupon.getValue();
                     } else {
-                        currentRawPrice = (int)(currentRawPrice * 100.0 /(100.0 - coupon.getValue()));
+                        currentRawPrice = (int) (currentRawPrice * 100.0 / (100.0 - coupon.getValue()));
                     }
 
                     if (currentRawPrice < coupon.getMinPrice()) {
@@ -191,7 +191,7 @@ public class PayOrderController {
                     if (existingCoupon.getType() == CouponType.fixed) {
                         currentOrder.setRawPrice(currentRawPrice + coupon.getValue());
                     } else {
-                        currentOrder.setRawPrice((int)(currentRawPrice * 100.0 /(100.0 - coupon.getValue())));
+                        currentOrder.setRawPrice((int) (currentRawPrice * 100.0 / (100.0 - coupon.getValue())));
                     }
                     currentOrder.setCouponId(0);
                     currentOrder.calculatePayPrice();
@@ -305,8 +305,8 @@ public class PayOrderController {
 
                 if (code >= 200 && code < 300) {
                     Platform.runLater(this::handleBack);
-                }else if(code == 403){
-                    showAlert("error","you already have an active order",Alert.AlertType.ERROR);
+                } else if (code == 403) {
+                    showAlert("error", "you already have an active order", Alert.AlertType.ERROR);
                 }
             } catch (Exception e) {
                 e.printStackTrace();
@@ -415,7 +415,7 @@ public class PayOrderController {
                     if (existingCoupon.getType() == CouponType.fixed) {
                         currentRawPrice += coupon.getValue();
                     } else {
-                        currentRawPrice = (int)(currentRawPrice * 100.0 /(100.0 - coupon.getValue()));
+                        currentRawPrice = (int) (currentRawPrice * 100.0 / (100.0 - coupon.getValue()));
                     }
                 }
 
@@ -429,7 +429,7 @@ public class PayOrderController {
                 if (coupon.getType() == CouponType.fixed) {
                     order.setRawPrice(Math.max(order.getRawPrice() - coupon.getValue(), 0));
                 } else {
-                    order.setRawPrice((int)(order.getRawPrice() * ((100.0 - coupon.getValue()) / 100)));
+                    order.setRawPrice((int) (order.getRawPrice() * ((100.0 - coupon.getValue()) / 100)));
                 }
 
                 order.setCouponId(coupon.getId());
@@ -437,7 +437,16 @@ public class PayOrderController {
                 Platform.runLater(() ->
                         setOrder(order, restaurant, 1));
             } else {
-                showAlert("error", conn.getResponseMessage(), Alert.AlertType.ERROR);
+                String response = conn.getResponseMessage();
+                String errorMessage;
+                try {
+                    ObjectMapper mapper = new ObjectMapper();
+                    JsonNode root = mapper.readTree(response);
+                    errorMessage = root.path("error").asText("Unknown error");
+                } catch (Exception e) {
+                    errorMessage = "Invalid response format";
+                }
+                showAlert("error", errorMessage, Alert.AlertType.ERROR);
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -452,13 +461,13 @@ public class PayOrderController {
             HttpURLConnection conn = (HttpURLConnection) url.openConnection();
             conn.setRequestMethod("GET");
             conn.setRequestProperty("Authorization", "Bearer " + SessionManager.getAuthToken());
-            Coupon coupon =null;
-            if(conn.getResponseCode() == 200) {
+            Coupon coupon = null;
+            if (conn.getResponseCode() == 200) {
                 InputStream is = conn.getInputStream();
                 JsonNode root = mapper.readTree(is);
 
                 coupon = mapper.treeToValue(root, Coupon.class);
-            }else{
+            } else {
                 showAlert("error", "failed to load any coupons with that id" + conn.getResponseMessage(), Alert.AlertType.ERROR);
             }
             return coupon;
