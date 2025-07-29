@@ -152,6 +152,7 @@ public class PayOrderController {
         if (currentOrder.getCouponId() != 0) {
             Coupon existingCoupon = getCouponById(currentOrder.getCouponId());
             String code = existingCoupon.getCouponCode();
+
             try {
                 String temp = "http://localhost:8080/coupons?" +
                         "coupon_code=" + code;
@@ -167,35 +168,35 @@ public class PayOrderController {
                 if (resCode >= 200 && resCode < 300) {
                     ObjectMapper mapper = new ObjectMapper();
                     Coupon coupon = mapper.readValue(conn.getInputStream(), Coupon.class);
-                    Order order = SessionManager.getOrderList().get(restaurant.getId());
-                    int currentRawPrice = order.getRawPrice();
+                    int currentRawPrice = currentOrder.getRawPrice();
+                    if (existingCoupon.getType() == CouponType.fixed) {
+                        currentRawPrice += coupon.getValue();
+                    } else {
+                        currentRawPrice = (int)(currentRawPrice * 100.0 /(100.0 - coupon.getValue()));
+                    }
+
                     if (currentRawPrice < coupon.getMinPrice()) {
-                        if (existingCoupon.getType() == CouponType.fixed) {
-                            currentOrder.setRawPrice(currentRawPrice + coupon.getValue());
-                        } else {
-                            order.setRawPrice((int)(currentRawPrice * 100.0 /(100.0 - coupon.getValue())));
-                        }
-                        order.setCouponId(0);
-                        order.calculatePayPrice();
+                        currentOrder.setRawPrice(currentRawPrice);
+                        currentOrder.setCouponId(0);
+                        currentOrder.calculatePayPrice();
                         Platform.runLater(() ->
-                                setOrder(order, restaurant, 1));
+                                setOrder(currentOrder, restaurant, 1));
                         showAlert("error", "you have to at least buy " + coupon.getMinPrice() + " Toman to use this", Alert.AlertType.ERROR);
                         return;
                     }
                 } else {
                     ObjectMapper mapper = new ObjectMapper();
                     Coupon coupon = mapper.readValue(conn.getInputStream(), Coupon.class);
-                    Order order = SessionManager.getOrderList().get(restaurant.getId());
-                    int currentRawPrice = order.getRawPrice();
+                    int currentRawPrice = currentOrder.getRawPrice();
                     if (existingCoupon.getType() == CouponType.fixed) {
                         currentOrder.setRawPrice(currentRawPrice + coupon.getValue());
                     } else {
-                        order.setRawPrice((int)(currentRawPrice * 100.0 /(100.0 - coupon.getValue())));
+                        currentOrder.setRawPrice((int)(currentRawPrice * 100.0 /(100.0 - coupon.getValue())));
                     }
-                    order.setCouponId(0);
-                    order.calculatePayPrice();
+                    currentOrder.setCouponId(0);
+                    currentOrder.calculatePayPrice();
                     Platform.runLater(() ->
-                            setOrder(order, restaurant, 1));
+                            setOrder(currentOrder, restaurant, 1));
                     showAlert("error", conn.getResponseMessage(), Alert.AlertType.ERROR);
                     return;
                 }
@@ -389,7 +390,7 @@ public class PayOrderController {
 
     public void handleValidateCoupon(ActionEvent actionEvent) {
         String code = CouponCodeField.getText().trim();
-        if(code.isEmpty()) {
+        if (code.isEmpty()) {
             return;
         }
         try {
@@ -409,18 +410,21 @@ public class PayOrderController {
                 Coupon coupon = mapper.readValue(conn.getInputStream(), Coupon.class);
                 Order order = SessionManager.getOrderList().get(restaurant.getId());
                 int currentRawPrice = order.getRawPrice();
-                if (currentRawPrice < coupon.getMinPrice()) {
-                    showAlert("error", "you have to at least buy " + coupon.getMinPrice() + " Toman to use this", Alert.AlertType.ERROR);
-                }
-
                 if (order.getCouponId() != 0) {
                     Coupon existingCoupon = getCouponById(order.getCouponId());
                     if (existingCoupon.getType() == CouponType.fixed) {
-                        order.setRawPrice(currentRawPrice + coupon.getValue());
+                        currentRawPrice += coupon.getValue();
                     } else {
-                        order.setRawPrice((int)(currentRawPrice * 100.0 /(100.0 - coupon.getValue())));
+                        currentRawPrice = (int)(currentRawPrice * 100.0 /(100.0 - coupon.getValue()));
                     }
                 }
+
+                if (currentRawPrice < coupon.getMinPrice()) {
+                    showAlert("error", "you have to at least buy " + coupon.getMinPrice() + " Toman to use this", Alert.AlertType.ERROR);
+                    return;
+                }
+
+                order.setRawPrice(currentRawPrice);
 
                 if (coupon.getType() == CouponType.fixed) {
                     order.setRawPrice(Math.max(order.getRawPrice() - coupon.getValue(), 0));
