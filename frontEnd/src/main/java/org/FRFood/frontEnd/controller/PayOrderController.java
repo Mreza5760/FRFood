@@ -304,6 +304,8 @@ public class PayOrderController {
 
                 if (code >= 200 && code < 300) {
                     Platform.runLater(this::handleBack);
+                }else if(code == 403){
+                    showAlert("error","you already have an active order",Alert.AlertType.ERROR);
                 }
             } catch (Exception e) {
                 e.printStackTrace();
